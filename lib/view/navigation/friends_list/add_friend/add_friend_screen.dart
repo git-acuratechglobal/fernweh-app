@@ -9,6 +9,7 @@ import '../../../../utils/common/config.dart';
 import '../../../../utils/common/extensions.dart';
 import '../controller/friends_notifier.dart';
 import '../model/friends.dart';
+import '../model/friends_state.dart';
 
 class AddFriendScreen extends ConsumerStatefulWidget {
   const AddFriendScreen({super.key});
@@ -30,18 +31,18 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
     });
     ref.listenManual(friendsNotifierProvider, (previous, next) {
       switch (next) {
-        case AsyncData<String?> data when data.value != null:
-          setState(() {
-            friendId.add(data.value ?? "");
-            usesrId.map((e) => isLoading[e] = false).toList();
-          });
-          Common.showSnackBar(context, "Request sent successfully");
-
+        case AsyncData<FriendsState?> data when data.value != null:
+          if (data.value!.friendsEvent == FriendsEvent.requestSent) {
+            setState(() {
+              friendId.add(data.value!.response ?? "");
+              usesrId.map((e) => isLoading[e] = false).toList();
+            });
+            Common.showSnackBar(context, "Request sent successfully");
+          }
         case AsyncError error:
           setState(() {
             usesrId.map((e) => isLoading[e] = false).toList();
           });
-          Common.showSnackBar(context, error.error.toString());
       }
     });
     super.initState();

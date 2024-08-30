@@ -39,12 +39,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ref.read(userDetailProvider.notifier).update((state) => user);
           ref.invalidate(localStorageServiceProvider);
           context.navigateAndRemoveUntil(const NavigationScreen());
+          break;
         case SignUpVerified(:final user) when previous is Loading:
           context.navigateTo(VerificationScreen(user.email.toString()));
+          break;
         case OtpVerified(:final user) when previous is Loading:
           ref.read(userDetailProvider.notifier).update((state) => user);
           ref.invalidate(localStorageServiceProvider);
           context.navigateTo(CreateProfileScreen(user.email.toString()));
+          break;
         case UserUpdated(:final user) when previous is Loading:
           ref.read(userDetailProvider.notifier).update((state) => user);
           final locationService=ref.watch(locationServiceProvider);
@@ -58,6 +61,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 .clearGuestSession();
             context.navigateAndRemoveUntil(const NavigationScreen());
           }
+          break;
         case Error(:final error):
           Common.showSnackBar(context, error.toString());
         default:

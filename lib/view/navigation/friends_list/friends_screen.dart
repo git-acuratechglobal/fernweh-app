@@ -10,6 +10,7 @@ import '../../../utils/common/common.dart';
 import '../../../utils/common/config.dart';
 import 'add_friend/add_friend_screen.dart';
 import 'model/friends.dart';
+import 'model/friends_state.dart';
 
 class FriendsScreen extends ConsumerStatefulWidget {
   final bool isBack;
@@ -396,13 +397,16 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
   void initState() {
     ref.listenManual(friendsNotifierProvider, (previous, next) {
       switch (next) {
-        case AsyncData<String?> data when data.value != null:
-          setState(() {
-            userIds.remove(data.value);
-            acceptedRequests.add(data.value.toString());
-          });
-          Common.showSnackBar(context, "Request accept successfully");
-          userIds.clear();
+        case AsyncData<FriendsState?> data when data.value != null:
+           if(data.value !.friendsEvent==FriendsEvent.requestAccept){
+             setState(() {
+               acceptedRequests.add(data.value!.response.toString());
+               userIds.remove(data.value!.response);
+             });
+             Common.showSnackBar(context, "Request accept successfully");
+             userIds.clear();
+           }
+
         case AsyncError error:
           Common.showSnackBar(context, error.error.toString());
       }

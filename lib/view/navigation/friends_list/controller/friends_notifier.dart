@@ -2,6 +2,8 @@ import 'package:fernweh/services/api_service/api_service.dart';
 import 'package:fernweh/view/navigation/friends_list/model/friends.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../model/friends_state.dart';
+
 part 'friends_notifier.g.dart';
 
 @riverpod
@@ -25,7 +27,7 @@ FutureOr<List<Friends>> friendRequest(FriendRequestRef ref) async {
 @riverpod
 class FriendsNotifier extends _$FriendsNotifier {
   @override
-  FutureOr<String?> build() async {
+  FutureOr<FriendsState?> build() async {
     return null;
   }
 
@@ -34,7 +36,7 @@ class FriendsNotifier extends _$FriendsNotifier {
     state = await AsyncValue.guard(() async {
       final data = await ref.watch(apiServiceProvider).sendRequest(id, status);
       // ref.invalidate(addFriendsProvider);
-      return data;
+      return FriendsState(friendsEvent: FriendsEvent.requestSent,response: data);
     });
   }
 
@@ -43,18 +45,18 @@ class FriendsNotifier extends _$FriendsNotifier {
     state = await AsyncValue.guard(() async {
       final data = await ref.watch(apiServiceProvider).acceptRequest(userId,status);
        ref.invalidate(getFriendsProvider);
-      return data;
+      return FriendsState(friendsEvent: FriendsEvent.requestSent,response: data);
     });
   }
 
-  Future<void> rejectRequest() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      final data = await ref.watch(apiServiceProvider).rejectRequest();
-      // ref.invalidate(addFriendsProvider);
-      return data;
-    });
-  }
+  // Future<void> rejectRequest() async {
+  //   state = const AsyncLoading();
+  //   state = await AsyncValue.guard(() async {
+  //     final data = await ref.watch(apiServiceProvider).rejectRequest();
+  //     // ref.invalidate(addFriendsProvider);
+  //     return data;
+  //   });
+  // }
 }
 
 
@@ -74,3 +76,5 @@ class SearchFriend extends _$SearchFriend {
   }
 
 }
+
+

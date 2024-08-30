@@ -7,7 +7,7 @@ part of 'invite_friend_notifier.dart';
 // **************************************************************************
 
 String _$inviteFriendNotifierHash() =>
-    r'0f1743d34fe0e05dcac04b18c844b2bb977063d6';
+    r'81455ac2573f5787580f177d2779ee58c3f3dc49';
 
 /// See also [InviteFriendNotifier].
 @ProviderFor(InviteFriendNotifier)

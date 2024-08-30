@@ -49,12 +49,12 @@ final friendRequestProvider = AutoDisposeFutureProvider<List<Friends>>.internal(
 );
 
 typedef FriendRequestRef = AutoDisposeFutureProviderRef<List<Friends>>;
-String _$friendsNotifierHash() => r'010e9bdff922fe66e9511fa32da91a5ad041c5f8';
+String _$friendsNotifierHash() => r'ab25e604c8ab8f048b4f506f3b2b441065114fff';
 
 /// See also [FriendsNotifier].
 @ProviderFor(FriendsNotifier)
 final friendsNotifierProvider =
-    AutoDisposeAsyncNotifierProvider<FriendsNotifier, String?>.internal(
+    AutoDisposeAsyncNotifierProvider<FriendsNotifier, FriendsState?>.internal(
   FriendsNotifier.new,
   name: r'friendsNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -64,7 +64,7 @@ final friendsNotifierProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$FriendsNotifier = AutoDisposeAsyncNotifier<String?>;
+typedef _$FriendsNotifier = AutoDisposeAsyncNotifier<FriendsState?>;
 String _$searchFriendHash() => r'd5b0235ba7636b88776f0bb6a9bf1287e2a2a037';
 
 /// See also [SearchFriend].
