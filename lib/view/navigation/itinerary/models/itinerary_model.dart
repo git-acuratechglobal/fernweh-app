@@ -1,0 +1,114 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'itinerary_model.g.dart';
+
+@JsonSerializable(createToJson: false)
+class UserItinerary {
+  UserItinerary({
+    required this.userIteneries,
+    required this.sharedIteneries,
+  });
+
+  final List<Itenery>? userIteneries;
+  final List<Itenery>? sharedIteneries;
+
+  factory UserItinerary.fromJson(Map<String, dynamic> json) =>
+      _$UserItineraryFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class Itenery {
+  Itenery({
+    required this.itinerary,
+    required this.canView,
+    required this.canEdit,
+  });
+
+  final Itinerary? itinerary;
+  final List<Can>? canView;
+  final List<Can>? canEdit;
+
+  factory Itenery.fromJson(Map<String, dynamic> json) =>
+      _$IteneryFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class Can {
+  Can({
+    required this.id,
+    required this.name,
+    required this.image,
+  });
+
+  final int? id;
+  final String? name;
+  final String? image;
+
+  factory Can.fromJson(Map<String, dynamic> json) => _$CanFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class Itinerary {
+  Itinerary({
+    required this.id,
+    required this.userId,
+    required this.name,
+    required this.type,
+    required this.image,
+    required this.canView,
+    required this.canEdit,
+    required this.isDeleted,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.haveAccess,
+  });
+
+  final int? id;
+
+  @JsonKey(name: 'user_id')
+  final int? userId;
+  final String? name;
+  final String? type;
+  final String? image;
+
+  @JsonKey(name: 'can_view')
+  final String? canView;
+
+  @JsonKey(name: 'can_edit')
+  final String? canEdit;
+
+  @JsonKey(name: 'is_deleted')
+  final int? isDeleted;
+
+  @JsonKey(name: 'created_at')
+  final DateTime? createdAt;
+
+  @JsonKey(name: 'updated_at')
+  final DateTime? updatedAt;
+
+  @JsonKey(name: 'have_access')
+  final String? haveAccess;
+
+  factory Itinerary.fromJson(Map<String, dynamic> json) =>
+      _$ItineraryFromJson(json);
+
+  List get dummyList {
+    return List.generate(8, (index) {
+      return Itenery(
+          itinerary: Itinerary(
+              id: null,
+              userId: null,
+              name: 'dummy name',
+              type: '',
+              image: "assets/images/attractions.png",
+              canView: '',
+              canEdit: '',
+              isDeleted: null,
+              createdAt: null,
+              updatedAt: null,
+              haveAccess: ''),
+          canView: [],
+          canEdit: []);
+    });
+  }
+}

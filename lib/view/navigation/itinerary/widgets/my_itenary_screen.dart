@@ -1,0 +1,523 @@
+import 'dart:io';
+
+import 'package:fernweh/utils/common/action_button.dart';
+import 'package:fernweh/utils/common/app_mixin.dart';
+import 'package:fernweh/utils/common/app_validation.dart';
+import 'package:fernweh/utils/common/extensions.dart';
+import 'package:fernweh/utils/widgets/async_widget.dart';
+import 'package:fernweh/utils/widgets/image_widget.dart';
+import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
+import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/add_notes/add_notes_sheet.dart';
+import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/shared_list.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+import '../../../../utils/common/app_button.dart';
+import '../../../../utils/common/common.dart';
+import '../../../../utils/common/config.dart';
+import '../../../auth/signup/profile_setup/create_profile_screen.dart';
+import '../models/itinerary_model.dart';
+import '../models/states/itinerary_state.dart';
+import 'my_curated_list/curated_list_item_view/itenary_details_screen.dart';
+import 'my_curated_list/my_curated_list.dart';
+
+class MyItenaryScreen extends ConsumerStatefulWidget {
+  const MyItenaryScreen({super.key});
+
+  @override
+  ConsumerState<MyItenaryScreen> createState() => _MyItenaryScreenState();
+}
+
+class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
+    with SingleTickerProviderStateMixin {
+  bool isEditing = false;
+  late TabController tabController;
+  int tabIndex = 0;
+  bool mapView = false;
+
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(length: 2, vsync: this);
+    tabController.addListener(() {
+      setState(() {
+        tabIndex = tabController.index;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: tabIndex == 0
+          ? null
+          : ActionButton(
+              value: mapView,
+              onPressed: () {
+                setState(() {
+                  mapView = !mapView;
+                });
+              }),
+      body: Container(
+        constraints: const BoxConstraints.expand(),
+        decoration: BoxDecoration(gradient: Config.backgroundGradient),
+        child: Column(
+          children: [
+            AppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.transparent,
+              centerTitle: true,
+              title: Text(
+                "My Itenerary",
+                style: TextStyle(
+                  fontVariations: FVariations.w700,
+                  color: const Color(0xFF1A1B28),
+                  fontSize: 20,
+                ),
+              ),
+              actions: [
+                if (isEditing && tabIndex == 0)
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        isEditing = false;
+                      });
+                    },
+                    child: Text(
+                      "Done",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary,
+                        fontSize: 16,
+                        fontVariations: FVariations.w700,
+                      ),
+                    ),
+                  ),
+                // if (!isEditing && tabIndex == 0) const ShareIcon(),
+                if (!isEditing && tabIndex == 0)
+                  IconButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.white,
+                          isScrollControlled: true,
+                          constraints: BoxConstraints.tightFor(
+                            height: MediaQuery.sizeOf(context).height * 0.9,
+                          ),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(20)),
+                          ),
+                          builder: (context) {
+                            return const CreateItinerary();
+                          },
+                        );
+
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) => const CreateItinerary()));
+                      },
+                      icon: const Icon(Icons.add)),
+                if (tabIndex == 0)
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        isEditing = true;
+                      });
+                    },
+                    icon: Image.asset('assets/images/edit.png'),
+                  ),
+                if (tabIndex == 1)
+                  TextButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        backgroundColor: Colors.white,
+                        isScrollControlled: true,
+                        constraints: BoxConstraints.tightFor(
+                          height: MediaQuery.sizeOf(context).height * 0.85,
+                        ),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(20)),
+                        ),
+                        builder: (context) {
+                          return const AddNotesSheet();
+                        },
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'assets/images/note.png',
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                        const SizedBox(width: 4.0),
+                        Text(
+                          "Notes",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary,
+                            fontSize: 16,
+                            fontVariations: FVariations.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+            TabBar(
+              controller: tabController,
+              labelColor: Theme.of(context).colorScheme.secondary,
+              indicatorColor: Theme.of(context).colorScheme.secondary,
+              indicatorPadding: const EdgeInsets.symmetric(horizontal: 40),
+              dividerColor: const Color(0xffE2E2E2),
+              indicatorSize: TabBarIndicatorSize.tab,
+              unselectedLabelStyle: TextStyle(
+                fontFamily: "Plus Jakarta Sans",
+                fontSize: 15,
+                fontVariations: FVariations.w500,
+              ),
+              labelStyle: TextStyle(
+                fontFamily: "Plus Jakarta Sans",
+                fontSize: 15,
+                fontVariations: FVariations.w700,
+              ),
+              tabs: const [
+                Tab(child: Text("My Curated List")),
+                Tab(child: Text("Shared List")),
+              ],
+            ),
+            Expanded(
+              child: TabBarView(
+                controller: tabController,
+                children: [
+                  AsyncDataWidgetB(
+                    dataProvider: getUserItineraryProvider,
+                    dataBuilder: (context, userItinerary) {
+                      return userItinerary.userIteneries!.isEmpty
+                          ? const Center(child: Text("No Itinerary found"))
+                          : GridView.builder(
+                            padding: const EdgeInsets.all(24),
+                            itemCount: userItinerary.userIteneries!.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 25,
+                              mainAxisSpacing: 25,
+                              childAspectRatio: 0.85,
+                            ),
+                            itemBuilder: (context, index) {
+                              final itinary = userItinerary
+                                  .userIteneries![index].itinerary;
+                              return InkWell(
+                                onTap: () {
+                                  switch (isEditing) {
+                                    case true:
+                                      null;
+                          
+                                    case false:
+                                      ref
+                                          .read(
+                                              itineraryPlacesNotifierProvider
+                                                  .notifier)
+                                          .getItineraryPlaces(
+                                              itinary.id ?? 0);
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ItenaryDetailsScreen(
+                                            title: itinary.name ?? "",
+                                            itineraryId: itinary.id ?? 0,
+                                          ),
+                                        ),
+                                      );
+                                    default:
+                                  }
+                                },
+                                child: MyCuratedListTab(
+                                  itinary: itinary!,
+                                  isEditing: isEditing,
+                                  isSelected: false,
+                                ),
+                              );
+                            },
+                          );
+                    },
+                    errorBuilder: (error, stack) => Center(
+                      child: Text(error.toString()),
+                    ),
+                    loadingBuilder: Skeletonizer(
+                      enableSwitchAnimation: true,
+                      child: GridView.builder(
+                        padding: const EdgeInsets.all(24),
+                        itemCount: 6,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 25,
+                          mainAxisSpacing: 25,
+                          childAspectRatio: 0.8,
+                        ),
+                        itemBuilder: (context, index) {
+                          return Column(
+                            children: [
+                              AspectRatio(
+                                aspectRatio: 1.0,
+                                child: Container(
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border.all(
+                                      width: 1,
+                                      color: const Color(0xffE2E2E2),
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.asset(
+                                        "assets/images/3x/amusement.png",
+                                        fit: BoxFit.cover,
+                                      )),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              const Text("dummy name")
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  SharedListTab(isMapView: mapView)
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AvatarList extends StatelessWidget {
+  final List<Can>? images;
+  final double? size;
+  final double? width;
+
+  const AvatarList({super.key, required this.images, this.size, this.width});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      shrinkWrap: true,
+      padding: EdgeInsets.zero,
+      physics: const NeverScrollableScrollPhysics(),
+      scrollDirection: Axis.horizontal,
+      itemCount: images!.length,
+      itemBuilder: (BuildContext context, int index) {
+        final avtar = images![index];
+        return Align(
+          widthFactor: 0.75,
+          child: Container(
+            constraints: BoxConstraints.tight(
+              Size.fromRadius(size ?? 17),
+            ),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(width: width ?? 2.5, color: Colors.white),
+            ),
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: ImageWidget(
+                    url: "http://fernweh.acublock.in/public/${avtar.image}")),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class CreateItinerary extends ConsumerStatefulWidget {
+  const CreateItinerary({super.key});
+
+  @override
+  ConsumerState createState() => _CreateItineraryState();
+}
+
+class _CreateItineraryState extends ConsumerState<CreateItinerary>
+    with FormUtilsMixin {
+  XFile? file;
+  int? type = 0;
+  List<(String? name, int? type)> typeList = [
+    ("Private", 0),
+    ("Public", 1),
+  ];
+
+  @override
+  void initState() {
+    ref.listenManual(userItineraryNotifierProvider, (previous, next) {
+      switch (next) {
+        case UserItineraryCreated() when previous is UserItineraryLoading:
+          Navigator.pop(context);
+          Common.showSnackBar(context, "UserItinerary created successfully");
+        case UserItineraryError(:final error):
+          Common.showSnackBar(context, error.toString());
+        default:
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final validation = ref.watch(validatorsProvider);
+    final state = ref.watch(userItineraryNotifierProvider);
+    return Form(
+      key: fkey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.clear),
+                ),
+                Text(
+                  'Add to My Itinerary',
+                  style: TextStyle(
+                    color: const Color(0xFF1A1B28),
+                    fontSize: 20,
+                    fontVariations: FVariations.w700,
+                  ),
+                ),
+                const SizedBox.square(dimension: 40)
+              ],
+            ),
+          ),
+          const Divider(height: 0),
+          Padding(
+            padding: const EdgeInsets.only(top: 16, left: 24, right: 24),
+            child: Text(
+              "Create a new itinerary",
+              style: TextStyle(
+                fontVariations: FVariations.w700,
+              ),
+            ),
+          ),
+          Padding(
+            padding:
+                const EdgeInsets.only(top: 12, left: 24, bottom: 8, right: 24),
+            child: TextFormField(
+              // controller: itineraryController,
+              decoration: const InputDecoration(
+                hintText: "Enter name",
+              ),
+              onSaved: (val) {
+                ref
+                    .read(userItineraryNotifierProvider.notifier)
+                    .updateForm('name', val);
+              },
+              validator: (val) => validation.itineraryName(val),
+            ),
+          ),
+          Padding(
+            padding:
+                const EdgeInsets.only(top: 5, left: 24, right: 24, bottom: 10),
+            child: Text(
+              "Upload Photo",
+              style: TextStyle(
+                fontVariations: FVariations.w700,
+              ),
+            ),
+          ),
+          Padding(
+            padding:
+                const EdgeInsets.only(top: 5, left: 24, right: 24, bottom: 10),
+            child: GestureDetector(
+              onTap: () async {
+                final pickedImage = await showDialog(
+                  context: context,
+                  builder: (context) {
+                    return const ImagePickerOptions();
+                  },
+                );
+                if (pickedImage != null) {
+                  setState(() {
+                    file = pickedImage;
+                  });
+                  ref
+                      .read(userItineraryNotifierProvider.notifier)
+                      .updateForm('image', pickedImage);
+                }
+              },
+              child: Container(
+                  height: 100,
+                  width: 100,
+                  decoration:
+                      BoxDecoration(border: Border.all(color: Colors.black12)),
+                  child: switch (file) {
+                    XFile image => Image.file(
+                        File(image.path),
+                        fit: BoxFit.cover,
+                      ),
+                    null => const Icon(Icons.add),
+                  }),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Row(
+              children: [
+                Image.asset('assets/images/global.png'),
+                const SizedBox(width: 12.0),
+                DropdownButton(
+                  value: type,
+                  underline: const SizedBox.shrink(),
+                  items: typeList.map((e) {
+                    return DropdownMenuItem(
+                      value: e.$2,
+                      child: Text(e.$1.toString()),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      type = value!;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: AppButton(
+                isLoading: state is UserItineraryLoading,
+                onTap: () {
+                  if (validateAndSave()) {
+                    ref
+                        .read(userItineraryNotifierProvider.notifier)
+                        .updateForm('type', type);
+                    ref
+                        .read(userItineraryNotifierProvider.notifier)
+                        .createItinerary();
+                  }
+                },
+                child: const Text("Create Itinerary")),
+          ),
+        ],
+      ),
+    );
+  }
+}
