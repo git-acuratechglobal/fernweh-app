@@ -12,8 +12,8 @@ class UserItinerary {
   final List<Itenery>? userIteneries;
   final List<Itenery>? sharedIteneries;
 
-  factory UserItinerary.fromJson(Map<String, dynamic> json) =>
-      _$UserItineraryFromJson(json);
+  factory UserItinerary.fromJson(Map<String, dynamic> json) => _$UserItineraryFromJson(json);
+
 }
 
 @JsonSerializable(createToJson: false)
@@ -22,14 +22,16 @@ class Itenery {
     required this.itinerary,
     required this.canView,
     required this.canEdit,
+    required this.placesCount,
   });
 
   final Itinerary? itinerary;
   final List<Can>? canView;
   final List<Can>? canEdit;
+  final int? placesCount;
 
-  factory Itenery.fromJson(Map<String, dynamic> json) =>
-      _$IteneryFromJson(json);
+  factory Itenery.fromJson(Map<String, dynamic> json) => _$IteneryFromJson(json);
+
 }
 
 @JsonSerializable(createToJson: false)
@@ -45,6 +47,7 @@ class Can {
   final String? image;
 
   factory Can.fromJson(Map<String, dynamic> json) => _$CanFromJson(json);
+
 }
 
 @JsonSerializable(createToJson: false)
@@ -61,6 +64,7 @@ class Itinerary {
     required this.createdAt,
     required this.updatedAt,
     required this.haveAccess,
+    required this.shareUrl,
   });
 
   final int? id;
@@ -88,27 +92,27 @@ class Itinerary {
 
   @JsonKey(name: 'have_access')
   final String? haveAccess;
+  final String? shareUrl;
 
-  factory Itinerary.fromJson(Map<String, dynamic> json) =>
-      _$ItineraryFromJson(json);
+  factory Itinerary.fromJson(Map<String, dynamic> json) => _$ItineraryFromJson(json);
 
-  List get dummyList {
-    return List.generate(8, (index) {
-      return Itenery(
-          itinerary: Itinerary(
-              id: null,
-              userId: null,
-              name: 'dummy name',
-              type: '',
-              image: "assets/images/attractions.png",
-              canView: '',
-              canEdit: '',
-              isDeleted: null,
-              createdAt: null,
-              updatedAt: null,
-              haveAccess: ''),
-          canView: [],
-          canEdit: []);
-    });
-  }
 }
+
+
+List<Itinerary> get userItinerarydummyList {
+  return List.generate(8, (index) {
+    return Itinerary(
+        id: null,
+        userId: null,
+        name: 'dummy name',
+        type: '',
+        image: "assets/images/attractions.png",
+        canView: '',
+        canEdit: '',
+        isDeleted: null,
+        createdAt: null,
+        updatedAt: null,
+        haveAccess: '', shareUrl: '');
+  });
+}
+

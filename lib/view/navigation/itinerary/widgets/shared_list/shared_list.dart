@@ -1,17 +1,15 @@
-import 'dart:io';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/shared_list_details/shared_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import '../../../../../utils/common/config.dart';
 import '../../../../../utils/common/extensions.dart';
 import '../../models/itinerary_model.dart';
+import '../my_curated_list/edit_itenerary/edit_itenerary.dart';
 import '../my_itenary_screen.dart';
+import 'add_notes/add_notes_sheet.dart';
 
 class SharedListTab extends ConsumerWidget {
   final bool isMapView;
@@ -20,108 +18,62 @@ class SharedListTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (isMapView) {
-      return LayoutBuilder(builder: (context, snapshot) {
-        return Stack(
-          fit: StackFit.expand,
-          children: [
-            const GoogleMap(
-              initialCameraPosition: CameraPosition(
-                zoom: 14.4746,
-                target: LatLng(30.7333, 76.7794),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 100),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: AspectRatio(
-                    aspectRatio: 2.8,
-                    child: AsyncDataWidgetB(
-                        dataProvider: getUserItineraryProvider,
-                        dataBuilder: (context, sharedItinerary) {
-                          return ListView.separated(
-                            shrinkWrap: true,
-                            itemCount:
-                                sharedItinerary.sharedIteneries!.length,
-                            scrollDirection: Axis.horizontal,
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 24),
-                            itemBuilder: (context, index) {
-                              final itinerary =
-                                  sharedItinerary.sharedIteneries![index];
-                              return SharedItem(
-                                itinerary: itinerary,
-                                width: MediaQuery.sizeOf(context).width - 50,
-                              );
-                            },
-                            separatorBuilder:
-                                (BuildContext context, int index) {
-                              return const SizedBox(width: 24.0);
-                            },
-                          );
+    return RefreshIndicator(
+      color: const Color(0xffCF5253),
+      edgeOffset: 10,
+      onRefresh: () async {
+        ref.invalidate(getUserItineraryProvider);
+      },
+      child: AsyncDataWidgetB(
+          dataProvider: getUserItineraryProvider,
+          dataBuilder: (context, sharedItinerary) {
+            return sharedItinerary.sharedIteneries!.isEmpty
+                ? Center(
+                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("No shared Itineraries found"),
+                      const SizedBox(height: 10,),
+                      OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          minimumSize: const Size(60, 40),
+                        ),
+                        onPressed: () {
+                          ref.invalidate(getUserItineraryProvider);
                         },
-                        loadingBuilder: Skeletonizer(
-                            child: ListView.separated(
-                          itemCount: 6,
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          itemBuilder: (context, index) {
-                            return SharedItem(
-                              itinerary: Itenery(
-                                  itinerary: Itinerary(
-                                      id: null,
-                                      userId: null,
-                                      name: 'dummy name',
-                                      type: '',
-                                      image: 'assets/images/attractions.png',
-                                      canView: '',
-                                      canEdit: '',
-                                      isDeleted: null,
-                                      createdAt: null,
-                                      updatedAt: null,
-                                      haveAccess: ''),
-                                  canView: [],
-                                  canEdit: []),
-                              width: MediaQuery.sizeOf(context).width - 50,
-                            );
-                          },
-                          separatorBuilder: (BuildContext context, int index) {
-                            return const SizedBox(width: 24.0);
-                          },
-                        )),
-                        errorBuilder: (error, st) => Center(
-                              child: Text(error.toString()),
-                            ))),
-              ),
-            )
-          ],
-        );
-      });
-    }
-    return AsyncDataWidgetB(
-        dataProvider: getUserItineraryProvider,
-        dataBuilder: (context, sharedItinerary) {
-          return sharedItinerary.sharedIteneries!.isEmpty
-              ? const Text("No shared Itineraries")
-              : ListView.separated(
-                padding: const EdgeInsets.all(24),
-                itemCount: sharedItinerary.sharedIteneries!.length,
-                itemBuilder: (context, index) {
-                  final itinary = sharedItinerary.sharedIteneries![index];
-                  return SharedItem(itinerary: itinary);
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return const SizedBox(height: 16);
-                },
-              );
-        },
-        loadingBuilder: Skeletonizer(
-            child: ListView.separated(
-          padding: const EdgeInsets.all(24),
-          itemCount: 6,
-          itemBuilder: (context, index) {
-            return SharedItem(
+                        child: const Text(
+                          "Refresh",
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ),
+
+                    ],
+                  ),
+                )
+                : ListView.separated(
+                    padding: const EdgeInsets.all(24),
+                    itemCount: sharedItinerary.sharedIteneries!.length,
+                    itemBuilder: (context, index) {
+                      final itinary = sharedItinerary.sharedIteneries![index];
+                      return SharedItem(
+                        itinerary: itinary,
+                        placesCount:
+                            sharedItinerary.sharedIteneries?[index].placesCount ??
+                                0,
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return const SizedBox(height: 16);
+                    },
+                  );
+          },
+          loadingBuilder: Skeletonizer(
+              child: ListView.separated(
+            padding: const EdgeInsets.all(24),
+            itemCount: 6,
+            itemBuilder: (context, index) {
+              return SharedItem(
                 itinerary: Itenery(
                     itinerary: Itinerary(
                         id: null,
@@ -134,17 +86,22 @@ class SharedListTab extends ConsumerWidget {
                         isDeleted: null,
                         createdAt: null,
                         updatedAt: null,
-                        haveAccess: ''),
+                        haveAccess: '',
+                        shareUrl: ''),
                     canView: [],
-                    canEdit: []));
-          },
-          separatorBuilder: (BuildContext context, int index) {
-            return const SizedBox(height: 16);
-          },
-        )),
-        errorBuilder: (error, st) => Center(
-              child: Text(error.toString()),
-            ));
+                    canEdit: [],
+                    placesCount: null),
+                placesCount: 0,
+              );
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return const SizedBox(height: 16);
+            },
+          )),
+          errorBuilder: (error, st) => Center(
+                child: Text(error.toString()),
+              )),
+    );
   }
 }
 
@@ -154,10 +111,12 @@ class SharedItem extends ConsumerStatefulWidget {
   const SharedItem({
     super.key,
     required this.itinerary,
+    required this.placesCount,
     this.width,
   });
 
   final Itenery itinerary;
+  final int placesCount;
 
   @override
   ConsumerState<SharedItem> createState() => _SharedItemState();
@@ -218,6 +177,16 @@ class _SharedItemState extends ConsumerState<SharedItem> {
                       ),
                     ),
                   ),
+                  Text(
+                    "${widget.placesCount} locations",
+                    style: const TextStyle(
+                        color: Color(0xFF505050),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   const Text(
                     'Shared with',
                     style: TextStyle(
@@ -235,7 +204,65 @@ class _SharedItemState extends ConsumerState<SharedItem> {
                 ],
               ),
             ),
-            const ShareIcon("")
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (widget.itinerary.canEdit!.isNotEmpty)
+                  GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.white,
+                          isScrollControlled: true,
+                          constraints: BoxConstraints.tightFor(
+                            height: MediaQuery.sizeOf(context).height * 0.70,
+                          ),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(20)),
+                          ),
+                          builder: (context) {
+                            return EditItenerary(
+                              iteneraryPhoto:
+                                  "http://fernweh.acublock.in/public/${widget.itinerary.itinerary?.image}",
+                              iteneraryName:
+                                  widget.itinerary.itinerary?.name ?? "",
+                              id: widget.itinerary.itinerary?.id,
+                              type: int.parse(widget.itinerary.itinerary?.type??""),
+                            );
+                          },
+                        );
+                      },
+                      child: Image.asset('assets/images/edit.png')),
+                if (widget.itinerary.canEdit!.isNotEmpty)
+                  const SizedBox(
+                    height: 10,
+                  ),
+                GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      backgroundColor: Colors.white,
+                      isScrollControlled: true,
+                      constraints: BoxConstraints.tightFor(
+                        height: MediaQuery.sizeOf(context).height * 0.85,
+                      ),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (context) {
+                        return  AddNotesSheet(itineraryId: widget.itinerary.itinerary!.id??0,);
+                      },
+                    );
+                  },
+                  child: Image.asset(
+                    'assets/images/note.png',
+                  ),
+                ),
+                ShareIcon(widget.itinerary.itinerary?.id.toString())
+              ],
+            )
           ],
         ),
       ),

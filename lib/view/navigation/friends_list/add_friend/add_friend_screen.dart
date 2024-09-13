@@ -26,9 +26,6 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _textFieldFocusNode.requestFocus();
-    });
     ref.listenManual(friendsNotifierProvider, (previous, next) {
       switch (next) {
         case AsyncData<FriendsState?> data when data.value != null:
@@ -83,12 +80,21 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
                         ),
                         borderSide: const BorderSide(
                             color: Color(0xffCF5253), width: 2)),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(
+                          20,
+                        ),
+                        borderSide: const BorderSide(
+                            color: Colors.grey, width: 2)),
                     suffixIcon: const Icon(Icons.search)),
                 onFieldSubmitted: (val) {
                   ref.read(searchFriendProvider.notifier).searchFriends(val);
                 },
                 onChanged: (val) {
                   ref.read(searchFriendProvider.notifier).searchFriends(val);
+                },
+                onTapOutside: (val){
+                  _textFieldFocusNode.unfocus();
                 },
               ),
             ),

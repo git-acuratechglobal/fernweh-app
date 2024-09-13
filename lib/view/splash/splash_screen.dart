@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/local_storage_service/local_storage_service.dart';
 import '../../utils/common/config.dart';
+import '../location_permission/location_service.dart';
 import '../onboarding/onboarding_screen.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -16,10 +17,10 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
-
   @override
   void initState() {
     super.initState();
+    ref.read(currentPositionProvider);
     Future.delayed(const Duration(seconds: 3), () {
       final onBoarding = ref.read(localStorageServiceProvider).getOnboarding();
       final user = ref.read(localStorageServiceProvider).getUser();
@@ -41,13 +42,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             MaterialPageRoute(builder: (context) => const LoginScreen()));
         return;
       }
-
       ref.read(userDetailProvider.notifier).update((state) => user);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const NavigationScreen()),
       );
     });
-
   }
 
   @override

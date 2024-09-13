@@ -3,6 +3,8 @@ import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/state/shared_itinerary_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../notifier/itinerary_notifier.dart';
+
 part 'shareItinerary_notifier.g.dart';
 
 @riverpod
@@ -18,6 +20,7 @@ class SharedItinerary extends _$SharedItinerary {
       final message = await ref
           .watch(apiServiceProvider)
           .shareItinerary(_formData, _formData["itineraryId"]);
+      ref.invalidate(getUserItineraryProvider);
       return SharedItineraryState(
           authEvent: SharedItineraryEvent.shared, message: message);
     });

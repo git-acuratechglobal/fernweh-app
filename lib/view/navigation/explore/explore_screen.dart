@@ -12,6 +12,8 @@ import 'package:skeletonizer/skeletonizer.dart';
 import '../../../utils/widgets/async_widget.dart';
 import '../map/model/category.dart';
 import '../map/restaurant_detail/restaurant_detail_screen.dart';
+import '../map/state/map_view_state.dart';
+import 'filter_sheet/filter_sheet.dart';
 import 'friend_list/friend_list.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
@@ -34,6 +36,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   @override
   Widget build(BuildContext context) {
     final filters = ref.watch(filtersProvider);
+    final mapViewState = ref.watch(mapViewStateProvider);
+    final mapState = ref.read(mapViewStateProvider.notifier);
     return Scaffold(
       body: RefreshIndicator(
         color: const Color(0xffCF5253),
@@ -129,16 +133,48 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                         ),
                       ),
                       Image.asset('assets/images/notification.png'),
+                      // Container(
+                      //   width: 70,
+                      //   decoration: BoxDecoration(boxShadow: [
+                      //     BoxShadow(
+                      //       color: Colors.black.withOpacity(0.1),
+                      //       spreadRadius: 5,
+                      //       blurRadius: 20,
+                      //       offset: const Offset(0, 2),
+                      //     ),
+                      //   ]),
+                      //   child:
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.white,
+                              isScrollControlled: true,
+                              constraints: BoxConstraints.tightFor(
+                                height:
+                                    MediaQuery.sizeOf(context).height * 0.88,
+                              ),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20)),
+                              ),
+                              builder: (context) {
+                                return FilterSheet(
+                                  refresh: (String val) {
+                                    setState(() {});
+                                  },
+                                );
+                              },
+                            );
+                          },
+                          child: Image.asset('assets/images/filter.png')),
+
+                      // ),
                     ]),
                   ),
-                ),
-                const SizedBox(height: 16),
-
-                //****search and filter widget****
-                SearchAndFilterWidget(
-                  refresh: (String val) {
-                    setState(() {});
-                  },
                 ),
                 const SizedBox(height: 26),
                 Padding(
@@ -167,10 +203,12 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       final category = Config.dashboardCategories[index];
                       return InkWell(
                         onTap: () {
-                          if (category.title == filters['selected_category']) {
-                            setState(() {
-                              selectedIndex = -1;
-                            });
+                          if (category.title == mapViewState.selectedCategory) {
+                            mapState.update((_) => MapViewState(
+                                  categoryView: true,
+                                  itineraryView: false,
+                                  selectedCategory: "",
+                                ));
                             filterData = {
                               'type': null,
                               'rating': filters['rating'],
@@ -188,7 +226,11 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                 .updateFilter(filterData);
                             return;
                           } else {
-                            selectedIndex = index;
+                            mapState.update((_) => MapViewState(
+                                  categoryView: true,
+                                  itineraryView: false,
+                                  selectedCategory: category.title,
+                                ));
                             filterData = {
                               'type': category.type,
                               'rating': filters['rating'],
@@ -209,7 +251,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                         child: CategoryItem(
                           category: category,
                           isSelected:
-                              category.title == filters['selected_category'],
+                              category.title == mapViewState.selectedCategory,
                         ),
                       );
                     },
@@ -606,5 +648,3 @@ String formatCategory(String categories) {
 
   return firstName;
 }
-
-

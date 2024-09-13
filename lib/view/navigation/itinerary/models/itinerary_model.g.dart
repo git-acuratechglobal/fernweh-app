@@ -26,6 +26,7 @@ Itenery _$IteneryFromJson(Map<String, dynamic> json) => Itenery(
       canEdit: (json['canEdit'] as List<dynamic>?)
           ?.map((e) => Can.fromJson(e as Map<String, dynamic>))
           .toList(),
+      placesCount: (json['placesCount'] as num?)?.toInt(),
     );
 
 Can _$CanFromJson(Map<String, dynamic> json) => Can(
@@ -50,4 +51,5 @@ Itinerary _$ItineraryFromJson(Map<String, dynamic> json) => Itinerary(
           ? null
           : DateTime.parse(json['updated_at'] as String),
       haveAccess: json['have_access'] as String?,
+      shareUrl: json['shareUrl'] as String?,
     );

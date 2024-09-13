@@ -6,34 +6,6 @@ part of 'friends_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$addFriendsHash() => r'aaf02a0d89474916675d7e9e3c6810a49762e2bc';
-
-/// See also [addFriends].
-@ProviderFor(addFriends)
-final addFriendsProvider = AutoDisposeFutureProvider<List<Friends>>.internal(
-  addFriends,
-  name: r'addFriendsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$addFriendsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef AddFriendsRef = AutoDisposeFutureProviderRef<List<Friends>>;
-String _$getFriendsHash() => r'0615adb8bfc372cd38bb2868c44f1dd9bd87e5c2';
-
-/// See also [getFriends].
-@ProviderFor(getFriends)
-final getFriendsProvider = FutureProvider<List<Friends>>.internal(
-  getFriends,
-  name: r'getFriendsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$getFriendsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef GetFriendsRef = FutureProviderRef<List<Friends>>;
 String _$friendRequestHash() => r'0fd5c1ce4889d0ab44fd8edfe89bd2a6ec42c012';
 
 /// See also [friendRequest].
@@ -49,7 +21,7 @@ final friendRequestProvider = AutoDisposeFutureProvider<List<Friends>>.internal(
 );
 
 typedef FriendRequestRef = AutoDisposeFutureProviderRef<List<Friends>>;
-String _$friendsNotifierHash() => r'ab25e604c8ab8f048b4f506f3b2b441065114fff';
+String _$friendsNotifierHash() => r'744b5e36882805cf8719c270906c7f5c3e247fde';
 
 /// See also [FriendsNotifier].
 @ProviderFor(FriendsNotifier)
@@ -65,7 +37,7 @@ final friendsNotifierProvider =
 );
 
 typedef _$FriendsNotifier = AutoDisposeAsyncNotifier<FriendsState?>;
-String _$searchFriendHash() => r'd5b0235ba7636b88776f0bb6a9bf1287e2a2a037';
+String _$searchFriendHash() => r'990f2330e4363bef4ec0891c2a4c8801225d11da';
 
 /// See also [SearchFriend].
 @ProviderFor(SearchFriend)
@@ -80,5 +52,20 @@ final searchFriendProvider =
 );
 
 typedef _$SearchFriend = AutoDisposeAsyncNotifier<List<Friends>?>;
+String _$friendListHash() => r'd1a9287937dfa433b6780e06d6572c9fd70a5bae';
+
+/// See also [FriendList].
+@ProviderFor(FriendList)
+final friendListProvider =
+    AsyncNotifierProvider<FriendList, PaginationResponse<Friends>>.internal(
+  FriendList.new,
+  name: r'friendListProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$friendListHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$FriendList = AsyncNotifier<PaginationResponse<Friends>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

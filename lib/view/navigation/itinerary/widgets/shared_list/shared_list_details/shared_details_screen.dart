@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../../../utils/common/action_button.dart';
 import '../../../../../../utils/widgets/loading_widget.dart';
+import '../../../../../location_permission/location_service.dart';
 import '../../../../friends_list/friends_screen.dart';
 import '../../../../map/notifier/category_notifier.dart';
 import '../../../models/itinerary_model.dart';
@@ -30,28 +31,34 @@ class SharedDetailsScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<SharedDetailsScreen> createState() => _SharedDetailsScreenState();
+  ConsumerState<SharedDetailsScreen> createState() =>
+      _SharedDetailsScreenState();
 }
 
 class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
   bool _isMapView = true;
   List<Marker> markers = <Marker>[];
   final CustomInfoWindowController _customInfoWindowController =
-  CustomInfoWindowController();
+      CustomInfoWindowController();
   late GoogleMapController mapController;
-  bool _isHide=false;
+  bool _isHide = false;
+
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_){
-      ref.read(itineraryPlacesNotifierProvider.notifier).getItineraryPlaces( widget.itinerary.itinerary!.id??0);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(itineraryPlacesNotifierProvider.notifier)
+          .getItineraryPlaces(widget.itinerary.itinerary!.id ?? 0);
     });
 
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     final icon =
-    ref.watch(bitmapIconProvider(MediaQuery.devicePixelRatioOf(context)));
+        ref.watch(bitmapIconProvider(MediaQuery.devicePixelRatioOf(context)));
+    final userCurrentPosition = ref.watch(currentPositionProvider);
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: ActionButton(
@@ -95,7 +102,7 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                             BorderRadius.vertical(top: Radius.circular(20)),
                       ),
                       builder: (context) {
-                        return const AddNotesSheet();
+                        return  AddNotesSheet(itineraryId: widget.itinerary.itinerary!.id??0,);
                       },
                     );
                   },
@@ -111,156 +118,209 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                 ? Expanded(
                     child: Stack(
                       children: [
-                      Visibility.maintain(
-                      visible: _isMapView,
-                      child: AsyncDataWidgetB(
-                          dataProvider: itineraryPlacesNotifierProvider,
-                          dataBuilder: (BuildContext context, itineraryPlace) {
-                            markers.clear();
-                            for (var data in itineraryPlace) {
-                              markers.add(Marker(
-                                  icon: icon.value ?? BitmapDescriptor.defaultMarker,
-                                  consumeTapEvents: true,
-                                  markerId: MarkerId(data.locationId.toString()),
-                                  position: LatLng(
-                                    double.parse(data.latitude.toString()),
-                                    double.parse(data.longitude.toString()),
+                        Visibility.maintain(
+                            visible: _isMapView,
+                            child: AsyncDataWidgetB(
+                              dataProvider: itineraryPlacesNotifierProvider,
+                              dataBuilder:
+                                  (BuildContext context, itineraryPlace) {
+                                markers.clear();
+                                for (var data in itineraryPlace) {
+                                  markers.add(Marker(
+                                      icon: icon.value ??
+                                          BitmapDescriptor.defaultMarker,
+                                      consumeTapEvents: true,
+                                      markerId:
+                                          MarkerId(data.locationId.toString()),
+                                      position: LatLng(
+                                        double.parse(data.latitude.toString()),
+                                        double.parse(data.longitude.toString()),
+                                      ),
+                                      onTap: () async {
+                                        setState(() {
+                                          _isHide = true;
+                                        });
+                                        final latlng = LatLng(
+                                          double.parse(
+                                              data.latitude.toString()),
+                                          double.parse(
+                                              data.longitude.toString()),
+                                        );
+                                        await mapController
+                                            .animateCamera(
+                                                CameraUpdate.newLatLng(latlng))
+                                            .then((val) {
+                                          navigateToScreen(data);
+                                        });
+                                      }));
+                                }
+                                return itineraryPlace.isEmpty
+                                    ? const Stack(
+                                        children: [
+                                          GoogleMap(
+                                            initialCameraPosition:
+                                                CameraPosition(
+                                              zoom: 14.4746,
+                                              target: LatLng(30.7333, 76.7794),
+                                            ),
+                                          ),
+                                          Scaffold(
+                                            backgroundColor: Colors.black54,
+                                            body: Center(
+                                              child: LoadingWidget(),
+                                            ),
+                                          )
+                                        ],
+                                      )
+                                    : GoogleMap(
+                                        myLocationButtonEnabled: false,
+                                        initialCameraPosition: CameraPosition(
+                                          zoom: 14.4746,
+                                          target: LatLng(
+                                            double.parse(itineraryPlace[0]
+                                                .latitude
+                                                .toString()),
+                                            double.parse(itineraryPlace[0]
+                                                .longitude
+                                                .toString()),
+                                          ),
+                                        ),
+                                        onMapCreated: (controller) async {
+                                          mapController = controller;
+                                          _customInfoWindowController
+                                              .googleMapController = controller;
+                                          final latlng = LatLng(
+                                            double.parse(itineraryPlace[0]
+                                                .latitude
+                                                .toString()),
+                                            double.parse(itineraryPlace[0]
+                                                .longitude
+                                                .toString()),
+                                          );
+                                          await mapController.animateCamera(
+                                              CameraUpdate.newLatLng(latlng));
+                                        },
+                                        onCameraMove: (position) async {
+                                          _customInfoWindowController
+                                              .onCameraMove!();
+                                        },
+                                        onTap: (latLng) {
+                                          setState(() {
+                                            _isHide = !_isHide;
+                                          });
+                                          _customInfoWindowController
+                                              .hideInfoWindow!();
+                                        },
+                                        markers: Set.from(markers),
+                                      );
+                              },
+                              errorBuilder: (e, st) => const SizedBox(),
+                              loadingBuilder: const Stack(
+                                children: [
+                                  GoogleMap(
+                                    initialCameraPosition: CameraPosition(
+                                      zoom: 14.4746,
+                                      target: LatLng(30.7333, 76.7794),
+                                    ),
                                   ),
-                                  onTap: () async {
-                                    setState(() {
-                                      _isHide=true;
-                                    });
-                                    final latlng = LatLng(
-                                      double.parse(data.latitude.toString()),
-                                      double.parse(data.longitude.toString()),
-                                    );
-                                    await mapController
-                                        .animateCamera(CameraUpdate.newLatLng(latlng))
-                                        .then((val) {
-                                      navigateToScreen(data);
-                                    });
-                                  }));
-                            }
-                            return GoogleMap(
-                              myLocationButtonEnabled: false,
-                              initialCameraPosition: CameraPosition(
-                                zoom: 14.4746,
-                                target: LatLng(
-                                  double.parse(itineraryPlace[0].latitude.toString()),
-                                  double.parse(itineraryPlace[0].longitude.toString()),
-                                ),
+                                  Scaffold(
+                                    backgroundColor: Colors.black45,
+                                    body: Center(
+                                      child: LoadingWidget(),
+                                    ),
+                                  )
+                                ],
                               ),
-                              onMapCreated: (controller) async {
-                                mapController = controller;
-                                _customInfoWindowController.googleMapController =
-                                    controller;
-                                final latlng = LatLng(
-                                  double.parse(itineraryPlace[0].latitude.toString()),
-                                  double.parse(itineraryPlace[0].longitude.toString()),
-                                );
-                                await mapController
-                                    .animateCamera(CameraUpdate.newLatLng(latlng));
-                              },
-                              onCameraMove: (position) async {
-                                _customInfoWindowController.onCameraMove!();
-                              },
-                              onTap: (latLng) {
-                                setState(() {
-                                  _isHide=!_isHide;
-                                });
-                                _customInfoWindowController.hideInfoWindow!();
-                              },
-                              markers: Set.from(markers),
-                            );
-                          },
-                          errorBuilder: (e, st) => const SizedBox(),
-                          loadingBuilder: const Stack(
-                            children: [
-                              GoogleMap(
-                                initialCameraPosition: CameraPosition(
-                                  zoom: 14.4746,
-                                  target: LatLng(30.7333, 76.7794),
-                                ),
-                              ),
-                              Scaffold(
-                                backgroundColor: Colors.black45,
-                                body: Center(
-                                  child: LoadingWidget(),
-                                ),
-                              )
-                            ],
-                          ),)
-                        ),
+                            )),
                         CustomInfoWindow(
                           controller: _customInfoWindowController,
                           height: 70,
                           width: 220,
                           offset: 30,
                         ),
-                        _isHide?const SizedBox.shrink():  Padding(
-                          padding: const EdgeInsets.only(bottom: 100),
-                          child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: AspectRatio(
-                                aspectRatio: 2.0,
-                                child: AsyncDataWidgetB(
-                                    dataProvider:
-                                        itineraryPlacesNotifierProvider,
-                                    dataBuilder: (context, itineraryPlaces) {
-                                      return ListView.separated(
-                                        itemCount: itineraryPlaces.length,
-                                        scrollDirection: Axis.horizontal,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 24),
-                                        itemBuilder: (context, index) {
-                                          final data = itineraryPlaces[index];
-                                          return SizedBox(
-                                              width: 350,
-                                              child: DetailItem(
-                                                name: data.name,
-                                                url: data.photo,
-                                                rating: data.rating.toString(),
-                                                walkTime:
-                                                    data.walkingTime.toString(),
-                                                distance:
-                                                    data.distance.toString(),
-                                                address: data.formattedAddress,
-                                              ));
-                                        },
-                                        separatorBuilder:
-                                            (BuildContext context, int index) {
-                                          return const SizedBox(width: 15.0);
-                                        },
-                                      );
-                                    },
-                                    loadingBuilder: Skeletonizer(
-                                        child: ListView.separated(
-                                      itemCount: 6,
-                                      scrollDirection: Axis.horizontal,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 24),
-                                      itemBuilder: (context, index) {
-                                        return const SizedBox(
-                                            width: 350,
-                                            child: DetailItem(
-                                              name: "data.name",
-                                              url: "data.photo",
-                                              address: "data.vicinity",
-                                              rating: "4",
-                                              walkTime: "ytytyty",
-                                              distance: "uyuyuyu",
-                                            ));
-                                      },
-                                      separatorBuilder:
-                                          (BuildContext context, int index) {
-                                        return const SizedBox(width: 15.0);
-                                      },
-                                    )),
-                                    errorBuilder: (error, st) => Center(
-                                          child: Text(error.toString()),
-                                        ))),
-                          ),
-                        )
+                        _isHide
+                            ? const SizedBox.shrink()
+                            : Padding(
+                                padding: const EdgeInsets.only(bottom: 100),
+                                child: Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: AspectRatio(
+                                      aspectRatio: 2.0,
+                                      child: AsyncDataWidgetB(
+                                          dataProvider:
+                                              itineraryPlacesNotifierProvider,
+                                          dataBuilder:
+                                              (context, itineraryPlaces) {
+                                            return ListView.separated(
+                                              itemCount: itineraryPlaces.length,
+                                              scrollDirection: Axis.horizontal,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 24),
+                                              itemBuilder: (context, index) {
+                                                final data =
+                                                    itineraryPlaces[index];
+                                                return SizedBox(
+                                                    width: 350,
+                                                    child: DetailItem(
+                                                      selection: data.type == 1
+                                                          ? "VISITED"
+                                                          : data.type == 2
+                                                              ? "WILL VISIT"
+                                                              : "WANT TO VISIT",
+                                                      placeType:
+                                                          data.placeTypes ?? "",
+                                                      name: data.name,
+                                                      url: data.photo,
+                                                      rating: data.rating
+                                                          .toString(),
+                                                      walkTime: data.walkingTime
+                                                          .toString(),
+                                                      distance: data.distance
+                                                          .toString(),
+                                                      address:
+                                                          data.formattedAddress,
+                                                    ));
+                                              },
+                                              separatorBuilder:
+                                                  (BuildContext context,
+                                                      int index) {
+                                                return const SizedBox(
+                                                    width: 15.0);
+                                              },
+                                            );
+                                          },
+                                          loadingBuilder: Skeletonizer(
+                                              child: ListView.separated(
+                                            itemCount: 6,
+                                            scrollDirection: Axis.horizontal,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 24),
+                                            itemBuilder: (context, index) {
+                                              return const SizedBox(
+                                                  width: 350,
+                                                  child: DetailItem(
+                                                    placeType: "lkjjjh",
+                                                    name: "data.name",
+                                                    url: "data.photo",
+                                                    address: "data.vicinity",
+                                                    rating: "4",
+                                                    walkTime: "ytytyty",
+                                                    distance: "uyuyuyu",
+                                                  ));
+                                            },
+                                            separatorBuilder:
+                                                (BuildContext context,
+                                                    int index) {
+                                              return const SizedBox(
+                                                  width: 15.0);
+                                            },
+                                          )),
+                                          errorBuilder: (error, st) => Center(
+                                                child: Text(error.toString()),
+                                              ))),
+                                ),
+                              )
                       ],
                     ),
                   )
@@ -317,18 +377,23 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                                                 : widget.itinerary.canView),
                                       ),
                                       const SizedBox(width: 16),
-                                      widget.itinerary.canView!.length>3|| widget.itinerary.canEdit!.length>3? Text(
-                                        widget.itinerary.canView!.isEmpty
-                                            ? "+${widget.itinerary.canEdit!.length} more"
-                                            : "+${widget.itinerary.canView!.length} more",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
-                                          fontVariations: FVariations.w700,
-                                        ),
-                                      ):const SizedBox.shrink()
+                                      widget.itinerary.canView!.length > 3 ||
+                                              widget.itinerary.canEdit!.length >
+                                                  3
+                                          ? Text(
+                                              widget.itinerary.canView!.isEmpty
+                                                  ? "+${widget.itinerary.canEdit!.length} more"
+                                                  : "+${widget.itinerary.canView!.length} more",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary,
+                                                fontVariations:
+                                                    FVariations.w700,
+                                              ),
+                                            )
+                                          : const SizedBox.shrink()
                                     ],
                                   ),
                           ),
@@ -343,6 +408,12 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                                     itemBuilder: (context, index) {
                                       final data = itineraryPlaces[index];
                                       return DetailItem(
+                                        selection: data.type == 1
+                                            ? "VISITED"
+                                            : data.type == 2
+                                                ? "WILL VISIT"
+                                                : "WANT TO VISIT",
+                                        placeType: data.placeTypes ?? "",
                                         name: data.name,
                                         url: data.photo,
                                         rating: data.rating.toString(),
@@ -362,8 +433,8 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                                   padding: const EdgeInsets.all(24),
                                   itemCount: 8,
                                   itemBuilder: (context, index) {
-
                                     return const DetailItem(
+                                      placeType: "klklkl",
                                       name: "data.name",
                                       url: "data.photo",
                                       address: "data.vicinity",
@@ -388,9 +459,10 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
       ),
     );
   }
+
   void navigateToScreen(ItineraryPlaces data) {
     _customInfoWindowController.addInfoWindow!(
-        MarkersInfo(
+        ItineraryMarkersInfo(
           data: data,
         ),
         LatLng(double.parse(data.latitude.toString()),

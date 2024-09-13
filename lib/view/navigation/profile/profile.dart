@@ -50,6 +50,7 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
           ref.read(localStorageServiceProvider).clearSession();
           ref.invalidate(filtersProvider);
           ref.invalidate(localStorageServiceProvider);
+          ref.invalidate(mapViewStateProvider);
           Common.showSnackBar(context, message);
           Navigator.pushAndRemoveUntil(
             context,

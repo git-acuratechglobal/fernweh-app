@@ -18,32 +18,37 @@ class NavigationScreen extends ConsumerStatefulWidget {
   ConsumerState<NavigationScreen> createState() => _NavigationScreenState();
 }
 
-class _NavigationScreenState extends ConsumerState<NavigationScreen> {
-  int _selectedIndex = 0;
-  PageController pageController = PageController();
+class _NavigationScreenState extends ConsumerState<NavigationScreen>
+    with AutomaticKeepAliveClientMixin {
+  int _selectedIndex = 2;
+  PageController pageController = PageController(initialPage: 2);
 
-void _onWillPop()  {
-     showDialog<void>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Are you sure?'),
-            content: const Text('Do you want to exit the app?'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('No'),
-              ),
-              TextButton(
-                onPressed: () =>  SystemNavigator.pop(),
-                child: const Text('Yes'),
-              ),
-            ],
+  @override
+  bool get wantKeepAlive => true;
+
+  void _onWillPop() {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Are you sure?'),
+        content: const Text('Do you want to exit the app?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('No'),
           ),
-        );
+          TextButton(
+            onPressed: () => SystemNavigator.pop(),
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final guest = ref.watch(localStorageServiceProvider).getGuestLogin();
     return PopScope(
         canPop: false,
@@ -54,9 +59,8 @@ void _onWillPop()  {
           _onWillPop();
         },
         child: Scaffold(
-            body: PageView(
-              physics: const NeverScrollableScrollPhysics(),
-              controller: pageController,
+            body: IndexedStack(
+              index: _selectedIndex,
               children: [
                 const ExploreScreen(),
                 guest == true ? const GuestLogin() : const MyItenaryScreen(),
@@ -70,7 +74,6 @@ void _onWillPop()  {
               onTap: (index) {
                 setState(() {
                   _selectedIndex = index;
-                  pageController.jumpToPage(index);
                 });
               },
               type: BottomNavigationBarType.fixed,

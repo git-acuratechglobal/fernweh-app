@@ -28,7 +28,7 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen>
     with FormUtilsMixin {
   String countryCode = "1";
   XFile? file;
-
+  FocusNode _focusNode = FocusNode();
   @override
   Widget build(BuildContext context) {
     final validation = ref.watch(validatorsProvider);
@@ -148,7 +148,9 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen>
                       ),
                       const SizedBox(height: 24),
                       TextFormField(
+                        focusNode:_focusNode,
                           keyboardType: TextInputType.phone,
+                          textInputAction: TextInputAction.done,
                           decoration: InputDecoration(
                             hintText: "Phone number",
                             counterText: "",
@@ -183,7 +185,9 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen>
                           validator: (val) => validation.validateMobile(val),
                           onSaved: (val) => ref
                               .read(authNotifierProvider.notifier)
-                              .updateFormData("phone", val)),
+                              .updateFormData("phone", val),onTapOutside: (val){
+                          _focusNode.unfocus();
+                      },),
                       const SizedBox(height: 16),
                       Text(
                         'Gender',

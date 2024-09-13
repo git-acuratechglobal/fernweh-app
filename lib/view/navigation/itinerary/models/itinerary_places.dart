@@ -23,6 +23,7 @@ class ItineraryPlaces {
     required this.longitude,
     required this.distance,
     required this.walkingTime,
+    required this.placeTypes,
   });
 
   final int? id;
@@ -55,7 +56,9 @@ class ItineraryPlaces {
 
   @JsonKey(name: 'walking_time')
   final int? walkingTime;
+  @JsonKey(name: 'place_types')
+  final String? placeTypes;
 
-  factory ItineraryPlaces.fromJson(Map<String, dynamic> json) => _$ItineraryPlacesFromJson(json);
-
+  factory ItineraryPlaces.fromJson(Map<String, dynamic> json) =>
+      _$ItineraryPlacesFromJson(json);
 }

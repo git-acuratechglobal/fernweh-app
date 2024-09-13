@@ -1,12 +1,13 @@
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
 import 'package:fernweh/view/navigation/map/notifier/category_notifier.dart';
+import 'package:fernweh/view/navigation/map/state/map_view_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../services/api_service/api_service.dart';
 import '../../../../utils/widgets/async_widget.dart';
-import '../../map/model/place_search.dart';
 import '../filter_sheet/filter_sheet.dart';
+import 'model/search_result.dart';
 
 part 'search_and_filter_widget.g.dart';
 
@@ -49,6 +50,7 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
       var offset = renderBox.localToGlobal(Offset.zero);
       final filters = ref.watch(filtersProvider);
       final searchController = ref.watch(searchControllerProvider);
+      final mapState = ref.read(mapViewStateProvider.notifier);
       return OverlayEntry(
           builder: (context) => Positioned(
               left: offset.dx + 20,
@@ -70,13 +72,55 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
                             padding: EdgeInsets.zero,
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
+                              if (index == 0) {
+                                return ListTile(
+                                  onTap: () {
+                                    // ref
+                                    //     .read(searchControllerProvider.notifier)
+                                    //     .state
+                                    //     .text = data[index].description??"";
+                                    // if (index == 0) {
+                                    filter = {
+                                      'type': filters['type'],
+                                      'search_term':
+                                          searchController.text.toString(),
+                                      'selected_category':
+                                          filters['selected_category'],
+                                    };
+                                    // }
+                                    // else {
+                                    //   filter.remove('search_term');
+                                    //   filter = {
+                                    //     'type': filters['type'],
+                                    //     'selected_category':
+                                    //     filters['selected_category'],
+                                    //     'input': searchController.text.toString(),
+                                    //   };
+                                    //
+                                    // }
+                                    mapState.update((_) => MapViewState(
+                                        categoryView: true,
+                                        itineraryView: false));
+                                    ref
+                                        .read(filtersProvider.notifier)
+                                        .updateFilter(filter);
+                                    _removeOverlay();
+                                  },
+                                  title: Text(
+                                    searchController.text.toString(),
+                                    style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                );
+                              }
                               return ListTile(
                                 onTap: () {
                                   ref
                                       .read(searchControllerProvider.notifier)
                                       .state
-                                      .text = data[index].description;
-                                  if (index == 0) {
+                                      .text = data[index - 1].description ?? "";
+                                  if (data[index - 1].placeId == null) {
                                     filter = {
                                       'type': filters['type'],
                                       'search_term':
@@ -85,24 +129,24 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
                                           filters['selected_category'],
                                     };
                                   } else {
+                                    filter.remove('search_term');
                                     filter = {
                                       'type': filters['type'],
                                       'selected_category':
                                           filters['selected_category'],
-                                      'input': searchController.text.toString(),
+                                      'input': data[index - 1].placeId,
                                     };
-                                    filter.remove('search_term');
                                   }
-                                  ref
-                                      .read(filtersProvider.notifier)
-                                      .updateFilter(filter);
+                                  mapState.update((_) => MapViewState(
+                                      categoryView: true,
+                                      itineraryView: false));
                                   ref
                                       .read(filtersProvider.notifier)
                                       .updateFilter(filter);
                                   _removeOverlay();
                                 },
                                 title: Text(
-                                  data[index].description,
+                                  data[index - 1].description ?? "",
                                   style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w500),
@@ -112,7 +156,7 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
                             separatorBuilder: (context, index) {
                               return const Divider();
                             },
-                            itemCount: data.length);
+                            itemCount: data.length + 1);
                       },
                       errorBuilder: (e, st) {
                         return Text("Error: $e");
@@ -157,6 +201,7 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
                             ),
                           ]),
                       child: AnimatedTextField(
+                        textInputAction: TextInputAction.search,
                         animationDuration: const Duration(seconds: 2),
                         animationType: Animationtype.slide,
                         hintTextStyle: TextStyle(
@@ -186,6 +231,20 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
                           } else {
                             _removeOverlay();
                           }
+                        },
+                        onSubmitted: (val) {
+                          filter = {
+                            'type': filters['type'],
+                            'search_term': searchController.text.toString(),
+                            'selected_category': filters['selected_category'],
+                          };
+                          _removeOverlay();
+                          ref.read(mapViewStateProvider.notifier).update((_) =>
+                              MapViewState(
+                                  categoryView: true, itineraryView: false));
+                          ref
+                              .read(filtersProvider.notifier)
+                              .updateFilter(filter);
                         },
                         decoration: InputDecoration(
                             prefixIcon: Image.asset('assets/images/search.png'),
@@ -275,7 +334,7 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
 @riverpod
 class SearchPlaceNotifier extends _$SearchPlaceNotifier {
   @override
-  FutureOr<List<PlaceSearch>> build() async {
+  FutureOr<List<SearchResult>> build() async {
     return [];
   }
 

@@ -12,8 +12,6 @@ import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../../../utils/common/config.dart';
 import '../../../../../../utils/common/extensions.dart';
 import '../../../../explore/explore_screen.dart';
-import '../../../../map/map_screen.dart';
-import '../../../../map/model/category.dart';
 import '../../../../map/notifier/category_notifier.dart';
 import '../../../../map/restaurant_detail/restaurant_detail_screen.dart';
 import '../../../models/itinerary_places.dart';
@@ -32,6 +30,20 @@ class ItenaryDetailsScreen extends ConsumerStatefulWidget {
 }
 
 class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      ref
+          .read(
+          itineraryPlacesNotifierProvider
+              .notifier)
+          .getItineraryPlaces(
+          widget.itineraryId );
+    });
+  }
+
   bool mapView = false;
 
   DateTime selectedDate = DateTime.now();
@@ -40,6 +52,7 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
     return now.add(Duration(days: index));
   });
   int? type;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,11 +98,7 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
                   style: const TextStyle(fontSize: 18),
                 ),
                 actions: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: Image.asset('assets/images/global.png'),
-                  ),
-                   ShareIcon(widget.itineraryId.toString()),
+                  ShareIcon(widget.itineraryId.toString()),
                 ],
               ),
               TabBar(
@@ -253,7 +262,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                         await mapController
                             .animateCamera(CameraUpdate.newLatLng(latlng))
                             .then((val) {
-                          navigateToScreen(data);
+                          itineraryMarkerInfo(data);
                         });
                       }));
                 }
@@ -335,6 +344,12 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                                 itemBuilder: (context, index) {
                                   final data = itineraryPlaces[index];
                                   return DetailItem(
+                                    selection: data.type == 1
+                                        ? "VISITED"
+                                        : data.type == 2
+                                            ? "WILL VISIT"
+                                            : "WANT TO VISIT",
+                                    placeType: data.placeTypes ?? "",
                                     width:
                                         MediaQuery.sizeOf(context).width - 50,
                                     name: data.name,
@@ -359,6 +374,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                               padding: EdgeInsets.symmetric(horizontal: 24),
                               child: Skeletonizer(
                                 child: DetailItem(
+                                  placeType: "kkklkl",
                                   name: "data.name",
                                   url: "data.photo",
                                   address: "data.vicinity",
@@ -379,24 +395,52 @@ class _DetailPageState extends ConsumerState<DetailPage> {
     return AsyncDataWidgetB(
       dataProvider: itineraryPlacesNotifierProvider,
       dataBuilder: (context, itineraryPlace) {
-        return ListView.separated(
-          itemCount: itineraryPlace.length,
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          itemBuilder: (context, index) {
-            final data = itineraryPlace[index];
-            return DetailItem(
-              name: data.name,
-              url: data.photo,
-              address: data.formattedAddress,
-              rating: data.rating.toString(),
-              walkTime: convertMinutes(int.parse(data.walkingTime.toString())),
-              distance: data.distance.toString(),
-            );
-          },
-          separatorBuilder: (BuildContext context, int index) {
-            return const SizedBox(height: 16.0);
-          },
-        );
+        return itineraryPlace.isEmpty
+            ? Skeletonizer(
+                child: ListView.separated(
+                  itemCount: 4,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  itemBuilder: (context, index) {
+                    return const DetailItem(
+                      placeType: "kjhjhjhkjh",
+                      name: "data.name",
+                      url: "data.photo",
+                      address: "data.vicinity",
+                      rating: "4",
+                      walkTime: "ytytyty",
+                      distance: "uyuyuyu",
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(height: 16.0);
+                  },
+                ),
+              )
+            : ListView.separated(
+                itemCount: itineraryPlace.length,
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                itemBuilder: (context, index) {
+                  final data = itineraryPlace[index];
+                  return DetailItem(
+                    selection: data.type == 1
+                        ? "VISITED"
+                        : data.type == 2
+                            ? "WILL VISIT"
+                            : "WANT TO VISIT",
+                    placeType: data.placeTypes ?? "",
+                    name: data.name,
+                    url: data.photo,
+                    address: data.formattedAddress,
+                    rating: data.rating.toString(),
+                    walkTime:
+                        convertMinutes(int.parse(data.walkingTime.toString())),
+                    distance: data.distance.toString(),
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return const SizedBox(height: 16.0);
+                },
+              );
       },
       errorBuilder: (e, st) => Center(
         child: Text(e.toString()),
@@ -407,6 +451,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           itemBuilder: (context, index) {
             return const DetailItem(
+              placeType: "kkklkk",
               name: "data.name",
               url: "data.photo",
               address: "data.vicinity",
@@ -423,9 +468,9 @@ class _DetailPageState extends ConsumerState<DetailPage> {
     );
   }
 
-  void navigateToScreen(ItineraryPlaces data) {
+  void itineraryMarkerInfo(ItineraryPlaces data) {
     _customInfoWindowController.addInfoWindow!(
-        MarkersInfo(
+        ItineraryMarkersInfo(
           data: data,
         ),
         LatLng(double.parse(data.latitude.toString()),
@@ -441,25 +486,26 @@ class DetailItem extends StatefulWidget {
   final String? rating;
   final String? walkTime;
   final String? distance;
+  final String placeType;
+  final String? selection;
 
-  const DetailItem({
-    super.key,
-    this.width,
-    this.url,
-    this.name,
-    this.address,
-    this.rating,
-    this.walkTime,
-    this.distance,
-  });
+  const DetailItem(
+      {super.key,
+      this.width,
+      this.url,
+      this.name,
+      this.address,
+      this.rating,
+      this.walkTime,
+      this.distance,
+      required this.placeType,
+      this.selection});
 
   @override
   State<DetailItem> createState() => _DetailItemState();
 }
 
 class _DetailItemState extends State<DetailItem> {
-  String selection = "VISITED";
-
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -498,21 +544,14 @@ class _DetailItemState extends State<DetailItem> {
                 children:
                     List.generate(Config.selectionOptions.length, (index) {
                   final option = Config.selectionOptions[index].toUpperCase();
-                  return InkWell(
-                    onTap: () {
-                      setState(() {
-                        selection = option;
-                      });
-                    },
-                    child: Text(
-                      option,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontVariations: FVariations.w600,
-                        color: selection == option
-                            ? const Color(0xff12B347)
-                            : Colors.grey,
-                      ),
+                  return Text(
+                    option,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontVariations: FVariations.w600,
+                      color: widget.selection == option
+                          ? const Color(0xff12B347)
+                          : Colors.grey,
                     ),
                   );
                 }),
@@ -557,7 +596,7 @@ class _DetailItemState extends State<DetailItem> {
                           ),
                         ),
                         child: Text(
-                          'CAFE',
+                          widget.placeType,
                           style: TextStyle(
                             color: const Color(0xFFCF5253),
                             fontSize: 11,
@@ -659,8 +698,8 @@ class _DetailItemState extends State<DetailItem> {
   }
 }
 
-class MarkersInfo extends StatelessWidget {
-  const MarkersInfo({super.key, required this.data});
+class ItineraryMarkersInfo extends StatelessWidget {
+  const ItineraryMarkersInfo({super.key, required this.data});
 
   final ItineraryPlaces data;
 

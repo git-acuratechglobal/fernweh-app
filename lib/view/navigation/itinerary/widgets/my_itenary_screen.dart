@@ -50,16 +50,6 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: tabIndex == 0
-          ? null
-          : ActionButton(
-              value: mapView,
-              onPressed: () {
-                setState(() {
-                  mapView = !mapView;
-                });
-              }),
       body: Container(
         constraints: const BoxConstraints.expand(),
         decoration: BoxDecoration(gradient: Config.backgroundGradient),
@@ -70,7 +60,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
               backgroundColor: Colors.transparent,
               centerTitle: true,
               title: Text(
-                "My Itenerary",
+                "My Itinerary",
                 style: TextStyle(
                   fontVariations: FVariations.w700,
                   color: const Color(0xFF1A1B28),
@@ -120,52 +110,6 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                         //         builder: (context) => const CreateItinerary()));
                       },
                       icon: const Icon(Icons.add)),
-                if (tabIndex == 0)
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        isEditing = true;
-                      });
-                    },
-                    icon: Image.asset('assets/images/edit.png'),
-                  ),
-                if (tabIndex == 1)
-                  TextButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        backgroundColor: Colors.white,
-                        isScrollControlled: true,
-                        constraints: BoxConstraints.tightFor(
-                          height: MediaQuery.sizeOf(context).height * 0.85,
-                        ),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(20)),
-                        ),
-                        builder: (context) {
-                          return const AddNotesSheet();
-                        },
-                      );
-                    },
-                    child: Row(
-                      children: [
-                        Image.asset(
-                          'assets/images/note.png',
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                        const SizedBox(width: 4.0),
-                        Text(
-                          "Notes",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary,
-                            fontSize: 16,
-                            fontVariations: FVariations.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
               ],
             ),
             TabBar(
@@ -194,103 +138,114 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
               child: TabBarView(
                 controller: tabController,
                 children: [
-                  AsyncDataWidgetB(
-                    dataProvider: getUserItineraryProvider,
-                    dataBuilder: (context, userItinerary) {
-                      return userItinerary.userIteneries!.isEmpty
-                          ? const Center(child: Text("No Itinerary found"))
-                          : GridView.builder(
-                            padding: const EdgeInsets.all(24),
-                            itemCount: userItinerary.userIteneries!.length,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 25,
-                              mainAxisSpacing: 25,
-                              childAspectRatio: 0.85,
-                            ),
-                            itemBuilder: (context, index) {
-                              final itinary = userItinerary
-                                  .userIteneries![index].itinerary;
-                              return InkWell(
-                                onTap: () {
-                                  switch (isEditing) {
-                                    case true:
-                                      null;
-                          
-                                    case false:
-                                      ref
-                                          .read(
-                                              itineraryPlacesNotifierProvider
-                                                  .notifier)
-                                          .getItineraryPlaces(
-                                              itinary.id ?? 0);
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              ItenaryDetailsScreen(
-                                            title: itinary.name ?? "",
-                                            itineraryId: itinary.id ?? 0,
-                                          ),
-                                        ),
-                                      );
-                                    default:
-                                  }
-                                },
-                                child: MyCuratedListTab(
-                                  itinary: itinary!,
-                                  isEditing: isEditing,
-                                  isSelected: false,
-                                ),
-                              );
-                            },
-                          );
+                  RefreshIndicator(
+                    color: const Color(0xffCF5253),
+                    edgeOffset: 10,
+                    onRefresh: () async {
+                      ref.invalidate(getUserItineraryProvider);
                     },
-                    errorBuilder: (error, stack) => Center(
-                      child: Text(error.toString()),
-                    ),
-                    loadingBuilder: Skeletonizer(
-                      enableSwitchAnimation: true,
-                      child: GridView.builder(
-                        padding: const EdgeInsets.all(24),
-                        itemCount: 6,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 25,
-                          mainAxisSpacing: 25,
-                          childAspectRatio: 0.8,
-                        ),
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              AspectRatio(
-                                aspectRatio: 1.0,
-                                child: Container(
-                                  padding: const EdgeInsets.all(8.0),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(
-                                      width: 1,
-                                      color: const Color(0xffE2E2E2),
+                    child: AsyncDataWidgetB(
+                      dataProvider: getUserItineraryProvider,
+                      dataBuilder: (context, userItinerary) {
+                        return userItinerary.userIteneries!.isEmpty
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text("No user Itineraries found"),
+                                    const SizedBox(
+                                      height: 10,
                                     ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.asset(
-                                        "assets/images/3x/amusement.png",
-                                        fit: BoxFit.cover,
-                                      )),
+                                    OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12),
+                                        minimumSize: const Size(60, 40),
+                                      ),
+                                      onPressed: () {
+                                        ref.invalidate(
+                                            getUserItineraryProvider);
+                                      },
+                                      child: const Text(
+                                        "Refresh",
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              const Text("dummy name")
-                            ],
-                          );
-                        },
+                              )
+                            : ListView.separated(
+                                padding: const EdgeInsets.all(24),
+                                itemCount: userItinerary.userIteneries!.length,
+                                itemBuilder: (context, index) {
+                                  final itinary = userItinerary
+                                      .userIteneries![index].itinerary;
+                                  return InkWell(
+                                    onTap: () {
+                                      switch (isEditing) {
+                                        case true:
+                                          null;
+
+                                        case false:
+
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ItenaryDetailsScreen(
+                                                title: itinary.name ?? "",
+                                                itineraryId: itinary.id ?? 0,
+                                              ),
+                                            ),
+                                          );
+                                        default:
+                                      }
+                                    },
+                                    child: MyCreatedItinerary(
+                                      placeCount: userItinerary
+                                              .userIteneries![index]
+                                              .placesCount ??
+                                          0,
+                                      itinary: itinary!,
+                                      editList: userItinerary
+                                              .userIteneries![index]
+                                              .canView!
+                                              .isEmpty
+                                          ? userItinerary
+                                              .userIteneries![index].canEdit!
+                                          : userItinerary
+                                              .userIteneries![index].canView!,
+                                    ),
+                                  );
+                                },
+                                separatorBuilder:
+                                    (BuildContext context, int index) {
+                                  return const SizedBox(
+                                    height: 10,
+                                  );
+                                },
+                              );
+                      },
+                      errorBuilder: (error, stack) => Center(
+                        child: Text(error.toString()),
+                      ),
+                      loadingBuilder: Skeletonizer(
+                        enableSwitchAnimation: true,
+                        child: ListView.separated(
+                          padding: const EdgeInsets.all(24),
+                          itemCount: userItinerarydummyList.length,
+                          itemBuilder: (context, index) {
+                            return MyCreatedItinerary(
+                              placeCount: 0,
+                              itinary: userItinerarydummyList[index],
+                              editList: [],
+                            );
+                          },
+                          separatorBuilder: (BuildContext context, int index) {
+                            return const SizedBox(
+                              height: 10,
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -317,7 +272,7 @@ class AvatarList extends StatelessWidget {
     return ListView.builder(
       shrinkWrap: true,
       padding: EdgeInsets.zero,
-      physics: const NeverScrollableScrollPhysics(),
+      // physics: const NeverScrollableScrollPhysics(),
       scrollDirection: Axis.horizontal,
       itemCount: images!.length,
       itemBuilder: (BuildContext context, int index) {

@@ -21,7 +21,6 @@ import '../../../auth/signup/profile_setup/create_profile_screen.dart';
 import '../../explore/explore_screen.dart';
 import '../../itinerary/models/itinerary_model.dart';
 import '../../itinerary/widgets/my_curated_list/my_curated_list.dart';
-import '../../itinerary/widgets/shared_list/shared_list_details/shared_details_screen.dart';
 
 class RestaurantDetailScreen extends ConsumerWidget {
   const RestaurantDetailScreen({
@@ -45,6 +44,7 @@ class RestaurantDetailScreen extends ConsumerWidget {
   final String? walkingTime;
   final String? locationId;
 
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final guest = ref.watch(localStorageServiceProvider).getGuestLogin();
@@ -64,11 +64,14 @@ class RestaurantDetailScreen extends ConsumerWidget {
                           child: ImageWidget(url: image.toString()))
                       : CarouselSlider(
                           options: CarouselOptions(
+                              scrollPhysics: images!.length >= 2
+                                  ? null
+                                  : const NeverScrollableScrollPhysics(),
                               autoPlayAnimationDuration:
                                   const Duration(milliseconds: 700),
                               aspectRatio: 1.3,
                               viewportFraction: 1,
-                              autoPlay: true,
+                              autoPlay: images!.length >= 2,
                               onPageChanged: (val, _) {}),
                           items: images?.map((i) {
                             return Builder(
@@ -101,15 +104,15 @@ class RestaurantDetailScreen extends ConsumerWidget {
                         ),
                         Row(
                           children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const ShareIcon(""),
-                            ),
+                            // Container(
+                            //   width: 48,
+                            //   height: 48,
+                            //   decoration: const BoxDecoration(
+                            //     color: Colors.white,
+                            //     shape: BoxShape.circle,
+                            //   ),
+                            //   child: const ShareIcon(""),
+                            // ),
                             const SizedBox(width: 16),
                             Container(
                               width: 48,
@@ -519,73 +522,117 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                   AsyncDataWidgetB(
                     dataProvider: getUserItineraryProvider,
                     dataBuilder: (context, userItinerary) {
-                      return GridView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        padding: const EdgeInsets.all(10),
-                        itemCount: userItinerary.userIteneries!.length + 1,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 25,
-                          mainAxisSpacing: 25,
-                          childAspectRatio: 0.78,
-                        ),
-                        itemBuilder: (context, index) {
-                          if (index == userItinerary.userIteneries!.length) {
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.only(bottom: 35, right: 10),
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _isSelected = !_isSelected;
-                                    // ref
-                                    //     .read(localStorageServiceProvider)
-                                    //     .setItineraryId();
-                                  });
-                                },
-                                child: Container(
-                                  height: 100,
-                                  width: 100,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                        color: _isSelected
-                                            ? Colors.red
-                                            : Colors.black12),
-                                  ),
-                                  child: const Icon(Icons.add),
+                      return userItinerary.userIteneries!.isEmpty
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text("No user Itinerary found"),
+                                const SizedBox(
+                                  width: 10,
                                 ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 20),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _isSelected = !_isSelected;
+                                        // ref
+                                        //     .read(localStorageServiceProvider)
+                                        //     .setItineraryId();
+                                      });
+                                    },
+                                    child: Container(
+                                      height: 100,
+                                      width: 100,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                            color: _isSelected
+                                                ? Colors.red
+                                                : Colors.black12),
+                                      ),
+                                      child: const Icon(Icons.add),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            )
+                          : GridView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.all(10),
+                              itemCount:
+                                  userItinerary.userIteneries!.length + 1,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                crossAxisSpacing: 25,
+                                mainAxisSpacing: 25,
+                                childAspectRatio: 0.78,
                               ),
-                            );
-                          }
-                          final itinary = userItinerary.userIteneries![index];
-                          if (selectedItineraryId != null) {
-                            _selectedItinerary = userItinerary.userIteneries!
-                                .indexWhere((e) =>
-                                    e.itinerary!.id == selectedItineraryId);
-                            itinerary = userItinerary.userIteneries!.firstWhere(
-                                (e) => e.itinerary!.id == selectedItineraryId);
-                          }
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedItinerary = index;
-                              });
+                              itemBuilder: (context, index) {
+                                if (index ==
+                                    userItinerary.userIteneries!.length) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(
+                                        bottom: 35, right: 10),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _isSelected = !_isSelected;
+                                          // ref
+                                          //     .read(localStorageServiceProvider)
+                                          //     .setItineraryId();
+                                        });
+                                      },
+                                      child: Container(
+                                        height: 100,
+                                        width: 100,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border: Border.all(
+                                              color: _isSelected
+                                                  ? Colors.red
+                                                  : Colors.black12),
+                                        ),
+                                        child: const Icon(Icons.add),
+                                      ),
+                                    ),
+                                  );
+                                }
+                                final itinary =
+                                    userItinerary.userIteneries![index];
+                                if (selectedItineraryId != null) {
+                                  _selectedItinerary = userItinerary
+                                      .userIteneries!
+                                      .indexWhere((e) =>
+                                          e.itinerary!.id ==
+                                          selectedItineraryId);
+                                  itinerary = userItinerary.userIteneries!
+                                      .firstWhere((e) =>
+                                          e.itinerary!.id ==
+                                          selectedItineraryId);
+                                }
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedItinerary = index;
+                                    });
 
-                              ref
-                                  .read(localStorageServiceProvider)
-                                  .setItineraryId(int.parse(
-                                      itinary.itinerary!.id.toString()));
-                            },
-                            child: MyCuratedListTab(
-                                itinary: itinary.itinerary!,
-                                isEditing: false,
-                                isSelected: _selectedItinerary == index),
-                          );
-                        },
-                      );
+                                    ref
+                                        .read(localStorageServiceProvider)
+                                        .setItineraryId(int.parse(
+                                            itinary.itinerary!.id.toString()));
+                                  },
+                                  child: MyCuratedListTab(
+                                      itinary: itinary.itinerary!,
+                                      isEditing: false,
+                                      isSelected: _selectedItinerary == index),
+                                );
+                              },
+                            );
                     },
                     errorBuilder: (error, stack) => Center(
                       child: Padding(

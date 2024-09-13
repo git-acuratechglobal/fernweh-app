@@ -26,7 +26,8 @@ class DioExceptions implements Exception {
       case DioExceptionType.badResponse:
         final response = dioError.response?.data;
         if (response != null && response is Map) {
-          message = dioError.response?.data?["message"];
+          message = dioError.response?.data?["error"] ??
+              dioError.response?.data?["message"];
           break;
         }
         message = _handleError(

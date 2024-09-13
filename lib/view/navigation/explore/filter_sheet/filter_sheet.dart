@@ -1,5 +1,6 @@
 import 'package:fernweh/utils/common/config.dart';
 import 'package:fernweh/view/navigation/map/notifier/category_notifier.dart';
+import 'package:fernweh/view/navigation/map/state/map_view_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -48,6 +49,8 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   @override
   Widget build(BuildContext context) {
     final filters = ref.watch(filtersProvider);
+    final mapViewState = ref.watch(mapViewStateProvider);
+    final mapState = ref.read(mapViewStateProvider.notifier);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -73,6 +76,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
               GestureDetector(
                 onTap: () {
                   ref.invalidate(filtersProvider);
+                  ref.invalidate(mapViewStateProvider);
                   widget.refresh("sunil");
                   Navigator.pop(
                     context,
@@ -102,7 +106,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                   runSpacing: 3.0, // Space between rows
                   children: Config.dashboardCategories.map((data) {
                     final isSelected =
-                        filtersData['selected_category'] == data.title;
+                        mapViewState.selectedCategory == data.title;
 
                     return RawChip(
                       showCheckmark: false,
@@ -122,13 +126,15 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                       onSelected: (selected) {
                         setState(() {
                           filtersData['type'] = data.type;
-                          filtersData['selected_category'] = data.title;
                         });
+                        mapState.update((_) => MapViewState(
+                            categoryView: true,
+                            itineraryView: false,
+                            selectedCategory: data.title));
                       },
                     );
                   }).toList(),
                 ),
-
                 const SizedBox(height: 24),
                 const Divider(height: 0),
                 const SizedBox(height: 24),
@@ -222,7 +228,9 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                     ref
                         .read(filtersProvider.notifier)
                         .updateFilter(filtersData);
-                     ref.read(itineraryNotifierProvider.notifier).filteredItinerary();
+                    ref
+                        .read(itineraryNotifierProvider.notifier)
+                        .filteredItinerary();
                     widget.refresh("sunil");
                     Navigator.pop(
                       context,

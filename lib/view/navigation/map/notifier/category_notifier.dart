@@ -8,6 +8,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'dart:ui' as ui;
 
+import '../state/map_view_state.dart';
+
 part 'category_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
@@ -85,3 +87,8 @@ final searchControllerProvider =
     StateProvider<TextEditingController>((ref) => TextEditingController());
 
 final latlngProvider = StateProvider<LatLng?>((ref) => null);
+
+
+final mapViewStateProvider = StateProvider<MapViewState>((ref) => MapViewState(categoryView: true,itineraryView: false));
+
+

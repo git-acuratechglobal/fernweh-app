@@ -78,8 +78,8 @@ abstract class Config {
 
   static List<String> selectionOptions = [
     "Visited",
-    "Want to visit",
     "Will visit",
+    "Want to visit",
   ];
 
   static List<String> sortBy = [

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../../../utils/common/extensions.dart';
+import '../../../../../../utils/common/pagination_widget.dart';
 import '../../../../../../utils/widgets/async_widget.dart';
 import '../../../../friends_list/model/friends.dart';
 import 'invite_friend/invite_friend_sheet.dart';
@@ -26,7 +27,7 @@ class _ShareItenarySheetState extends ConsumerState<ShareItenarySheet> {
   final List<Friends> _selectedUsers = [];
   final List<String> selectedUserId = [];
   String selectedDropdown = "view";
-
+ final scrollController=ScrollController();
   @override
   void initState() {
     ref.listenManual(sharedItineraryProvider, (previous, next) {
@@ -209,63 +210,83 @@ class _ShareItenarySheetState extends ConsumerState<ShareItenarySheet> {
           ),
         ),
         Expanded(
-            child: AsyncDataWidgetB(
-          dataProvider: getFriendsProvider,
-          dataBuilder: (BuildContext context, data) {
-            return ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemBuilder: (context, index) {
-                final user = data[index];
-                return ListTile(
-                  onTap: () {
-                    setState(() {
-                      _selectedUsers.toggle(user);
-                      selectedUserId.toggle(user.id.toString());
-                    });
-                  },
-                  leading: ClipOval(
-                    child: SizedBox.square(
-                      dimension: 50,
-                      child: ImageWidget(
-                          url:
-                              'http://fernweh.acublock.in/public/${user.image}'),
-                    ),
-                  ),
-                  title: Text(
-                    user.fullName,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontVariations: FVariations.w700,
-                    ),
-                  ),
-                  subtitle: Text(
-                    user.email.toString(),
-                    style: const TextStyle(
-                      color: Color(0xFF505050),
-                      fontSize: 14,
-                    ),
-                  ),
-                  trailing: IconButton(
-                    icon: _selectedUsers.contains(user)
-                        ? Image.asset('assets/images/tick.png')
-                        : Image.asset('assets/images/untick.png'),
-                    onPressed: () {
-                      setState(() {
-                        _selectedUsers.toggle(user);
-                        selectedUserId.toggle(user.id.toString());
-                      });
-                    },
-                  ),
-                );
+            child: PaginationWidget(
+              scrollController: scrollController,
+          value: ref.watch(friendListProvider),
+          itemBuilder: (int, user) {
+            return ListTile(
+              onTap: () {
+                setState(() {
+                  _selectedUsers.toggle(user);
+                  selectedUserId.toggle(user.id.toString());
+                });
               },
-              itemCount: data.length,
+              leading: ClipOval(
+                child: SizedBox.square(
+                  dimension: 50,
+                  child: ImageWidget(
+                      url: 'http://fernweh.acublock.in/public/${user.image}'),
+                ),
+              ),
+              title: Text(
+                user.fullName,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontVariations: FVariations.w700,
+                ),
+              ),
+              subtitle: Text(
+                user.email.toString(),
+                style: const TextStyle(
+                  color: Color(0xFF505050),
+                  fontSize: 14,
+                ),
+              ),
+              trailing: IconButton(
+                icon: _selectedUsers.contains(user)
+                    ? Image.asset('assets/images/tick.png')
+                    : Image.asset('assets/images/untick.png'),
+                onPressed: () {
+                  setState(() {
+                    _selectedUsers.toggle(user);
+                    selectedUserId.toggle(user.id.toString());
+                  });
+                },
+              ),
             );
           },
-          errorBuilder: (error, st) {
-            return Center(child: Text(error.toString()));
-          },
-          loadingBuilder: Skeletonizer(
+          onLoadMore: () =>ref.read(friendListProvider.notifier).loadMore(),
+          separator: const SizedBox(
+            height: 0,
+          ),
+          emptyWidget: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("No friends list found"),
+                const SizedBox(
+                  height: 10,
+                ),
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    minimumSize: const Size(60, 40),
+                  ),
+                  onPressed: () {
+                    ref.invalidate(friendListProvider);
+                  },
+                  child: const Text(
+                    "Refresh",
+                    style: TextStyle(fontSize: 14),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          canLoadMore: () =>
+              ref.read(friendListProvider.notifier).canLoadMore(),
+          loading: Skeletonizer(
             child: ListView.builder(
               padding: const EdgeInsets.all(8),
               itemBuilder: (context, index) {
@@ -300,16 +321,16 @@ class _ShareItenarySheetState extends ConsumerState<ShareItenarySheet> {
               itemCount: Config.users.length,
             ),
           ),
+          padding: const EdgeInsets.all(8),
         )),
         Padding(
             padding: const EdgeInsets.all(24.0),
             child: AppButton(
                 isLoading: sharedItineraryState is AsyncLoading,
                 onTap: () {
-                  final String users=selectedUserId.join(',');
+                  final String users = selectedUserId.join(',');
                   switch (selectedDropdown) {
                     case "view":
-
                       ref
                           .read(sharedItineraryProvider.notifier)
                           .updateForm("can_view", users);

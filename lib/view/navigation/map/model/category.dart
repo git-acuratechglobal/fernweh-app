@@ -48,3 +48,24 @@ class Category {
   factory Category.fromJson(Map<String, dynamic> json) =>
       _$CategoryFromJson(json);
 }
+
+
+List <Category> get dummyCategoryList{
+  return List.generate(6, (index){
+    return Category(
+      name: 'Category $index',
+      rating: 4.5,
+      compoundCode: 'CP123456',
+      userRatingsTotal: 1000,
+      vicinity: '123 Main St',
+      type: 'Restaurant',
+      photoUrls: ['https://example.com/photo1.jpg', 'https://example.com/photo2.jpg'],
+      placeId: '1234567890',
+      latitude: 37.7749,
+      longitude: -122.4194,
+      editorialSummary: 'This is a sample restaurant',
+      distance: 1500,
+      walkingTime: 30,
+    );
+  });
+}

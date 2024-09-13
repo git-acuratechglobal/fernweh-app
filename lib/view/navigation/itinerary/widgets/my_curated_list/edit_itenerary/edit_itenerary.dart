@@ -13,14 +13,16 @@ import '../../../../../../utils/common/extensions.dart';
 import '../../../../../auth/signup/profile_setup/create_profile_screen.dart';
 
 class EditItenerary extends ConsumerStatefulWidget {
-  const EditItenerary(
+   EditItenerary(
       {super.key,
       required this.iteneraryName,
       required this.iteneraryPhoto,
+        required this.type,
       this.id});
 
   final String iteneraryName;
   final String iteneraryPhoto;
+   int type;
   final int? id;
 
   @override
@@ -31,6 +33,10 @@ class _EditIteneraryState extends ConsumerState<EditItenerary>
     with FormUtilsMixin {
   XFile? file;
 
+  List<(String? name, int? type)> typeList = [
+    ("Private", 0),
+    ("Public", 1),
+  ];
   @override
   Widget build(BuildContext context) {
     ref.listen(userItineraryNotifierProvider, (previous, next) {
@@ -136,6 +142,30 @@ class _EditIteneraryState extends ConsumerState<EditItenerary>
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  children: [
+                    Image.asset('assets/images/global.png'),
+                    const SizedBox(width: 12.0),
+                    DropdownButton(
+                      value: widget.type,
+                      underline: const SizedBox.shrink(),
+                      items: typeList.map((e) {
+                        return DropdownMenuItem(
+                          value: e.$2,
+                          child: Text(e.$1.toString()),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          widget.type = value!;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(
                 height: 05,
               ),
@@ -144,6 +174,9 @@ class _EditIteneraryState extends ConsumerState<EditItenerary>
                 child: const Text('Save Itinerary'),
                 onTap: () {
                   if (validateAndSave()) {
+                    ref
+                        .read(userItineraryNotifierProvider.notifier)
+                        .updateForm('type', widget.type);
                     ref
                         .read(userItineraryNotifierProvider.notifier)
                         .updateForm('id', widget.id);

@@ -13,18 +13,27 @@ part 'auth_service.g.dart';
 @Riverpod(keepAlive: true)
 AuthService authService(AuthServiceRef ref) {
   return AuthService(
-      ref.watch(dioProvider), ref.watch(localStorageServiceProvider));
+      ref.watch(dioProvider),
+      ref.watch(localStorageServiceProvider),
+      ref.watch(localStorageServiceProvider).getToken());
 }
 
 class AuthService {
   final Dio _dio;
   final LocalStorageService _localStorageService;
+  final String? _token;
 
-  AuthService(this._dio, this._localStorageService);
+  AuthService(this._dio, this._localStorageService, this._token);
 
   Future<User> login(Map<String, dynamic> formData) async {
     return asyncGuard(() async {
-      final response = await _dio.post('login', data: formData);
+      final response = await _dio.post('login',
+          data: formData,
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }));
       final userJson = response.data["user"];
       final user = User.fromJson(userJson);
       await _localStorageService.setUser(user);
@@ -35,16 +44,28 @@ class AuthService {
 
   Future<User> signUp(Map<String, dynamic> formData) async {
     return asyncGuard(() async {
-    final response=  await _dio.post('register-otp', data: formData);
-    final userJson = response.data["user"];
-    final user = User.fromJson(userJson);
-    return user;
+      final response = await _dio.post('register-otp',
+          data: formData,
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }));
+      final userJson = response.data["user"];
+      final user = User.fromJson(userJson);
+      return user;
     });
   }
 
   Future<User> matchOtp(Map<String, dynamic> formData) async {
     return asyncGuard(() async {
-      final response = await _dio.post('match-otp', data: formData);
+      final response = await _dio.post('match-otp',
+          data: formData,
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }));
       final userJson = response.data["user"];
       final user = User.fromJson(userJson);
       await _localStorageService.setUser(user);
@@ -55,7 +76,12 @@ class AuthService {
 
   Future<List<IntrestedInCategory>> getCategories() async {
     return asyncGuard(() async {
-      final response = await _dio.get('category');
+      final response = await _dio.get('category',
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }));
       final categories = (response.data['categories'] as List)
           .map((json) => IntrestedInCategory.fromJson(json))
           .toList();
@@ -69,10 +95,13 @@ class AuthService {
       if (imagePath != null) {
         userDetails['image'] = await MultipartFile.fromFile(imagePath.path);
       }
-      final response = await _dio.post(
-        'add-profile-info',
-        data: FormData.fromMap(userDetails),
-      );
+      final response = await _dio.post('add-profile-info',
+          data: FormData.fromMap(userDetails),
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }));
       final userJson = response.data["user"];
       final user = User.fromJson(userJson);
       await _localStorageService.setUser(user);
@@ -83,8 +112,13 @@ class AuthService {
   Future<String> logOut(String token) async {
     print(token);
     return asyncGuard(() async {
-      final response =
-          await _dio.post('logout', data: FormData.fromMap({'token': token}));
+      final response = await _dio.post('logout',
+          data: FormData.fromMap({'token': token}),
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }));
       final message = response.data['message'];
       return message;
     });

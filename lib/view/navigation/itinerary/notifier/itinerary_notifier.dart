@@ -11,7 +11,7 @@ part 'itinerary_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
 FutureOr<UserItinerary> getUserItinerary(GetUserItineraryRef ref) async {
-  final userItinerary=await ref.watch(apiServiceProvider).getUserItinerary();
+  final userItinerary = await ref.watch(apiServiceProvider).getUserItinerary();
   return userItinerary;
 }
 
@@ -25,7 +25,8 @@ class UserItineraryNotifier extends _$UserItineraryNotifier {
   Future<void> createItinerary() async {
     try {
       state = UserItineraryLoading();
-   final data=   await ref.watch(apiServiceProvider).createUserItinerary(_formData);
+      final data =
+          await ref.watch(apiServiceProvider).createUserItinerary(_formData);
       ref.invalidate(getUserItineraryProvider);
       state = UserItineraryCreated(itinerary: data);
     } catch (e) {
@@ -60,31 +61,29 @@ class UserItineraryNotifier extends _$UserItineraryNotifier {
   }
 }
 
-
 @riverpod
 class MyItineraryNotifier extends _$MyItineraryNotifier {
   final Map<String, dynamic> _formData = {};
+
   @override
-  MyItineraryState build() =>MyItineraryInitialState();
+  MyItineraryState build() => MyItineraryInitialState();
 
-
-Future<void> createMyItinerary() async {
-  try{
-    state=MyItineraryLoading();
-    final data= await ref.watch(apiServiceProvider).createMyItinerary(_formData);
-    state=MyItineraryCreatedState(myItinerary: data);
-  }catch (e) {
-    state = MyItineraryErrorState(error: e);
+  Future<void> createMyItinerary() async {
+    try {
+      state = MyItineraryLoading();
+      final data =
+          await ref.watch(apiServiceProvider).createMyItinerary(_formData);
+      ref.invalidate(getUserItineraryProvider);
+      state = MyItineraryCreatedState(myItinerary: data);
+    } catch (e) {
+      state = MyItineraryErrorState(error: e);
+    }
   }
 
-}
   void updateForm(String key, dynamic value) {
     _formData[key] = value;
   }
-
 }
-
-
 
 @Riverpod(keepAlive: true)
 class ItineraryPlacesNotifier extends _$ItineraryPlacesNotifier {
@@ -93,28 +92,27 @@ class ItineraryPlacesNotifier extends _$ItineraryPlacesNotifier {
     return [];
   }
 
-
-  Future<void> getItineraryPlaces(int itineraryId)async{
+  Future<void> getItineraryPlaces(int itineraryId) async {
     try {
-      state=const AsyncLoading<List<ItineraryPlaces>>();
-      final itineraryPlaces= await ref.read(apiServiceProvider).getItineraryPlace(itineraryId,null);
-      state= AsyncData(itineraryPlaces);
-    }catch(e,st){
-      state= AsyncError<List<ItineraryPlaces>>(e,st);
+      state = const AsyncLoading<List<ItineraryPlaces>>();
+      final itineraryPlaces = await ref
+          .read(apiServiceProvider)
+          .getItineraryPlace(itineraryId, null);
+      state = AsyncData(itineraryPlaces);
+    } catch (e, st) {
+      state = AsyncError<List<ItineraryPlaces>>(e, st);
     }
   }
 
-
-  Future<void> getTypeItineraryPlace(int itineraryId, int? type) async{
-
-     try{
-       state=const AsyncLoading<List<ItineraryPlaces>>();
-       final itineraryPlaces= await ref.read(apiServiceProvider).getItineraryPlace(itineraryId, type);
-       state= AsyncData(itineraryPlaces);
-     }catch(e,st){
-       state= AsyncError<List<ItineraryPlaces>>(e,st);
-     }
-
+  Future<void> getTypeItineraryPlace(int itineraryId, int? type) async {
+    try {
+      state = const AsyncLoading<List<ItineraryPlaces>>();
+      final itineraryPlaces = await ref
+          .read(apiServiceProvider)
+          .getItineraryPlace(itineraryId, type);
+      state = AsyncData(itineraryPlaces);
+    } catch (e, st) {
+      state = AsyncError<List<ItineraryPlaces>>(e, st);
+    }
   }
-
 }
