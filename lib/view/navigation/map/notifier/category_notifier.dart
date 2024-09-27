@@ -50,10 +50,11 @@ class ItineraryNotifier extends _$ItineraryNotifier {
 }
 
 final bitmapIconProvider =
-    FutureProvider.family<BitmapDescriptor, double>((ref, value) async {
+    FutureProvider<BitmapDescriptor>((ref) async {
+
   ByteData data = await rootBundle.load("assets/images/marker.png");
   ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-      targetWidth: 80);
+      targetWidth:80);
   ui.FrameInfo fi = await codec.getNextFrame();
   final Uint8List? markerIcon =
       (await fi.image.toByteData(format: ui.ImageByteFormat.png))

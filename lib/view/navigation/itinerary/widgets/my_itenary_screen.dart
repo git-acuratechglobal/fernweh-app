@@ -206,14 +206,9 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                               .placesCount ??
                                           0,
                                       itinary: itinary!,
-                                      editList: userItinerary
-                                              .userIteneries![index]
-                                              .canView!
-                                              .isEmpty
-                                          ? userItinerary
-                                              .userIteneries![index].canEdit!
-                                          : userItinerary
-                                              .userIteneries![index].canView!,
+                                      editList: [...?userItinerary
+                                          .userIteneries![index].canEdit,...?userItinerary
+                                          .userIteneries![index].canView]
                                     ),
                                   );
                                 },

@@ -1,4 +1,3 @@
-import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
@@ -18,7 +17,6 @@ import '../explore/current_location/current_location.dart';
 import '../explore/explore_screen.dart';
 import '../explore/recommended/recommended.dart';
 import '../explore/search_filter/search_and_filter_widget.dart';
-import '../explore/wish_list/wish_list_screen.dart';
 import '../itinerary/models/itinerary_places.dart';
 import '../itinerary/notifier/itinerary_notifier.dart';
 import '../itinerary/widgets/my_curated_list/curated_list_item_view/itenary_details_screen.dart';
@@ -64,7 +62,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
   }
 
-  void _scrollToSelectedItineraryPlace(List<ItineraryPlaces> itinerary, String placeId) {
+  void _scrollToSelectedItineraryPlace(
+      List<ItineraryPlaces> itinerary, String placeId) {
     final index =
         itinerary.indexWhere((element) => element.id.toString() == placeId);
 
@@ -93,7 +92,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   Widget build(BuildContext context) {
     final icon =
-        ref.watch(bitmapIconProvider(MediaQuery.devicePixelRatioOf(context)));
+        ref.watch(bitmapIconProvider);
     final filters = ref.watch(filtersProvider);
     final currentPosition = ref.watch(positionProvider);
     final latLag = ref.watch(latlngProvider);
@@ -105,26 +104,68 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       floatingActionButton: mapViewState.categoryView
           ? SizedBox(
               height: 50,
-              child: ActionButton(
-                value: _categoryMapView,
-                onPressed: () {
-                  setState(() {
-                    _categoryMapView = !_categoryMapView;
-                  });
-                  // _customInfoWindowController.hideInfoWindow!();
-                },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(),
+                  ActionButton(
+                    value: _categoryMapView,
+                    onPressed: () {
+                      setState(() {
+                        _categoryMapView = !_categoryMapView;
+                      });
+                      // _customInfoWindowController.hideInfoWindow!();
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: Container(
+                      decoration: const BoxDecoration(
+                          color: Colors.white, shape: BoxShape.circle),
+                      child: IconButton(
+                        onPressed: () {
+                          ref
+                              .read(currentPositionProvider.notifier)
+                              .currentPosition();
+                        },
+                        icon: const Icon(Icons.gps_fixed_outlined),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             )
           : SizedBox(
               height: 50,
-              child: ActionButton(
-                value: _itineraryMapView,
-                onPressed: () {
-                  setState(() {
-                    _itineraryMapView = !_itineraryMapView;
-                  });
-                  // _customInfoWindowController.hideInfoWindow!();
-                },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(),
+                  ActionButton(
+                    value: _itineraryMapView,
+                    onPressed: () {
+                      setState(() {
+                        _itineraryMapView = !_itineraryMapView;
+                      });
+                      // _customInfoWindowController.hideInfoWindow!();
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: Container(
+                      decoration: const BoxDecoration(
+                          color: Colors.white, shape: BoxShape.circle),
+                      child: IconButton(
+                        onPressed: () {
+                          ref
+                              .read(currentPositionProvider.notifier)
+                              .currentPosition();
+                        },
+                        icon: const Icon(Icons.gps_fixed_outlined),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
       body: Container(
@@ -195,14 +236,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       ],
                     ),
                   )),
-                  IconButton(
-                    onPressed: () {
-                      ref
-                          .read(currentPositionProvider.notifier)
-                          .currentPosition();
-                    },
-                    icon: const Icon(Icons.gps_fixed_outlined),
-                  ),
                   Image.asset('assets/images/notification.png'),
                 ]),
               ),
@@ -298,6 +331,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 loadingBuilder: Stack(
                                   children: [
                                     GoogleMap(
+                                      myLocationButtonEnabled: false,
+                                      myLocationEnabled: false,
                                       initialCameraPosition: CameraPosition(
                                         zoom: 14.4746,
                                         target: LatLng(
@@ -395,6 +430,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             loadingBuilder: const Stack(
                               children: [
                                 GoogleMap(
+                                  myLocationButtonEnabled: false,
+                                  myLocationEnabled: false,
                                   initialCameraPosition: CameraPosition(
                                     zoom: 14.4746,
                                     target: LatLng(30.7333, 76.7794),
@@ -765,7 +802,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                           const SizedBox(width: 12.0),
                                       itemBuilder: (context, index) {
                                         final data = category[index];
-                                        final bool _isSelected =
+                                        final bool isSelected =
                                             selectedPlaceId ==
                                                 data.id.toString();
                                         return InkWell(
@@ -787,13 +824,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                 ),
                                               ),
                                             );
+                                            setState(() {
+                                              selectedPlaceId=data.id.toString();
+                                            });
                                           },
                                           child: Container(
                                             decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                                 border: Border.all(
-                                                    color: _isSelected
+                                                    color: isSelected
                                                         ? Colors.redAccent
                                                         : Colors.transparent,
                                                     width: 2)),
@@ -943,7 +983,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                           const SizedBox(width: 12.0),
                                       itemBuilder: (context, index) {
                                         final data = category[index];
-                                        final bool _isSelected =
+                                        final bool isSelected0 =
                                             selectedPlaceId == data.placeId;
                                         return InkWell(
                                           onTap: () {
@@ -975,7 +1015,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                                 border: Border.all(
-                                                    color: _isSelected
+                                                    color: isSelected0
                                                         ? Colors.redAccent
                                                         : Colors.transparent,
                                                     width: 2)),

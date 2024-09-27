@@ -57,7 +57,7 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final icon =
-        ref.watch(bitmapIconProvider(MediaQuery.devicePixelRatioOf(context)));
+        ref.watch(bitmapIconProvider);
     final userCurrentPosition = ref.watch(currentPositionProvider);
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

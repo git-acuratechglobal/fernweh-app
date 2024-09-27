@@ -128,8 +128,8 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
                     'assets/images/profile.png',
                     color: const Color(0xff1A72FF),
                   ),
-                  label: "Friends List",
-                  tooltip: "Friends List",
+                  label: "Friends",
+                  tooltip: "Friends",
                 ),
                 BottomNavigationBarItem(
                   icon: Image.asset(

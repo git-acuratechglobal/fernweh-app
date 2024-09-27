@@ -92,9 +92,13 @@ class MyCreatedItinerary extends StatelessWidget {
                 width: 110,
                 child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: ImageWidget(
-                        url:
-                            "http://fernweh.acublock.in/public/${itinary.image}")),
+                    child: itinary.image == null
+                        ? const ImageWidget(
+                            url:
+                                "https://cdn-icons-png.flaticon.com/512/2343/2343940.png")
+                        : ImageWidget(
+                            url:
+                                "http://fernweh.acublock.in/public/${itinary.image}")),
               ),
               const SizedBox(width: 12.0),
               Expanded(
@@ -172,7 +176,7 @@ class MyCreatedItinerary extends StatelessWidget {
                                   "http://fernweh.acublock.in/public/${itinary.image}",
                               iteneraryName: itinary.name ?? "",
                               id: itinary.id,
-                              type: int.parse(itinary.type??""),
+                              type: int.parse(itinary.type ?? ""),
                             );
                           },
                         );
@@ -195,7 +199,9 @@ class MyCreatedItinerary extends StatelessWidget {
                               BorderRadius.vertical(top: Radius.circular(20)),
                         ),
                         builder: (context) {
-                          return  AddNotesSheet(itineraryId: itinary.id??0,);
+                          return AddNotesSheet(
+                            itineraryId: itinary.id ?? 0,
+                          );
                         },
                       );
                     },

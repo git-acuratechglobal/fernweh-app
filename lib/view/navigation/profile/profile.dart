@@ -310,7 +310,7 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                       child: const Text('Update Profile'),
                       onTap: () {
                         if (validateAndSave()) {
-                          ref.read(authNotifierProvider.notifier).updateUser();
+                          ref.read(authNotifierProvider.notifier).updateProfile();
                         }
                       },
                     ),

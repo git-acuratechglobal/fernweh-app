@@ -85,11 +85,12 @@ class FriendDetailScreen extends StatelessWidget {
                     dataProvider:
                         getFriendsItineraryListProvider(friends.id ?? 0),
                     dataBuilder: (context, itinerary) {
+                      List<FriendsItinerary> filteredList=itinerary.where((e)=>e.type=="1").toList();
                       return itinerary.isEmpty
                           ? const Center(child: Text("No itinerary found!"))
                           : GridView.builder(
                               padding: const EdgeInsets.all(24),
-                              itemCount: itinerary.length,
+                              itemCount: filteredList.length,
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
@@ -104,16 +105,14 @@ class FriendDetailScreen extends StatelessWidget {
                                       MaterialPageRoute(
                                         builder: (context) =>
                                             ItenaryDetailsScreen(
-                                          title: itinerary[index].name ?? "",
-                                          itineraryId: itinerary[index].id ?? 0,
+                                          title: filteredList[index].name ?? "",
+                                          itineraryId: filteredList[index].id ?? 0,
                                         ),
                                       ),
                                     );
                                   },
-                                  child: itinerary[index].type == "0"
-                                      ? const SizedBox.shrink()
-                                      : FriendItineraryList(
-                                          itinary: itinerary[index],
+                                  child:  FriendItineraryList(
+                                          itinary: filteredList[index],
                                           isEditing: false,
                                           isSelected: false,
                                         ),

@@ -30,17 +30,13 @@ class ItenaryDetailsScreen extends ConsumerStatefulWidget {
 }
 
 class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
-
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_){
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
-          .read(
-          itineraryPlacesNotifierProvider
-              .notifier)
-          .getItineraryPlaces(
-          widget.itineraryId );
+          .read(itineraryPlacesNotifierProvider.notifier)
+          .getItineraryPlaces(widget.itineraryId);
     });
   }
 
@@ -102,6 +98,7 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
                 ],
               ),
               TabBar(
+                isScrollable: true,
                 onTap: (val) {
                   switch (val) {
                     case 0:
@@ -235,8 +232,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final icon =
-        ref.watch(bitmapIconProvider(MediaQuery.devicePixelRatioOf(context)));
+    final icon = ref.watch(bitmapIconProvider);
     if (widget.isMapView) {
       return LayoutBuilder(builder: (context, snapshot) {
         return Stack(
@@ -345,10 +341,10 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                                   final data = itineraryPlaces[index];
                                   return DetailItem(
                                     selection: data.type == 1
-                                        ? "VISITED"
+                                        ? "WANT TO VISIT"
                                         : data.type == 2
-                                            ? "WILL VISIT"
-                                            : "WANT TO VISIT",
+                                            ? " VISITED"
+                                            : "WILL VISIT AGAIN",
                                     placeType: data.placeTypes ?? "",
                                     width:
                                         MediaQuery.sizeOf(context).width - 50,
@@ -376,7 +372,8 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                                 child: DetailItem(
                                   placeType: "kkklkl",
                                   name: "data.name",
-                                  url: "data.photo",
+                                  url:
+                                      "https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg",
                                   address: "data.vicinity",
                                   rating: "4",
                                   walkTime: "ytytyty",
@@ -423,10 +420,10 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                   final data = itineraryPlace[index];
                   return DetailItem(
                     selection: data.type == 1
-                        ? "VISITED"
+                        ? "WANT TO VISIT"
                         : data.type == 2
-                            ? "WILL VISIT"
-                            : "WANT TO VISIT",
+                            ? " VISITED"
+                            : "WILL VISIT AGAIN",
                     placeType: data.placeTypes ?? "",
                     name: data.name,
                     url: data.photo,
@@ -453,7 +450,8 @@ class _DetailPageState extends ConsumerState<DetailPage> {
             return const DetailItem(
               placeType: "kkklkk",
               name: "data.name",
-              url: "data.photo",
+              url:
+                  "https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg",
               address: "data.vicinity",
               rating: "4",
               walkTime: "ytytyty",

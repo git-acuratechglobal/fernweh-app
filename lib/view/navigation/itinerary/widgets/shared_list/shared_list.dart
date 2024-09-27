@@ -197,9 +197,8 @@ class _SharedItemState extends ConsumerState<SharedItem> {
                   Flexible(
                     flex: 1,
                     child: AvatarList(
-                        images: widget.itinerary.canView!.isEmpty
-                            ? widget.itinerary.canEdit
-                            : widget.itinerary.canView),
+                        images:[...?widget.itinerary.canEdit,...? widget.itinerary.canView]
+                      ),
                   )
                 ],
               ),

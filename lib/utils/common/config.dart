@@ -53,17 +53,17 @@ abstract class Config {
   ];
 
   static List<({String name,int id})> itinaryOptions = [
-    (name:"Have visited",id: 1 ),
-    (name: "Will visit",id: 2 ),
-    (name: "Want to visit",id: 3 ),
+    (name:"Want to visit",id: 1 ),
+    (name: "Visited",id: 2 ),
+    (name: "Will visit again",id: 3 ),
 
   ];
 
   static List<String> tabOptions = [
     "All",
-    "Visited",
-    "Will visit",
     "Want to visit",
+    "Visited",
+    "Will visit again",
 
   ];
 
@@ -77,9 +77,9 @@ abstract class Config {
   ];
 
   static List<String> selectionOptions = [
-    "Visited",
-    "Will visit",
     "Want to visit",
+    "Visited",
+    "Will visit again",
   ];
 
   static List<String> sortBy = [

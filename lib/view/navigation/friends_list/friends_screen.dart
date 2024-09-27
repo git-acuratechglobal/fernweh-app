@@ -258,12 +258,15 @@ class _FriendsListState extends ConsumerState<FriendsList> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Text(
-                      user.name ?? "",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontVariations: FVariations.w700,
+                    Expanded(
+                      child: Text(
+                        overflow: TextOverflow.fade,
+                        user.name ?? "",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontVariations: FVariations.w700,
+                        ),
                       ),
                     ),
                     const Text(
@@ -440,6 +443,7 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                       const SizedBox(height: 16),
                   itemCount: friends.length,
                   itemBuilder: (context, index) {
+                    print(friends[index].id);
                     final user = friends[index];
                     bool isSelected =
                         acceptedRequests.contains(user.id.toString());
@@ -479,27 +483,33 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                                   )),
                             ),
                             const SizedBox(width: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text(
-                                  user.name ?? "",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontVariations: FVariations.w700,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  SizedBox(
+                                    width: 130,
+                                    child: Text(
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      user.name ?? "",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontVariations: FVariations.w700,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                const Text(
-                                  '5 Itinerary',
-                                  style: TextStyle(
-                                    color: Color(0xFF505050),
+                                  const Text(
+                                    '5 Itinerary',
+                                    style: TextStyle(
+                                      color: Color(0xFF505050),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                            const Spacer(),
                             isSelected
                                 ? OutlinedButton(
                                     style: OutlinedButton.styleFrom(
@@ -517,21 +527,24 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                                       style: TextStyle(fontSize: 14),
                                     ),
                                   )
-                                : AppButton(
-                                    isLoading:
-                                        userIds.contains(user.id.toString()),
-                                    onTap: () {
-                                      setState(() {
-                                        userIds.add(user.id.toString());
-                                      });
-                                      ref
-                                          .read(
-                                              friendsNotifierProvider.notifier)
-                                          .acceptRequest(user.id ?? 0, 2);
-                                    },
-                                    size: const Size(60, 40),
-                                    child: const Text("Accept"),
-                                  ),
+                                : Expanded(
+
+                                  child: AppButton(
+                                      isLoading:
+                                          userIds.contains(user.id.toString()),
+                                      onTap: () {
+                                        setState(() {
+                                          userIds.add(user.id.toString());
+                                        });
+                                        ref
+                                            .read(
+                                                friendsNotifierProvider.notifier)
+                                            .acceptRequest(user.id ?? 0,);
+                                      },
+                                      size: const Size(60, 40),
+                                      child: const Text("Accept"),
+                                    ),
+                                ),
 
                             // SizedBox(
                             //   width: 100,

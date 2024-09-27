@@ -36,12 +36,11 @@ class FriendsNotifier extends _$FriendsNotifier {
 
   Future<void> acceptRequest(
     int userId,
-    int status,
   ) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final data =
-          await ref.watch(apiServiceProvider).acceptRequest(userId, status);
+          await ref.watch(apiServiceProvider).acceptRequest(userId, 2);
        ref.invalidate(friendListProvider);
       return FriendsState(
           friendsEvent: FriendsEvent.requestAccept, response: data);

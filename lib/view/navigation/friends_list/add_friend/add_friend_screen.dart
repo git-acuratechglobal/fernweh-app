@@ -226,7 +226,10 @@ class _FriendListItemState extends State<FriendListItem> {
             ClipOval(
               child: SizedBox.square(
                   dimension: 50,
-                  child: ImageWidget(
+                  child:widget.user.image==null?const ImageWidget(
+                    url:
+                    'https://cdn-icons-png.flaticon.com/256/149/149071.png',
+                  ): ImageWidget(
                     url:
                         'http://fernweh.acublock.in/public/${widget.user.image}',
                   )),
@@ -237,12 +240,15 @@ class _FriendListItemState extends State<FriendListItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text(
-                    widget.user.fullName,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      fontVariations: FVariations.w700,
+                  Expanded(
+                    child: Text(
+                      overflow: TextOverflow.fade,
+                      widget.user.fullName,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontVariations: FVariations.w700,
+                      ),
                     ),
                   ),
                   const Text(
