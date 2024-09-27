@@ -6,6 +6,7 @@ import 'package:fernweh/view/navigation/map/notifier/category_notifier.dart';
 import 'package:fernweh/view/navigation/map/state/map_view_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../utils/common/action_button.dart';
@@ -41,6 +42,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   String? selectedPlaceId;
   late GoogleMapController mapController;
   late ScrollController _scrollController;
+  bool floatingButtonsHide = true;
 
   Map<String, dynamic> filterData = {
     'type': null,
@@ -49,31 +51,22 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     'sort_by': null,
     'selected_category': null,
   };
+  bool showSearchMessage = false;
+  LatLng? _latLng;
 
-  void _scrollToSelectedPlace(List<Category> category, String placeId) {
-    final index = category.indexWhere((element) => element.placeId == placeId);
-
-    if (index != -1) {
-      _scrollController.animateTo(
-        index * 342.0,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  void _scrollToSelectedItineraryPlace(
-      List<ItineraryPlaces> itinerary, String placeId) {
-    final index =
-        itinerary.indexWhere((element) => element.id.toString() == placeId);
-
-    if (index != -1) {
-      _scrollController.animateTo(
-        index * 342.0,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
-    }
+  void searchMessage() {
+    Position position = Position(
+        latitude: _latLng!.latitude,
+        longitude: _latLng!.longitude,
+        timestamp: DateTime.now(),
+        accuracy: 0.0,
+        altitude: 0.0,
+        heading: 0.0,
+        speed: 0.0,
+        speedAccuracy: 0.0,
+        altitudeAccuracy: 0.0,
+        headingAccuracy: 0.0);
+    ref.read(currentPositionProvider.notifier).updatePosition(position);
   }
 
   @override
@@ -91,8 +84,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final icon =
-        ref.watch(bitmapIconProvider);
+    final icon = ref.watch(bitmapIconProvider);
     final filters = ref.watch(filtersProvider);
     final currentPosition = ref.watch(positionProvider);
     final latLag = ref.watch(latlngProvider);
@@ -108,15 +100,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const SizedBox(),
-                  ActionButton(
-                    value: _categoryMapView,
-                    onPressed: () {
-                      setState(() {
-                        _categoryMapView = !_categoryMapView;
-                      });
-                      // _customInfoWindowController.hideInfoWindow!();
-                    },
-                  ),
+                  floatingButtonsHide
+                      ? const SizedBox.shrink()
+                      : ActionButton(
+                          value: _categoryMapView,
+                          onPressed: () {
+                            setState(() {
+                              _categoryMapView = !_categoryMapView;
+                            });
+                            // _customInfoWindowController.hideInfoWindow!();
+                          },
+                        ),
                   Padding(
                     padding: const EdgeInsets.only(right: 10),
                     child: Container(
@@ -141,15 +135,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const SizedBox(),
-                  ActionButton(
-                    value: _itineraryMapView,
-                    onPressed: () {
-                      setState(() {
-                        _itineraryMapView = !_itineraryMapView;
-                      });
-                      // _customInfoWindowController.hideInfoWindow!();
-                    },
-                  ),
+                  floatingButtonsHide
+                      ? const SizedBox.shrink()
+                      : ActionButton(
+                          value: _itineraryMapView,
+                          onPressed: () {
+                            setState(() {
+                              _itineraryMapView = !_itineraryMapView;
+                            });
+                            // _customInfoWindowController.hideInfoWindow!();
+                          },
+                        ),
                   Padding(
                     padding: const EdgeInsets.only(right: 10),
                     child: Container(
@@ -322,9 +318,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                               latLag.longitude),
                                     ),
                                     markers: Set.from(markers),
+                                    onCameraMoveStarted: () {
+                                        setState(() {
+                                          showSearchMessage = true;
+                                        });
+                                    },
                                     onCameraMove: (position) {
-                                      _customInfoWindowController
-                                          .onCameraMove!();
+                                      setState(() {
+                                        _latLng = position.target;
+                                      });
                                     },
                                   );
                                 },
@@ -487,11 +489,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   onPressed: () {
                                     if (mapViewState.selectedCategory ==
                                         category.title) {
-                                      // setState(() {
-                                      //   selectedItineraryIndex = -1;
-                                      //   _itineraryView = false;
-                                      //   _categoryView = true;
-                                      // });
+                                      setState(() {
+                                        floatingButtonsHide = true;
+                                      });
                                       mapState.update((_) => MapViewState(
                                           categoryView: true,
                                           itineraryView: false,
@@ -514,13 +514,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       ref
                                           .read(filtersProvider.notifier)
                                           .updateFilter(filterData);
+                                      ref.invalidate(itineraryNotifierProvider);
+
                                       return;
                                     } else {
-                                      // setState(() {
-                                      //   _itineraryView = false;
-                                      //   _categoryView = true;
-                                      //   selectedItineraryIndex = -1;
-                                      // });
+                                      setState(() {
+                                        floatingButtonsHide = false;
+                                      });
                                       mapState.update((_) => MapViewState(
                                           categoryView: true,
                                           itineraryView: false,
@@ -544,6 +544,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       ref
                                           .read(filtersProvider.notifier)
                                           .updateFilter(filterData);
+                                      ref
+                                          .read(itineraryNotifierProvider
+                                              .notifier)
+                                          .filteredItinerary();
                                     }
 
                                     _customInfoWindowController
@@ -601,9 +605,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                               if (mapViewState
                                                       .selectedItinerary ==
                                                   index) {
-                                                // selectedItineraryIndex = -1;
-                                                // _itineraryView = false;
-                                                // _categoryView = true;
+                                                setState(() {
+                                                  floatingButtonsHide = true;
+                                                });
                                                 mapState.update((_) =>
                                                     MapViewState(
                                                         categoryView: true,
@@ -630,8 +634,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                         .notifier)
                                                     .updateFilter(filterData);
                                               } else {
-                                                // selectedItineraryIndex =
-                                                //     index;
+                                                setState(() {
+                                                  floatingButtonsHide = false;
+                                                });
                                                 mapState.update((_) =>
                                                     MapViewState(
                                                         categoryView: false,
@@ -706,7 +711,27 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     },
                                   )),
                             ),
-                          )
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          showSearchMessage
+                              ? GestureDetector(
+                                  onTap: () {
+                                    searchMessage();
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(50)),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text("search this area"),
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
                         ],
                       ),
                     ),
@@ -825,7 +850,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                               ),
                                             );
                                             setState(() {
-                                              selectedPlaceId=data.id.toString();
+                                              selectedPlaceId =
+                                                  data.id.toString();
                                             });
                                           },
                                           child: Container(
@@ -923,17 +949,22 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                             ),
                                           );
                                         },
-                                        child: RecommendedItem(
-                                          address: data.vicinity ?? "",
-                                          type: formatCategory(data.type ?? ""),
-                                          image: data.photoUrls!.isEmpty
-                                              ? ""
-                                              : data.photoUrls?[0],
-                                          name: data.name,
-                                          distance: data.distance.toString(),
-                                          walkingTime: convertMinutes(int.parse(
-                                              data.walkingTime.toString())),
-                                          rating: data.rating.toString(),
+                                        child: SizedBox(
+                                          height: 130,
+                                          child: RecommendedItem(
+                                            address: data.vicinity ?? "",
+                                            type:
+                                                formatCategory(data.type ?? ""),
+                                            image: data.photoUrls!.isEmpty
+                                                ? ""
+                                                : data.photoUrls?[0],
+                                            name: data.name,
+                                            distance: data.distance.toString(),
+                                            walkingTime: convertMinutes(
+                                                int.parse(data.walkingTime
+                                                    .toString())),
+                                            rating: data.rating.toString(),
+                                          ),
                                         ),
                                       );
                                     },
@@ -962,7 +993,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     child: Text("No Itinerary Found")))),
                       ),
                     if (_categoryMapView && mapViewState.categoryView)
-                      Padding(
+                      floatingButtonsHide?const SizedBox.shrink(): Padding(
                         padding: const EdgeInsets.only(bottom: 80),
                         child: Align(
                           alignment: Alignment.bottomCenter,
@@ -1079,6 +1110,32 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ),
       ),
     );
+  }
+
+  void _scrollToSelectedPlace(List<Category> category, String placeId) {
+    final index = category.indexWhere((element) => element.placeId == placeId);
+
+    if (index != -1) {
+      _scrollController.animateTo(
+        index * 342.0,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _scrollToSelectedItineraryPlace(
+      List<ItineraryPlaces> itinerary, String placeId) {
+    final index =
+        itinerary.indexWhere((element) => element.id.toString() == placeId);
+
+    if (index != -1) {
+      _scrollController.animateTo(
+        index * 342.0,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   void navigateToScreen(Category data) {

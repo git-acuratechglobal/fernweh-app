@@ -12,8 +12,21 @@ class UserItinerary {
   final List<Itenery>? userIteneries;
   final List<Itenery>? sharedIteneries;
 
-  factory UserItinerary.fromJson(Map<String, dynamic> json) => _$UserItineraryFromJson(json);
+  factory UserItinerary.fromJson(Map<String, dynamic> json) =>
+      _$UserItineraryFromJson(json);
 
+  List<Itenery> getCombinedItineraries(int currentUserId) {
+    List<Itenery> combinedItineraries = [];
+    if (userIteneries != null) {
+      combinedItineraries.addAll(userIteneries!);
+    }
+    if (sharedIteneries != null) {
+      combinedItineraries.addAll(sharedIteneries!.where(
+        (itinerary) => itinerary.canEdit!.any((can) => can.id == currentUserId),
+      ));
+    }
+    return combinedItineraries;
+  }
 }
 
 @JsonSerializable(createToJson: false)
@@ -30,8 +43,8 @@ class Itenery {
   final List<Can>? canEdit;
   final int? placesCount;
 
-  factory Itenery.fromJson(Map<String, dynamic> json) => _$IteneryFromJson(json);
-
+  factory Itenery.fromJson(Map<String, dynamic> json) =>
+      _$IteneryFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -47,7 +60,6 @@ class Can {
   final String? image;
 
   factory Can.fromJson(Map<String, dynamic> json) => _$CanFromJson(json);
-
 }
 
 @JsonSerializable(createToJson: false)
@@ -94,10 +106,9 @@ class Itinerary {
   final String? haveAccess;
   final String? shareUrl;
 
-  factory Itinerary.fromJson(Map<String, dynamic> json) => _$ItineraryFromJson(json);
-
+  factory Itinerary.fromJson(Map<String, dynamic> json) =>
+      _$ItineraryFromJson(json);
 }
-
 
 List<Itinerary> get userItinerarydummyList {
   return List.generate(8, (index) {
@@ -112,7 +123,7 @@ List<Itinerary> get userItinerarydummyList {
         isDeleted: null,
         createdAt: null,
         updatedAt: null,
-        haveAccess: '', shareUrl: '');
+        haveAccess: '',
+        shareUrl: '');
   });
 }
-

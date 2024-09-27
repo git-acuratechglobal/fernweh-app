@@ -168,15 +168,19 @@ class RecommendedItem extends StatelessWidget {
                   right: Radius.circular(6.0),
                 ),
               ),
-              child: Text(
-                overflow: TextOverflow.ellipsis,
-                type ?? 'All',
-                style: TextStyle(
-                  color: const Color(0xFFCF5253),
-                  fontSize: 11,
-                  fontVariations: FVariations.w700,
-                ),
-              ),
+              child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 80),
+                    child: Text(
+                      type ?? 'All',
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      style: const TextStyle(
+                        color: Color(0xFFCF5253),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  )
             ),
           ),
         ],

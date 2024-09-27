@@ -105,12 +105,15 @@ class MyCreatedItinerary extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      itinary.name ?? "",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontVariations: FVariations.w700,
+                    Expanded(
+                      child: Text(
+                        overflow: TextOverflow.fade,
+                        itinary.name ?? "",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontVariations: FVariations.w700,
+                        ),
                       ),
                     ),
                     const SizedBox(
@@ -164,7 +167,7 @@ class MyCreatedItinerary extends StatelessWidget {
                           backgroundColor: Colors.white,
                           isScrollControlled: true,
                           constraints: BoxConstraints.tightFor(
-                            height: MediaQuery.sizeOf(context).height * 0.70,
+                            height: MediaQuery.sizeOf(context).height * 0.80,
                           ),
                           shape: const RoundedRectangleBorder(
                             borderRadius:

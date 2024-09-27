@@ -129,7 +129,7 @@ class FriendDetailScreen extends StatelessWidget {
                         crossAxisCount: 2,
                         crossAxisSpacing: 25,
                         mainAxisSpacing: 25,
-                        childAspectRatio: 0.85,
+                        childAspectRatio: 0.75,
                       ),
                       itemBuilder: (context, index) {
                         return Column(
@@ -216,12 +216,15 @@ class FriendItineraryList extends StatelessWidget {
                           "http://fernweh.acublock.in/public/${itinary.image}")),
             )),
         const SizedBox(
-          height: 10,
+          height: 5,
         ),
-        Text(
-          itinary.name ?? "",
-          style: const TextStyle(
-            color: Colors.black,
+        Expanded(
+          child: Text(
+            overflow:TextOverflow.fade,
+            itinary.name ?? "",
+            style: const TextStyle(
+              color: Colors.black,
+            ),
           ),
         ),
       ],

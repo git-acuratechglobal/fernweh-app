@@ -20,7 +20,7 @@ final addressProvider = FutureProvider<String>.internal(
 );
 
 typedef AddressRef = FutureProviderRef<String>;
-String _$currentPositionHash() => r'67333f46e9fcbed35e391cc3fbc9ff79a7a99e68';
+String _$currentPositionHash() => r'29d4f3697224c20b07594ce396d4c7c8717a5306';
 
 /// See also [CurrentPosition].
 @ProviderFor(CurrentPosition)

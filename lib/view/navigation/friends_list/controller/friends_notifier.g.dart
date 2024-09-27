@@ -21,7 +21,7 @@ final friendRequestProvider = AutoDisposeFutureProvider<List<Friends>>.internal(
 );
 
 typedef FriendRequestRef = AutoDisposeFutureProviderRef<List<Friends>>;
-String _$friendsNotifierHash() => r'744b5e36882805cf8719c270906c7f5c3e247fde';
+String _$friendsNotifierHash() => r'7ef835620503449f9d463bfb6c5d1fe5730e956d';
 
 /// See also [FriendsNotifier].
 @ProviderFor(FriendsNotifier)

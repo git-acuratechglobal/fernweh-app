@@ -16,17 +16,17 @@ part 'category_notifier.g.dart';
 class ItineraryNotifier extends _$ItineraryNotifier {
   @override
   FutureOr<List<Category>> build() async {
-    final position = await ref.watch(currentPositionProvider.future);
-    final filters = ref.watch(filtersProvider);
-    final data = await ref.watch(apiServiceProvider).getCategory(
-        position.latitude.toString(), position.longitude.toString(),
-        filter: filters);
-    if (data.isNotEmpty) {
-      ref.read(latlngProvider.notifier).state = LatLng(
-          double.parse(data[0].latitude.toString()),
-          double.parse(data[0].longitude.toString()));
-    }
-    return data;
+    // final position = await ref.watch(currentPositionProvider.future);
+    // final filters = ref.watch(filtersProvider);
+    // final data = await ref.watch(apiServiceProvider).getCategory(
+    //     position.latitude.toString(), position.longitude.toString(),
+    //     filter: filters);
+    // if (data.isNotEmpty) {
+    //   ref.read(latlngProvider.notifier).state = LatLng(
+    //       double.parse(data[0].latitude.toString()),
+    //       double.parse(data[0].longitude.toString()));
+    // }
+    return [];
   }
 
   Future<void> filteredItinerary() async {
@@ -70,13 +70,13 @@ final filtersProvider =
 class FilterNotifier extends StateNotifier<Map<String, dynamic>> {
   FilterNotifier()
       : super({
-          'type': null,
-          'rating': null,
-          'radius': null,
-          'sort_by': null,
-          'selected_category': null,
-          'selected_radius': null,
-          'input': null
+          // 'type': null,
+          // 'rating': null,
+          // 'radius': null,
+          // 'sort_by': null,
+          // 'selected_category': null,
+          // 'selected_radius': null,
+          // 'input': null
         });
 
   void updateFilter(Map<String, dynamic> filters) {

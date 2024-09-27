@@ -8,6 +8,7 @@ import 'package:fernweh/utils/common/config.dart';
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
+import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/navigation/itinerary/models/states/itinerary_state.dart';
 import 'package:fernweh/view/navigation/itinerary/models/states/my_itinerary_state.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
@@ -436,6 +437,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
     final selectedItineraryId =
         ref.watch(localStorageServiceProvider).getItineraryId();
     final validation = ref.watch(validatorsProvider);
+    final user=ref.watch(userDetailProvider);
     return Form(
       key: fkey,
       child: Column(
@@ -522,7 +524,8 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                   AsyncDataWidgetB(
                     dataProvider: getUserItineraryProvider,
                     dataBuilder: (context, userItinerary) {
-                      return userItinerary.userIteneries!.isEmpty
+                      List<Itenery> combinedItineraries = userItinerary.getCombinedItineraries(user?.id??0);
+                      return combinedItineraries.isEmpty
                           ? Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -562,8 +565,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               padding: const EdgeInsets.all(10),
-                              itemCount:
-                                  userItinerary.userIteneries!.length + 1,
+                              itemCount: combinedItineraries.length + 1,
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 3,
@@ -573,7 +575,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                               ),
                               itemBuilder: (context, index) {
                                 if (index ==
-                                    userItinerary.userIteneries!.length) {
+                                    combinedItineraries.length) {
                                   return Padding(
                                     padding: const EdgeInsets.only(
                                         bottom: 35, right: 10),
@@ -603,14 +605,13 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                   );
                                 }
                                 final itinary =
-                                    userItinerary.userIteneries![index];
+                                combinedItineraries[index];
                                 if (selectedItineraryId != null) {
-                                  _selectedItinerary = userItinerary
-                                      .userIteneries!
+                                  _selectedItinerary = combinedItineraries
                                       .indexWhere((e) =>
                                           e.itinerary!.id ==
                                           selectedItineraryId);
-                                  itinerary = userItinerary.userIteneries!
+                                  itinerary = combinedItineraries
                                       .firstWhere((e) =>
                                           e.itinerary!.id ==
                                           selectedItineraryId);

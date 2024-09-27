@@ -77,7 +77,7 @@ class CurrentPosition extends _$CurrentPosition {
     state = AsyncData(position);
     ref.read(positionProvider.notifier).update((state) => position);
     ref.invalidate(addressProvider);
-    ref.invalidate(itineraryNotifierProvider);
+    ref.read(itineraryNotifierProvider.notifier).filteredItinerary();
   }
 }
 
