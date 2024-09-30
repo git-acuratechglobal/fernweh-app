@@ -88,24 +88,22 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                               AsyncDataWidgetB(
                                 dataProvider: addressProvider,
                                 dataBuilder: (BuildContext context, data) {
-                                  return SizedBox(
-                                    width: 190,
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            overflow: TextOverflow.ellipsis,
-                                            data,
-                                            style: TextStyle(
-                                              color: const Color(0xFF1A1B28),
-                                              fontVariations: FVariations.w700,
-                                            ),
+                                  return Row(
+                                    children: [
+                                      ConstrainedBox(
+                                        constraints: const BoxConstraints(maxWidth: 230),
+                                        child: Text(
+                                          overflow: TextOverflow.ellipsis,
+                                          data,
+                                          style: TextStyle(
+                                            color: const Color(0xFF1A1B28),
+                                            fontVariations: FVariations.w700,
                                           ),
                                         ),
-                                        const Icon(
-                                            Icons.keyboard_arrow_down_outlined)
-                                      ],
-                                    ),
+                                      ),
+                                      const Icon(
+                                          Icons.keyboard_arrow_down_outlined)
+                                    ],
                                   );
                                 },
                                 errorBuilder: (error, stack) => const Center(
@@ -120,18 +118,18 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           ),
                         ),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (context) => const WishListScreen()),
-                          );
-                        },
-                        icon: Image.asset(
-                          'assets/images/heart.png',
-                          color: const Color(0xffCF5253),
-                        ),
-                      ),
+                      // IconButton(
+                      //   onPressed: () {
+                      //     Navigator.of(context).push(
+                      //       MaterialPageRoute(
+                      //           builder: (context) => const WishListScreen()),
+                      //     );
+                      //   },
+                      //   icon: Image.asset(
+                      //     'assets/images/heart.png',
+                      //     color: const Color(0xffCF5253),
+                      //   ),
+                      // ),
                       Image.asset('assets/images/notification.png'),
                       // Container(
                       //   width: 70,

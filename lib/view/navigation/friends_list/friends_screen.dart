@@ -57,22 +57,6 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
                       )
                     : null,
                 actions: const [
-                  // Padding(
-                  //   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  //   child: ElevatedButton(
-                  //       style: ElevatedButton.styleFrom(
-                  //           padding: const EdgeInsets.symmetric(horizontal: 10),
-                  //           minimumSize: const Size(60, 40)),
-                  //       onPressed: () {
-                  //         Navigator.of(context).push(
-                  //           MaterialPageRoute(
-                  //             fullscreenDialog: true,
-                  //             builder: (context) => const AddFriendScreen(),
-                  //           ),
-                  //         );
-                  //       },
-                  //       child: const Text('Suggestions')),
-                  // )
                 ],
               ),
               Padding(
@@ -80,32 +64,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // GestureDetector(
-                        //   onTap: () {},
-                        //   child: Container(
-                        //     height: 50,
-                        //     width: 300,
-                        //     decoration: BoxDecoration(
-                        //       borderRadius: BorderRadius.circular(20),
-                        //       border: Border.all(color: Colors.grey),
-                        //       color: Colors.white,
-                        //     ),
-                        //     child: const Padding(
-                        //       padding: EdgeInsets.symmetric(horizontal: 20),
-                        //       child: Row(
-                        //         mainAxisAlignment:
-                        //             MainAxisAlignment.spaceBetween,
-                        //         children: [
-                        //           Text(
-                        //             "Search friends",
-                        //             style: TextStyle(fontSize: 15),
-                        //           ),
-                        //           Icon(Icons.search),
-                        //         ],
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
+
                         Expanded(
                           child: TextFormField(
                             focusNode: searchFriend,

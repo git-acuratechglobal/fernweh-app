@@ -38,13 +38,16 @@ class LocationService {
   }
 
   Future<String> getAddressFromPosition(Position position) async {
+    print(position.latitude);
+    print(position.longitude);
     List<Placemark> placemarks = await placemarkFromCoordinates(
       position.latitude,
       position.longitude,
     );
     if (placemarks.isNotEmpty) {
+      print(placemarks);
       final Placemark placemark = placemarks[0];
-      return '${placemark.street}, ${placemark.locality}, ${placemark.country}';
+      return '${placemark.name}, ${placemark.locality}, ${placemark.country}';
     }
     return 'No address available';
   }

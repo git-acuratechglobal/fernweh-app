@@ -20,7 +20,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    ref.read(currentPositionProvider);
+    ref.read(currentPositionProvider.future);
     Future.delayed(const Duration(seconds: 3), () {
       final onBoarding = ref.read(localStorageServiceProvider).getOnboarding();
       final user = ref.read(localStorageServiceProvider).getUser();
