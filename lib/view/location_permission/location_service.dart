@@ -8,7 +8,9 @@ part 'location_service.g.dart';
 
 class LocationService {
   bool _isLocationPermissionGranted = false;
+
   bool get isLocationPermissionGranted => _isLocationPermissionGranted;
+
   Future<Position> getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -38,14 +40,11 @@ class LocationService {
   }
 
   Future<String> getAddressFromPosition(Position position) async {
-    print(position.latitude);
-    print(position.longitude);
     List<Placemark> placemarks = await placemarkFromCoordinates(
       position.latitude,
       position.longitude,
     );
     if (placemarks.isNotEmpty) {
-      print(placemarks);
       final Placemark placemark = placemarks[0];
       return '${placemark.name}, ${placemark.locality}, ${placemark.country}';
     }
@@ -63,14 +62,14 @@ class CurrentPosition extends _$CurrentPosition {
   FutureOr<Position> build() async {
     final locationService = ref.watch(locationServiceProvider);
     final Position position = await locationService.getCurrentLocation();
-    ref.read(positionProvider.notifier).update((state) => position);
+    ref.read(positionProvider.notifier).updatePosition(position);
     return position;
   }
 
   Future<void> currentPosition() async {
     final locationService = ref.watch(locationServiceProvider);
     final currentPosition = await locationService.getCurrentLocation();
-    ref.read(positionProvider.notifier).update((state) => currentPosition);
+    ref.read(positionProvider.notifier).updatePosition(currentPosition);
     state = AsyncData(currentPosition);
     ref.invalidate(addressProvider);
     ref.invalidate(itineraryNotifierProvider);
@@ -78,17 +77,26 @@ class CurrentPosition extends _$CurrentPosition {
 
   Future<void> updatePosition(Position position) async {
     state = AsyncData(position);
-    ref.read(positionProvider.notifier).update((state) => position);
+    ref.read(positionProvider.notifier).updatePosition(position);
     ref.invalidate(addressProvider);
     ref.read(itineraryNotifierProvider.notifier).filteredItinerary();
   }
 }
 
-final positionProvider = StateProvider<Position?>((ref) => null);
+final positionProvider = StateNotifierProvider<PositionNotifier, Position?>(
+    (ref) => PositionNotifier());
+
+class PositionNotifier extends StateNotifier<Position?> {
+  PositionNotifier() : super(null);
+
+  void updatePosition(Position? position) {
+    state = position;
+  }
+}
 
 @Riverpod(keepAlive: true)
 FutureOr<String> address(AddressRef ref) async {
-  final position = await ref.read(currentPositionProvider.future);
-  final locationService = ref.read(locationServiceProvider);
+  final position = await ref.watch(currentPositionProvider.future);
+  final locationService = ref.watch(locationServiceProvider);
   return await locationService.getAddressFromPosition(position);
 }

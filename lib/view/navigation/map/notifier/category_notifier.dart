@@ -41,6 +41,8 @@ class ItineraryNotifier extends _$ItineraryNotifier {
         ref.read(latlngProvider.notifier).state = LatLng(
             double.parse(data[0].latitude.toString()),
             double.parse(data[0].longitude.toString()));
+      }else{
+        ref.read(latlngProvider.notifier).state=null;
       }
       state = AsyncData(data);
     } catch (e, st) {
@@ -52,9 +54,9 @@ class ItineraryNotifier extends _$ItineraryNotifier {
 final bitmapIconProvider =
     FutureProvider<BitmapDescriptor>((ref) async {
 
-  ByteData data = await rootBundle.load("assets/images/marker.png");
+  ByteData data = await rootBundle.load("assets/images/marker_in_black.png");
   ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-      targetWidth:80);
+      targetWidth:200,);
   ui.FrameInfo fi = await codec.getNextFrame();
   final Uint8List? markerIcon =
       (await fi.image.toByteData(format: ui.ImageByteFormat.png))

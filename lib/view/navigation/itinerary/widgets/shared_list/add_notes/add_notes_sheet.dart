@@ -80,17 +80,19 @@ class _AddNotesSheetState extends ConsumerState<AddNotesSheet> {
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: TextFormField(
-              validator: (val) => validation.itineraryName(val),
-              controller: noteController,
-              maxLines: 4,
-              decoration: const InputDecoration(hintText: "Add your note"),
-              onSaved: (val) {
-                ref.read(addNotesProvider.notifier).updateFormData(
-                    userId: userId?.id ?? 0,
-                    itineraryId: widget.itineraryId,
-                    notes: val);
-              },
-            ),
+                textInputAction: TextInputAction.done,
+                validator: (val) => validation.itineraryName(val),
+                controller: noteController,
+                maxLines: 4,
+                decoration: const InputDecoration(hintText: "Add your note"),
+                onSaved: (val) {
+                  ref.read(addNotesProvider.notifier).updateFormData(
+                      userId: userId?.id ?? 0,
+                      itineraryId: widget.itineraryId,
+                      notes: val);
+                },
+                onTapOutside: (val) =>
+                    FocusManager.instance.primaryFocus?.unfocus()),
           ),
           const Divider(height: 0),
           Expanded(

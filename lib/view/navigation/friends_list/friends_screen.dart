@@ -352,6 +352,7 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
         case AsyncData<FriendsState?> data when data.value != null:
           if (data.value!.friendsEvent == FriendsEvent.requestAccept) {
             setState(() {
+              print("api request get ============>${data.value!.response}");
               acceptedRequests.add(data.value!.response.toString());
               userIds.remove(data.value!.response);
             });

@@ -114,10 +114,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       decoration: const BoxDecoration(
                           color: Colors.white, shape: BoxShape.circle),
                       child: IconButton(
-                        onPressed: () {
-                          ref
-                              .read(currentPositionProvider.notifier)
-                              .currentPosition();
+                        onPressed: ()async {
+                          ref.invalidate(currentPositionProvider);
+                        ref.invalidate(mapViewStateProvider);
+                          ref.invalidate(itineraryNotifierProvider);
+
                         },
                         icon: const Icon(Icons.gps_fixed_outlined),
                       ),
@@ -286,23 +287,29 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     myLocationEnabled: true,
                                     onMapCreated: (controller) async {
                                       mapController = controller;
-                                      _customInfoWindowController
-                                          .googleMapController = controller;
-                                      final latlng = LatLng(
-                                        double.parse(
-                                            category[0].latitude.toString()),
-                                        double.parse(
-                                            category[0].longitude.toString()),
-                                      );
-                                      await mapController.animateCamera(
-                                          CameraUpdate.newLatLng(latlng));
+                                      if(category.isNotEmpty){
+                                        final latlng = LatLng(
+                                          double.parse(
+                                              category[0].latitude.toString()),
+                                          double.parse(
+                                              category[0].longitude.toString()),
+                                        );
+                                        await mapController.animateCamera(
+                                            CameraUpdate.newLatLng(latlng));
+                                      }else{
+                                        await mapController
+                                            .animateCamera(
+                                            CameraUpdate.newLatLngZoom(
+                                                LatLng(currentPosition.latitude,
+                                                    currentPosition.longitude), 16));
+                                      }
+
+
                                     },
                                     onTap: (controller) {
                                       setState(() {
                                         itemsHide = !itemsHide;
                                       });
-                                      _customInfoWindowController
-                                          .hideInfoWindow!();
                                     },
                                     initialCameraPosition: CameraPosition(
                                       zoom: 14,
@@ -416,7 +423,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   setState(() {
                                     itemsHide = !itemsHide;
                                   });
-                                  _customInfoWindowController.hideInfoWindow!();
                                 },
                                 markers: Set.from(markers),
                               );
@@ -445,12 +451,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           ),
                         ),
                       ),
-                    CustomInfoWindow(
-                      controller: _customInfoWindowController,
-                      height: 70,
-                      width: 220,
-                      offset: 5,
-                    ),
+                    // CustomInfoWindow(
+                    //   controller: _customInfoWindowController,
+                    //   height: 70,
+                    //   width: 220,
+                    //   offset: 5,
+                    // ),
                     Positioned(
                       top: 0,
                       left: 0,
@@ -545,8 +551,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                           .filteredItinerary();
                                     }
 
-                                    _customInfoWindowController
-                                        .hideInfoWindow!();
                                   },
                                   avatar: Icon(
                                     category.icon,
@@ -907,7 +911,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       child: Text("No Itinerary Found")))),
                         ),
                       ),
-                    if (!_categoryMapView && mapViewState.categoryView)
+              if (!_categoryMapView && mapViewState.categoryView)
                       Positioned.fill(
                         child: Padding(
                             padding: const EdgeInsets.only(top: 180),
@@ -987,7 +991,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 errorBuilder: (error, stack) => const Center(
                                     child: Text("No Itinerary Found")))),
                       ),
-                    if (_categoryMapView && mapViewState.categoryView)
+                    if(!itemsHide)    if (_categoryMapView && mapViewState.categoryView)
                       floatingButtonsHide?const SizedBox.shrink(): Padding(
                         padding: const EdgeInsets.only(bottom: 80),
                         child: Align(
