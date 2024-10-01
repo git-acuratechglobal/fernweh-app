@@ -56,10 +56,7 @@ class FriendDetailScreen extends StatelessWidget {
                   color: Theme.of(context).colorScheme.secondary,
                 ),
               ),
-              child: ClipOval(
-                  child: ImageWidget(
-                      url:
-                          'http://fernweh.acublock.in/public/${friends.image}')),
+              child: ClipOval(child: ImageWidget(url: friends.imageUrl)),
             ),
             const SizedBox(height: 16.0),
             Text(
@@ -85,7 +82,8 @@ class FriendDetailScreen extends StatelessWidget {
                     dataProvider:
                         getFriendsItineraryListProvider(friends.id ?? 0),
                     dataBuilder: (context, itinerary) {
-                      List<FriendsItinerary> filteredList=itinerary.where((e)=>e.type=="1").toList();
+                      List<FriendsItinerary> filteredList =
+                          itinerary.where((e) => e.type == "1").toList();
                       return itinerary.isEmpty
                           ? const Center(child: Text("No itinerary found!"))
                           : GridView.builder(
@@ -106,16 +104,17 @@ class FriendDetailScreen extends StatelessWidget {
                                         builder: (context) =>
                                             ItenaryDetailsScreen(
                                           title: filteredList[index].name ?? "",
-                                          itineraryId: filteredList[index].id ?? 0,
+                                          itineraryId:
+                                              filteredList[index].id ?? 0,
                                         ),
                                       ),
                                     );
                                   },
-                                  child:  FriendItineraryList(
-                                          itinary: filteredList[index],
-                                          isEditing: false,
-                                          isSelected: false,
-                                        ),
+                                  child: FriendItineraryList(
+                                    itinary: filteredList[index],
+                                    isEditing: false,
+                                    isSelected: false,
+                                  ),
                                 );
                               },
                             );
@@ -220,7 +219,7 @@ class FriendItineraryList extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            overflow:TextOverflow.fade,
+            overflow: TextOverflow.fade,
             itinary.name ?? "",
             style: const TextStyle(
               color: Colors.black,

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/common/extensions.dart';
+import '../../itinerary/widgets/my_curated_list/share_your_itinerary/invite_friend/invite_friend_sheet.dart';
 import '../controller/friends_notifier.dart';
 import '../model/friends.dart';
 import '../model/friends_state.dart';
@@ -52,6 +53,7 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
         constraints: const BoxConstraints.expand(),
         decoration: BoxDecoration(gradient: Config.backgroundGradient),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AppBar(
               backgroundColor: Colors.transparent,
@@ -84,8 +86,8 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
                         borderRadius: BorderRadius.circular(
                           20,
                         ),
-                        borderSide: const BorderSide(
-                            color: Colors.grey, width: 2)),
+                        borderSide:
+                            const BorderSide(color: Colors.grey, width: 2)),
                     suffixIcon: const Icon(Icons.search)),
                 onFieldSubmitted: (val) {
                   ref.read(searchFriendProvider.notifier).searchFriends(val);
@@ -93,13 +95,54 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
                 onChanged: (val) {
                   ref.read(searchFriendProvider.notifier).searchFriends(val);
                 },
-                onTapOutside: (val){
+                onTapOutside: (val) {
                   _textFieldFocusNode.unfocus();
                 },
               ),
             ),
             const SizedBox(
               height: 10,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  showModalBottomSheet(
+                    context: context,
+                    backgroundColor: Colors.white,
+                    isScrollControlled: true,
+                    constraints: BoxConstraints.tightFor(
+                      height: MediaQuery.sizeOf(context).height * 0.65,
+                    ),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    builder: (context) {
+                      return const InviteFriendSheet();
+                    },
+                  );
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      'assets/images/user-add.png',
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                    const SizedBox(width: 8.0),
+                    Text(
+                      "Invite Friend",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary,
+                        fontSize: 16,
+                        fontVariations: FVariations.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
             Expanded(
                 child: AsyncDataWidgetB(
@@ -226,12 +269,8 @@ class _FriendListItemState extends State<FriendListItem> {
             ClipOval(
               child: SizedBox.square(
                   dimension: 50,
-                  child:widget.user.image==null?const ImageWidget(
-                    url:
-                    'https://cdn-icons-png.flaticon.com/256/149/149071.png',
-                  ): ImageWidget(
-                    url:
-                        'http://fernweh.acublock.in/public/${widget.user.image}',
+                  child: ImageWidget(
+                    url: widget.user.imageUrl,
                   )),
             ),
             const SizedBox(width: 16),

@@ -42,5 +42,11 @@ class FriendsItinerary {
   final DateTime? updatedAt;
 
   factory FriendsItinerary.fromJson(Map<String, dynamic> json) => _$FriendsItineraryFromJson(json);
-
+  String get imageUrl{
+    if(image==null){
+      return "https://cdn-icons-png.flaticon.com/512/2343/2343940.png";
+    }else{
+      return "http://fernweh.acublock.in/public/$image";
+    }
+  }
 }

@@ -155,46 +155,6 @@ class _ShareItenarySheetState extends ConsumerState<ShareItenarySheet> {
             ),
           ),
         ),
-        // Padding(
-        //   padding: const EdgeInsets.only(left: 16.0),
-        //   child: TextButton(
-        //     onPressed: () {
-        //       Navigator.of(context).pop();
-        //       showModalBottomSheet(
-        //         context: context,
-        //         backgroundColor: Colors.white,
-        //         isScrollControlled: true,
-        //         constraints: BoxConstraints.tightFor(
-        //           height: MediaQuery.sizeOf(context).height * 0.65,
-        //         ),
-        //         shape: const RoundedRectangleBorder(
-        //           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        //         ),
-        //         builder: (context) {
-        //           return const InviteFriendSheet();
-        //         },
-        //       );
-        //     },
-        //     child: Row(
-        //       mainAxisSize: MainAxisSize.min,
-        //       children: [
-        //         Image.asset(
-        //           'assets/images/user-add.png',
-        //           color: Theme.of(context).colorScheme.secondary,
-        //         ),
-        //         const SizedBox(width: 8.0),
-        //         Text(
-        //           "Invite Friend",
-        //           style: TextStyle(
-        //             color: Theme.of(context).colorScheme.secondary,
-        //             fontSize: 16,
-        //             fontVariations: FVariations.w700,
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // ),
         const SizedBox(height: 16),
         const Divider(height: 0),
         Padding(

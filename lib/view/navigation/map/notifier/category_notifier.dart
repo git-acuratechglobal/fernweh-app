@@ -26,10 +26,12 @@ class ItineraryNotifier extends _$ItineraryNotifier {
     //       double.parse(data[0].latitude.toString()),
     //       double.parse(data[0].longitude.toString()));
     // }
+    ref.invalidate(latlngProvider);
     return [];
   }
 
   Future<void> filteredItinerary() async {
+    print("filter method called===================");
     try {
       state = const AsyncLoading();
       final position = await ref.watch(currentPositionProvider.future);
@@ -42,7 +44,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
             double.parse(data[0].latitude.toString()),
             double.parse(data[0].longitude.toString()));
       }else{
-        ref.read(latlngProvider.notifier).state=null;
+        ref.invalidate(latlngProvider);
       }
       state = AsyncData(data);
     } catch (e, st) {
@@ -56,7 +58,7 @@ final bitmapIconProvider =
 
   ByteData data = await rootBundle.load("assets/images/marker_in_black.png");
   ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-      targetWidth:200,);
+      targetWidth:160,);
   ui.FrameInfo fi = await codec.getNextFrame();
   final Uint8List? markerIcon =
       (await fi.image.toByteData(format: ui.ImageByteFormat.png))

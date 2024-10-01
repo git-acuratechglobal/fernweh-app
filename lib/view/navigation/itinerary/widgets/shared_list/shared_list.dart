@@ -1,5 +1,6 @@
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
+import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/shared_list_details/shared_details_screen.dart';
 import 'package:flutter/material.dart';
@@ -29,28 +30,29 @@ class SharedListTab extends ConsumerWidget {
           dataBuilder: (context, sharedItinerary) {
             return sharedItinerary.sharedIteneries!.isEmpty
                 ? Center(
-                  child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("No shared Itineraries found"),
-                      const SizedBox(height: 10,),
-                      OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          minimumSize: const Size(60, 40),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("No shared Itineraries found"),
+                        const SizedBox(
+                          height: 10,
                         ),
-                        onPressed: () {
-                          ref.invalidate(getUserItineraryProvider);
-                        },
-                        child: const Text(
-                          "Refresh",
-                          style: TextStyle(fontSize: 14),
+                        OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            minimumSize: const Size(60, 40),
+                          ),
+                          onPressed: () {
+                            ref.invalidate(getUserItineraryProvider);
+                          },
+                          child: const Text(
+                            "Refresh",
+                            style: TextStyle(fontSize: 14),
+                          ),
                         ),
-                      ),
-
-                    ],
-                  ),
-                )
+                      ],
+                    ),
+                  )
                 : ListView.separated(
                     padding: const EdgeInsets.all(24),
                     itemCount: sharedItinerary.sharedIteneries!.length,
@@ -58,9 +60,9 @@ class SharedListTab extends ConsumerWidget {
                       final itinary = sharedItinerary.sharedIteneries![index];
                       return SharedItem(
                         itinerary: itinary,
-                        placesCount:
-                            sharedItinerary.sharedIteneries?[index].placesCount ??
-                                0,
+                        placesCount: sharedItinerary
+                                .sharedIteneries?[index].placesCount ??
+                            0,
                       );
                     },
                     separatorBuilder: (BuildContext context, int index) {
@@ -125,6 +127,7 @@ class SharedItem extends ConsumerStatefulWidget {
 class _SharedItemState extends ConsumerState<SharedItem> {
   @override
   Widget build(BuildContext context) {
+    final userId = ref.watch(userDetailProvider);
     return InkWell(
       onTap: () {
         // ref
@@ -158,8 +161,8 @@ class _SharedItemState extends ConsumerState<SharedItem> {
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: ImageWidget(
-                      url:
-                          "http://fernweh.acublock.in/public/${widget.itinerary.itinerary!.image}")),
+                          url:
+                              widget.itinerary.itinerary!.imageUrl)),
             ),
             const SizedBox(width: 12.0),
             Expanded(
@@ -196,9 +199,10 @@ class _SharedItemState extends ConsumerState<SharedItem> {
                   ),
                   Flexible(
                     flex: 1,
-                    child: AvatarList(
-                        images:[...?widget.itinerary.canEdit,...? widget.itinerary.canView]
-                      ),
+                    child: AvatarList(images: [
+                      ...?widget.itinerary.canEdit,
+                      ...?widget.itinerary.canView
+                    ]),
                   )
                 ],
               ),
@@ -206,7 +210,10 @@ class _SharedItemState extends ConsumerState<SharedItem> {
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (widget.itinerary.canEdit!.isNotEmpty)
+                if (widget.itinerary.canEdit!.isNotEmpty &&
+                    widget.itinerary.canEdit!
+                        .where((val) => val.id == userId?.id)
+                        .isNotEmpty)
                   GestureDetector(
                       onTap: () {
                         showModalBottomSheet(
@@ -227,38 +234,48 @@ class _SharedItemState extends ConsumerState<SharedItem> {
                               iteneraryName:
                                   widget.itinerary.itinerary?.name ?? "",
                               id: widget.itinerary.itinerary?.id,
-                              type: int.parse(widget.itinerary.itinerary?.type??""),
+                              type: int.parse(
+                                  widget.itinerary.itinerary?.type ?? ""),
                             );
                           },
                         );
                       },
                       child: Image.asset('assets/images/edit.png')),
-                if (widget.itinerary.canEdit!.isNotEmpty)
+                if (widget.itinerary.canEdit!.isNotEmpty &&
+                    widget.itinerary.canEdit!
+                        .where((val) => val.id == userId?.id)
+                        .isNotEmpty)
                   const SizedBox(
                     height: 10,
                   ),
-                GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                      context: context,
-                      backgroundColor: Colors.white,
-                      isScrollControlled: true,
-                      constraints: BoxConstraints.tightFor(
-                        height: MediaQuery.sizeOf(context).height * 0.85,
-                      ),
-                      shape: const RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(20)),
-                      ),
-                      builder: (context) {
-                        return  AddNotesSheet(itineraryId: widget.itinerary.itinerary!.id??0,);
-                      },
-                    );
-                  },
-                  child: Image.asset(
-                    'assets/images/note.png',
+                if (widget.itinerary.canEdit!.isNotEmpty &&
+                    widget.itinerary.canEdit!
+                        .where((val) => val.id == userId?.id)
+                        .isNotEmpty)
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        backgroundColor: Colors.white,
+                        isScrollControlled: true,
+                        constraints: BoxConstraints.tightFor(
+                          height: MediaQuery.sizeOf(context).height * 0.85,
+                        ),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(20)),
+                        ),
+                        builder: (context) {
+                          return AddNotesSheet(
+                            itineraryId: widget.itinerary.itinerary!.id ?? 0,
+                          );
+                        },
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/images/note.png',
+                    ),
                   ),
-                ),
                 ShareIcon(widget.itinerary.itinerary?.id.toString())
               ],
             )

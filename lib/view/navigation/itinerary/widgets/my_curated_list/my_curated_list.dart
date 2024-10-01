@@ -39,9 +39,9 @@ class MyCuratedListTab extends StatelessWidget {
               aspectRatio: 1,
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: ImageWidget(
-                      url:
-                          "http://fernweh.acublock.in/public/${itinary.image}")),
+                  child:ImageWidget(
+                      url:itinary.imageUrl)
+                     ),
             )),
         const SizedBox(
           height: 10,
@@ -88,8 +88,8 @@ class MyCreatedItinerary extends StatelessWidget {
           child: Row(
             children: [
               SizedBox(
-                height: 130,
-                width: 110,
+                height: 150,
+                width: 120,
                 child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: itinary.image == null

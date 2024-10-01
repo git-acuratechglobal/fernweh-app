@@ -56,15 +56,13 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
                         },
                       )
                     : null,
-                actions: const [
-                ],
+                actions: const [],
               ),
               Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-
                         Expanded(
                           child: TextFormField(
                             focusNode: searchFriend,
@@ -209,8 +207,8 @@ class _FriendsListState extends ConsumerState<FriendsList> {
                   child: SizedBox.square(
                       dimension: 50,
                       child: ImageWidget(
-                          url:
-                              'http://fernweh.acublock.in/public/${user.image}')),
+                              url:
+                                  user.imageUrl)),
                 ),
                 const SizedBox(width: 16),
                 Column(
@@ -407,6 +405,7 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                     final user = friends[index];
                     bool isSelected =
                         acceptedRequests.contains(user.id.toString());
+                    bool isLoading = userIds.contains(user.id.toString());
                     return InkWell(
                       onTap: () {
                         // Navigator.of(context).push(
@@ -438,15 +437,16 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                               child: SizedBox.square(
                                   dimension: 50,
                                   child: ImageWidget(
-                                    url:
-                                        'http://fernweh.acublock.in/public/${user.image}',
-                                  )),
+                                          url:
+                                              user.imageUrl,
+                                        )),
                             ),
                             const SizedBox(width: 16),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   SizedBox(
                                     width: 130,
@@ -488,23 +488,23 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                                     ),
                                   )
                                 : Expanded(
-
-                                  child: AppButton(
-                                      isLoading:
-                                          userIds.contains(user.id.toString()),
+                                    child: AppButton(
+                                      isLoading: isLoading,
                                       onTap: () {
                                         setState(() {
                                           userIds.add(user.id.toString());
                                         });
                                         ref
-                                            .read(
-                                                friendsNotifierProvider.notifier)
-                                            .acceptRequest(user.id ?? 0,);
+                                            .read(friendsNotifierProvider
+                                                .notifier)
+                                            .acceptRequest(
+                                              user.id ?? 0,
+                                            );
                                       },
                                       size: const Size(60, 40),
                                       child: const Text("Accept"),
                                     ),
-                                ),
+                                  ),
 
                             // SizedBox(
                             //   width: 100,

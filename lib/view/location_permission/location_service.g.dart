@@ -6,7 +6,7 @@ part of 'location_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$addressHash() => r'e1fcea924ee760b80fc322e0681b68770a6a2329';
+String _$addressHash() => r'1e5cd4c286f8899316ee42aed7b57fe820e576a4';
 
 /// See also [address].
 @ProviderFor(address)
@@ -20,7 +20,7 @@ final addressProvider = FutureProvider<String>.internal(
 );
 
 typedef AddressRef = FutureProviderRef<String>;
-String _$currentPositionHash() => r'29d4f3697224c20b07594ce396d4c7c8717a5306';
+String _$currentPositionHash() => r'9844c279ec434921e24c9cfe3aafcf297f953666';
 
 /// See also [CurrentPosition].
 @ProviderFor(CurrentPosition)

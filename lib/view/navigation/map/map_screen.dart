@@ -64,6 +64,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         altitudeAccuracy: 0.0,
         headingAccuracy: 0.0);
     ref.read(currentPositionProvider.notifier).updatePosition(position);
+    setState(() {
+      floatingButtonsHide = false;
+    });
   }
 
   @override
@@ -114,11 +117,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       decoration: const BoxDecoration(
                           color: Colors.white, shape: BoxShape.circle),
                       child: IconButton(
-                        onPressed: ()async {
+                        onPressed: () async {
                           ref.invalidate(currentPositionProvider);
-                        ref.invalidate(mapViewStateProvider);
+                          ref.invalidate(mapViewStateProvider);
                           ref.invalidate(itineraryNotifierProvider);
-
+                          setState(() {
+                            floatingButtonsHide = true;
+                          });
                         },
                         icon: const Icon(Icons.gps_fixed_outlined),
                       ),
@@ -204,7 +209,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             return Row(
                               children: [
                                 ConstrainedBox(
-                                  constraints: const BoxConstraints(maxWidth: 230),
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 230),
                                   child: Text(
                                     overflow: TextOverflow.ellipsis,
                                     data,
@@ -287,7 +293,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     myLocationEnabled: true,
                                     onMapCreated: (controller) async {
                                       mapController = controller;
-                                      if(category.isNotEmpty){
+                                      if (category.isNotEmpty) {
                                         final latlng = LatLng(
                                           double.parse(
                                               category[0].latitude.toString()),
@@ -296,15 +302,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                         );
                                         await mapController.animateCamera(
                                             CameraUpdate.newLatLng(latlng));
-                                      }else{
-                                        await mapController
-                                            .animateCamera(
+                                      } else {
+                                        await mapController.animateCamera(
                                             CameraUpdate.newLatLngZoom(
                                                 LatLng(currentPosition.latitude,
-                                                    currentPosition.longitude), 16));
+                                                    currentPosition.longitude),
+                                                16));
                                       }
-
-
                                     },
                                     onTap: (controller) {
                                       setState(() {
@@ -321,9 +325,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     ),
                                     markers: Set.from(markers),
                                     onCameraMoveStarted: () {
-                                        setState(() {
-                                          showSearchMessage = true;
-                                        });
+                                      setState(() {
+                                        showSearchMessage = true;
+                                      });
                                     },
                                     onCameraMove: (position) {
                                       setState(() {
@@ -550,7 +554,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                               .notifier)
                                           .filteredItinerary();
                                     }
-
                                   },
                                   avatar: Icon(
                                     category.icon,
@@ -714,23 +717,23 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           const SizedBox(
                             height: 10,
                           ),
-                          showSearchMessage
-                              ? GestureDetector(
-                                  onTap: () {
-                                    searchMessage();
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(50)),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Text("search this area"),
-                                    ),
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
+                          if (_categoryMapView &&
+                              mapViewState.categoryView &&
+                              showSearchMessage)
+                            GestureDetector(
+                              onTap: () {
+                                searchMessage();
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(50)),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text("search this area"),
+                                ),
+                              ),
+                            )
                         ],
                       ),
                     ),
@@ -911,7 +914,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       child: Text("No Itinerary Found")))),
                         ),
                       ),
-              if (!_categoryMapView && mapViewState.categoryView)
+                    if (!_categoryMapView && mapViewState.categoryView)
                       Positioned.fill(
                         child: Padding(
                             padding: const EdgeInsets.only(top: 180),
@@ -991,116 +994,134 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 errorBuilder: (error, stack) => const Center(
                                     child: Text("No Itinerary Found")))),
                       ),
-                    if(!itemsHide)    if (_categoryMapView && mapViewState.categoryView)
-                      floatingButtonsHide?const SizedBox.shrink(): Padding(
-                        padding: const EdgeInsets.only(bottom: 80),
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: AspectRatio(
-                              aspectRatio: 2.7,
-                              child: AsyncDataWidgetB(
-                                  dataProvider: itineraryNotifierProvider,
-                                  dataBuilder:
-                                      (BuildContext context, category) {
-                                    return ListView.separated(
-                                      controller: _scrollController,
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: category.length,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 15,
-                                      ),
-                                      separatorBuilder: (context, index) =>
-                                          const SizedBox(width: 12.0),
-                                      itemBuilder: (context, index) {
-                                        final data = category[index];
-                                        final bool isSelected0 =
-                                            selectedPlaceId == data.placeId;
-                                        return InkWell(
-                                          onTap: () {
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    RestaurantDetailScreen(
-                                                  distance:
-                                                      data.distance.toString(),
-                                                  walkingTime: convertMinutes(
-                                                      int.parse(data.walkingTime
-                                                          .toString())),
-                                                  address: data.vicinity,
-                                                  images:
-                                                      data.photoUrls!.isEmpty
-                                                          ? [""]
-                                                          : data.photoUrls,
-                                                  name: data.name,
-                                                  rating:
-                                                      data.rating.toString(),
-                                                  locationId:
-                                                      data.placeId ?? "",
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                border: Border.all(
-                                                    color: isSelected0
-                                                        ? Colors.redAccent
-                                                        : Colors.transparent,
-                                                    width: 2)),
-                                            child: SizedBox(
-                                              width: 330,
-                                              child: RecommendedItem(
-                                                address: data.vicinity ?? "",
-                                                type: formatCategory(
-                                                    data.type ?? ""),
-                                                image: data.photoUrls!.isEmpty
-                                                    ? ""
-                                                    : data.photoUrls?[0],
-                                                name: data.name,
-                                                distance:
-                                                    data.distance.toString(),
-                                                walkingTime: convertMinutes(
-                                                    int.parse(data.walkingTime
-                                                        .toString())),
-                                                rating: data.rating.toString(),
-                                              ),
+
+                    if (_categoryMapView && mapViewState.categoryView)
+                      floatingButtonsHide
+                          ? const SizedBox.shrink()
+                          : Padding(
+                              padding: const EdgeInsets.only(bottom: 80),
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: AspectRatio(
+                                    aspectRatio: 2.7,
+                                    child: AsyncDataWidgetB(
+                                        dataProvider: itineraryNotifierProvider,
+                                        dataBuilder:
+                                            (BuildContext context, category) {
+                                          return ListView.separated(
+                                            controller: _scrollController,
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: category.length,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 15,
                                             ),
+                                            separatorBuilder:
+                                                (context, index) =>
+                                                    const SizedBox(width: 12.0),
+                                            itemBuilder: (context, index) {
+                                              final data = category[index];
+                                              final bool isSelected0 =
+                                                  selectedPlaceId ==
+                                                      data.placeId;
+                                              return InkWell(
+                                                onTap: () {
+                                                  Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          RestaurantDetailScreen(
+                                                        distance: data.distance
+                                                            .toString(),
+                                                        walkingTime:
+                                                            convertMinutes(
+                                                                int.parse(data
+                                                                    .walkingTime
+                                                                    .toString())),
+                                                        address: data.vicinity,
+                                                        images: data.photoUrls!
+                                                                .isEmpty
+                                                            ? [""]
+                                                            : data.photoUrls,
+                                                        name: data.name,
+                                                        rating: data.rating
+                                                            .toString(),
+                                                        locationId:
+                                                            data.placeId ?? "",
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      border: Border.all(
+                                                          color: isSelected0
+                                                              ? Colors.redAccent
+                                                              : Colors
+                                                                  .transparent,
+                                                          width: 2)),
+                                                  child: SizedBox(
+                                                    width: 330,
+                                                    child: RecommendedItem(
+                                                      address:
+                                                          data.vicinity ?? "",
+                                                      type: formatCategory(
+                                                          data.type ?? ""),
+                                                      image: data.photoUrls!
+                                                              .isEmpty
+                                                          ? ""
+                                                          : data.photoUrls?[0],
+                                                      name: data.name,
+                                                      distance: data.distance
+                                                          .toString(),
+                                                      walkingTime:
+                                                          convertMinutes(
+                                                              int.parse(data
+                                                                  .walkingTime
+                                                                  .toString())),
+                                                      rating: data.rating
+                                                          .toString(),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
+                                        loadingBuilder: Skeletonizer(
+                                          child: ListView.separated(
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: 3,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 15,
+                                            ),
+                                            separatorBuilder:
+                                                (context, index) =>
+                                                    const SizedBox(width: 12.0),
+                                            itemBuilder: (context, index) {
+                                              return const SizedBox(
+                                                width: 400,
+                                                child: RecommendedItem(
+                                                  address: "hkjkhjh",
+                                                  type: "data.name",
+                                                  image: " data.phot",
+                                                  name: "data.name",
+                                                  distance:
+                                                      "data.distance.toString()",
+                                                  rating:
+                                                      "data.rating.toString()",
+                                                ),
+                                              );
+                                            },
                                           ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                  loadingBuilder: Skeletonizer(
-                                    child: ListView.separated(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: 3,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 15,
-                                      ),
-                                      separatorBuilder: (context, index) =>
-                                          const SizedBox(width: 12.0),
-                                      itemBuilder: (context, index) {
-                                        return const SizedBox(
-                                          width: 400,
-                                          child: RecommendedItem(
-                                            address: "hkjkhjh",
-                                            type: "data.name",
-                                            image: " data.phot",
-                                            name: "data.name",
-                                            distance:
-                                                "data.distance.toString()",
-                                            rating: "data.rating.toString()",
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  errorBuilder: (error, stack) => const Center(
-                                      child: Text("No Itinerary Found")))),
-                        ),
-                      )
+                                        ),
+                                        errorBuilder: (error, stack) =>
+                                            const Center(
+                                                child: Text(
+                                                    "No Itinerary Found")))),
+                              ),
+                            )
                   ],
                 );
               }),
@@ -1137,23 +1158,23 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
   }
 
-  // void navigateToScreen(Category data) {
-  //   _customInfoWindowController.addInfoWindow!(
-  //       MarkerInfo(
-  //         data: data,
-  //       ),
-  //       LatLng(double.parse(data.latitude.toString()),
-  //           double.parse(data.longitude.toString())));
-  // }
-  //
-  // void itineraryMarkerInfo(ItineraryPlaces data) {
-  //   _customInfoWindowController.addInfoWindow!(
-  //       ItineraryMarkersInfo(
-  //         data: data,
-  //       ),
-  //       LatLng(double.parse(data.latitude.toString()),
-  //           double.parse(data.longitude.toString())));
-  // }
+// void navigateToScreen(Category data) {
+//   _customInfoWindowController.addInfoWindow!(
+//       MarkerInfo(
+//         data: data,
+//       ),
+//       LatLng(double.parse(data.latitude.toString()),
+//           double.parse(data.longitude.toString())));
+// }
+//
+// void itineraryMarkerInfo(ItineraryPlaces data) {
+//   _customInfoWindowController.addInfoWindow!(
+//       ItineraryMarkersInfo(
+//         data: data,
+//       ),
+//       LatLng(double.parse(data.latitude.toString()),
+//           double.parse(data.longitude.toString())));
+// }
 }
 
 // class MarkerInfo extends StatelessWidget {

@@ -108,6 +108,16 @@ class Itinerary {
 
   factory Itinerary.fromJson(Map<String, dynamic> json) =>
       _$ItineraryFromJson(json);
+
+  String get imageUrl{
+    if(image==null){
+      return "https://cdn-icons-png.flaticon.com/512/2343/2343940.png";
+    }else{
+      return "http://fernweh.acublock.in/public/$image";
+    }
+  }
+
+
 }
 
 List<Itinerary> get userItinerarydummyList {

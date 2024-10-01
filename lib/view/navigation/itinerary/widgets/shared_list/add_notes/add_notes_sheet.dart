@@ -7,9 +7,7 @@ import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/add_notes/
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-
 import '../../../../../../utils/common/common.dart';
-import '../../../../../../utils/common/config.dart';
 import '../../../../../../utils/common/extensions.dart';
 import 'model/notes_model.dart';
 
@@ -142,7 +140,7 @@ class _AddNotesSheetState extends ConsumerState<AddNotesSheet> {
                                 children: [
                                   ClipOval(
                                     child: SizedBox.square(
-                                      dimension: 40,
+                                      dimension: 30,
                                       child: ImageWidget(
                                           url:
                                               "http://fernweh.acublock.in/public/${user.userImage}"),
@@ -154,7 +152,7 @@ class _AddNotesSheetState extends ConsumerState<AddNotesSheet> {
                                       user.userName ?? "",
                                       style: TextStyle(
                                         color: Colors.black,
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontVariations: FVariations.w700,
                                       ),
                                     ),
@@ -235,7 +233,7 @@ class _AddNotesSheetState extends ConsumerState<AddNotesSheet> {
                     separatorBuilder: (context, index) {
                       return const SizedBox(height: 24.0);
                     },
-                    itemCount: 5,
+                    itemCount: 4,
                   )),
               errorBuilder: (error, st) => Center(
                 child: Column(

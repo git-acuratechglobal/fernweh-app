@@ -5,6 +5,7 @@ import 'package:fernweh/services/local_storage_service/local_storage_service.dar
 import 'package:fernweh/utils/common/app_button.dart';
 import 'package:fernweh/utils/common/app_mixin.dart';
 import 'package:fernweh/utils/common/app_validation.dart';
+import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/auth/auth_state/auth_state.dart';
 import 'package:fernweh/view/auth/login/login_screen.dart';
@@ -122,29 +123,18 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                         color: Theme.of(context).colorScheme.secondary,
                       ),
                     ),
-                    child: user?.name == null && file == null
-                        ? Image.asset("")
-                        : ClipOval(
-                            child: file == null
-                                ? CachedNetworkImage(
-                                    imageUrl:
-                                        'http://fernweh.acublock.in/public/${user?.image}',
-                                    placeholder: (context, url) =>
-                                        const Padding(
-                                      padding: EdgeInsets.all(30.0),
-                                      child: LoadingWidget(),
-                                    ),
-                                    errorWidget: (context, url, error) =>
-                                        const Icon(Icons.error),
-                                    fit: BoxFit.cover,
-                                  )
-                                : Image.file(
-                                    File(
-                                      file!.path,
-                                    ),
-                                    fit: BoxFit.cover,
-                                  ),
-                          ),
+                    child: ClipOval(
+                      child: file == null
+                          ? ImageWidget(
+                              url: user!.imageUrl,
+                            )
+                          : Image.file(
+                              File(
+                                file!.path,
+                              ),
+                              fit: BoxFit.cover,
+                            ),
+                    ),
                   ),
                   const SizedBox(height: 16.0),
                   TextButton(
@@ -310,7 +300,9 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                       child: const Text('Update Profile'),
                       onTap: () {
                         if (validateAndSave()) {
-                          ref.read(authNotifierProvider.notifier).updateProfile();
+                          ref
+                              .read(authNotifierProvider.notifier)
+                              .updateProfile();
                         }
                       },
                     ),

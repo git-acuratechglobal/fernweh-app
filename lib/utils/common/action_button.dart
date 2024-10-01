@@ -9,21 +9,14 @@ class ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton.extended(
+    return FloatingActionButton(
       elevation: 0,
       heroTag: null,
       shape: const StadiumBorder(),
       backgroundColor: Colors.black,
       onPressed: onPressed,
-      icon: Image.asset(
+      child: Image.asset(
           value ? 'assets/images/task.png' : 'assets/images/map.png'),
-      label: Text(
-        value ? "ListView" : "MapView",
-        style: TextStyle(
-          color: Colors.white,
-          fontVariations: FVariations.w800,
-        ),
-      ),
     );
   }
 }

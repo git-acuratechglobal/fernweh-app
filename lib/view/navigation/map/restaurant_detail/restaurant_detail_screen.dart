@@ -487,7 +487,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                         spacing: 10,
                         children: Config.itinaryOptions.map((e) {
                           return Container(
-                            width: 140,
+                            width: 150,
                             decoration: BoxDecoration(
                                 border: Border.all(color: Colors.black12)),
                             child: Row(
