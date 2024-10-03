@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../services/auth_service/auth_service.dart';
 import 'explore/explore_screen.dart';
 import 'friends_list/friends_screen.dart';
 import 'itinerary/widgets/my_itenary_screen.dart';
@@ -45,7 +46,14 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
       ),
     );
   }
+@override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_)async{
+      await ref.read(authServiceProvider).refreshToken();
+    });
 
+  }
   @override
   Widget build(BuildContext context) {
     super.build(context);

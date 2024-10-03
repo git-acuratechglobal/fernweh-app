@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../utils/common/common.dart';
 import 'dio_exception.dart';
-
 part 'dio_service.g.dart';
 
 @Riverpod(keepAlive: true)
@@ -19,7 +18,7 @@ Dio dio(DioRef ref) {
       requestBody: true, responseBody: true, requestHeader: true));
   dio.interceptors.add(
     InterceptorsWrapper(
-      onError: (e, handler) {
+      onError: (e, handler) async{
         final message = DioExceptions.fromDioError(e);
         return handler.reject(
           DioException(requestOptions: e.requestOptions, error: message),

@@ -92,13 +92,8 @@ class MyCreatedItinerary extends StatelessWidget {
                 width: 120,
                 child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: itinary.image == null
-                        ? const ImageWidget(
-                            url:
-                                "https://cdn-icons-png.flaticon.com/512/2343/2343940.png")
-                        : ImageWidget(
-                            url:
-                                "http://fernweh.acublock.in/public/${itinary.image}")),
+                    child: ImageWidget(
+                            url:itinary.imageUrl)),
               ),
               const SizedBox(width: 12.0),
               Expanded(
@@ -175,8 +170,7 @@ class MyCreatedItinerary extends StatelessWidget {
                           ),
                           builder: (context) {
                             return EditItenerary(
-                              iteneraryPhoto:
-                                  "http://fernweh.acublock.in/public/${itinary.image}",
+                              iteneraryPhoto: itinary.imageUrl,
                               iteneraryName: itinary.name ?? "",
                               id: itinary.id,
                               type: int.parse(itinary.type ?? ""),

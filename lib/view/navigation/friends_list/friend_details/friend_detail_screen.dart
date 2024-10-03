@@ -211,8 +211,7 @@ class FriendItineraryList extends StatelessWidget {
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: ImageWidget(
-                      url:
-                          "http://fernweh.acublock.in/public/${itinary.image}")),
+                      url:itinary.imageUrl)),
             )),
         const SizedBox(
           height: 5,

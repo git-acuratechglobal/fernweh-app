@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:fernweh/services/auth_service/auth_service.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/auth/login/login_screen.dart';
 import 'package:fernweh/view/navigation/navigation_screen.dart';
@@ -21,7 +22,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void initState() {
     super.initState();
     ref.read(currentPositionProvider.future);
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () async{
       final onBoarding = ref.read(localStorageServiceProvider).getOnboarding();
       final user = ref.read(localStorageServiceProvider).getUser();
       final guest = ref.read(localStorageServiceProvider).getGuestLogin();

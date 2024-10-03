@@ -142,8 +142,7 @@ class _AddNotesSheetState extends ConsumerState<AddNotesSheet> {
                                     child: SizedBox.square(
                                       dimension: 30,
                                       child: ImageWidget(
-                                          url:
-                                              "http://fernweh.acublock.in/public/${user.userImage}"),
+                                          url:user.imageUrl),
                                     ),
                                   ),
                                   const SizedBox(width: 16.0),

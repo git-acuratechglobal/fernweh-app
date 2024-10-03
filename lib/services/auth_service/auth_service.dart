@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:fernweh/view/auth/signup/profile_setup/profile_step/model/intrestedin_category.dart';
 import 'package:image_picker/image_picker.dart';
@@ -121,6 +119,20 @@ class AuthService {
           }));
       final message = response.data['message'];
       return message;
+    });
+  }
+
+  Future<String> refreshToken() async {
+    return asyncGuard(() async {
+      final response = await _dio.post("refresh-token",
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }));
+      final token = response.data['token'];
+      await _localStorageService.setToken(token);
+      return token;
     });
   }
 }
