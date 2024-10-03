@@ -43,7 +43,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
         ref.read(latlngProvider.notifier).state = LatLng(
             double.parse(data[0].latitude.toString()),
             double.parse(data[0].longitude.toString()));
-      }else{
+      } else {
         ref.invalidate(latlngProvider);
       }
       state = AsyncData(data);
@@ -53,12 +53,12 @@ class ItineraryNotifier extends _$ItineraryNotifier {
   }
 }
 
-final bitmapIconProvider =
-    FutureProvider<BitmapDescriptor>((ref) async {
-
+final bitmapIconProvider = FutureProvider<BitmapDescriptor>((ref) async {
   ByteData data = await rootBundle.load("assets/images/marker_in_black.png");
-  ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-      targetWidth:160,);
+  ui.Codec codec = await ui.instantiateImageCodec(
+    data.buffer.asUint8List(),
+    targetWidth: 160,
+  );
   ui.FrameInfo fi = await codec.getNextFrame();
   final Uint8List? markerIcon =
       (await fi.image.toByteData(format: ui.ImageByteFormat.png))
@@ -85,6 +85,7 @@ class FilterNotifier extends StateNotifier<Map<String, dynamic>> {
 
   void updateFilter(Map<String, dynamic> filters) {
     state = filters;
+    print(state);
   }
 }
 
@@ -93,7 +94,24 @@ final searchControllerProvider =
 
 final latlngProvider = StateProvider<LatLng?>((ref) => null);
 
+class MapViewNotifier extends StateNotifier<MapViewState> {
+  MapViewNotifier()
+      : super(MapViewState(categoryView: true, itineraryView: false,selectedCategory: "null"));
 
-final mapViewStateProvider = StateProvider<MapViewState>((ref) => MapViewState(categoryView: true,itineraryView: false));
+  void update({
+    String? selectedCategory,
+    int? selectedItinerary,
+    bool? categoryView,
+    bool? itineraryView,
+  }) {
+    state = state.copyWith(
+      selectedCategory: selectedCategory,
+      selectedItinerary: selectedItinerary,
+      categoryView: categoryView,
+      itineraryView: itineraryView,
+    );
+  }
+}
 
-
+final mapViewStateProvider = StateNotifierProvider<MapViewNotifier,MapViewState>(
+    (ref) => MapViewNotifier());

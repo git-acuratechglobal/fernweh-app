@@ -90,6 +90,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final latLag = ref.watch(latlngProvider);
     final mapViewState = ref.watch(mapViewStateProvider);
     final mapState = ref.read(mapViewStateProvider.notifier);
+    // print(mapViewState.itineraryView);
+    // print(mapViewState.categoryView);
     return Scaffold(
       resizeToAvoidBottomInset: true,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -100,7 +102,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const SizedBox(),
-                  floatingButtonsHide
+                  mapViewState.selectedCategory == "null"
                       ? const SizedBox.shrink()
                       : ActionButton(
                           value: _categoryMapView,
@@ -156,9 +158,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           color: Colors.white, shape: BoxShape.circle),
                       child: IconButton(
                         onPressed: () {
-                          ref
-                              .read(currentPositionProvider.notifier)
-                              .currentPosition();
+                          ref.invalidate(currentPositionProvider);
+                          ref.invalidate(mapViewStateProvider);
+                          ref.invalidate(itineraryNotifierProvider);
                         },
                         icon: const Icon(Icons.gps_fixed_outlined),
                       ),
@@ -289,6 +291,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   }
 
                                   return GoogleMap(
+                                    zoomControlsEnabled: false,
                                     myLocationButtonEnabled: false,
                                     myLocationEnabled: true,
                                     onMapCreated: (controller) async {
@@ -304,10 +307,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                             CameraUpdate.newLatLng(latlng));
                                       } else {
                                         await mapController.animateCamera(
-                                            CameraUpdate.newLatLngZoom(
-                                                LatLng(currentPosition.latitude,
-                                                    currentPosition.longitude),
-                                                16));
+                                            CameraUpdate.newLatLng(
+                                          LatLng(currentPosition.latitude,
+                                              currentPosition.longitude),
+                                        ));
                                       }
                                     },
                                     onTap: (controller) {
@@ -420,9 +423,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   await mapController.animateCamera(
                                       CameraUpdate.newLatLng(latlng));
                                 },
-                                onCameraMove: (position) async {
-                                  _customInfoWindowController.onCameraMove!();
-                                },
+                                onCameraMove: (position) async {},
                                 onTap: (latLng) {
                                   setState(() {
                                     itemsHide = !itemsHide;
@@ -497,10 +498,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       setState(() {
                                         floatingButtonsHide = true;
                                       });
-                                      mapState.update((_) => MapViewState(
+                                      mapState.update(
                                           categoryView: true,
                                           itineraryView: false,
-                                          selectedCategory: ""));
+                                          selectedCategory: "null");
                                       filterData = {
                                         'type': null,
                                         'rating': filters['rating'],
@@ -526,11 +527,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       setState(() {
                                         floatingButtonsHide = false;
                                       });
-                                      mapState.update((_) => MapViewState(
+                                      mapState.update(
                                           categoryView: true,
                                           itineraryView: false,
                                           selectedCategory: category.title,
-                                          selectedItinerary: -1));
+                                          selectedItinerary: -1);
                                       filterData = {
                                         'type': category.type,
                                         'rating': filters['rating'],
@@ -610,11 +611,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                 setState(() {
                                                   floatingButtonsHide = true;
                                                 });
-                                                mapState.update((_) =>
-                                                    MapViewState(
-                                                        categoryView: true,
-                                                        itineraryView: false,
-                                                        selectedItinerary: -1));
+                                                mapState.update(
+                                                    categoryView: true,
+                                                    itineraryView: false,
+                                                    selectedItinerary: -1);
                                                 filterData = {
                                                   'type': null,
                                                   'rating': filters['rating'],
@@ -639,13 +639,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                 setState(() {
                                                   floatingButtonsHide = false;
                                                 });
-                                                mapState.update((_) =>
-                                                    MapViewState(
-                                                        categoryView: false,
-                                                        itineraryView: true,
-                                                        selectedCategory: "",
-                                                        selectedItinerary:
-                                                            index));
+                                                mapState.update(
+                                                    categoryView: false,
+                                                    itineraryView: true,
+                                                    selectedCategory: "null",
+                                                    selectedItinerary: index);
                                                 ref
                                                     .read(
                                                         itineraryPlacesNotifierProvider
@@ -758,6 +756,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   RestaurantDetailScreen(
+                                                types: const [],
                                                 distance:
                                                     data.distance.toString(),
                                                 walkingTime: convertMinutes(
@@ -838,6 +837,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     RestaurantDetailScreen(
+                                                  types: const [],
                                                   distance:
                                                       data.distance.toString(),
                                                   walkingTime: convertMinutes(
@@ -935,6 +935,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   RestaurantDetailScreen(
+                                                types: data.type ?? [],
                                                 distance:
                                                     data.distance.toString(),
                                                 walkingTime: convertMinutes(
@@ -955,8 +956,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                           height: 130,
                                           child: RecommendedItem(
                                             address: data.vicinity ?? "",
-                                            type:
-                                                formatCategory(data.type ?? ""),
+                                            type: formatCategory(
+                                                data.type ?? ["All"]),
                                             image: data.photoUrls!.isEmpty
                                                 ? ""
                                                 : data.photoUrls?[0],
@@ -996,19 +997,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       ),
 
                     if (_categoryMapView && mapViewState.categoryView)
-                      floatingButtonsHide
-                          ? const SizedBox.shrink()
-                          : Padding(
-                              padding: const EdgeInsets.only(bottom: 80),
-                              child: Align(
-                                alignment: Alignment.bottomCenter,
-                                child: AspectRatio(
-                                    aspectRatio: 2.7,
-                                    child: AsyncDataWidgetB(
-                                        dataProvider: itineraryNotifierProvider,
-                                        dataBuilder:
-                                            (BuildContext context, category) {
-                                          return ListView.separated(
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 80),
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: AspectRatio(
+                              aspectRatio: 2.7,
+                              child: AsyncDataWidgetB(
+                                  dataProvider: itineraryNotifierProvider,
+                                  dataBuilder:
+                                      (BuildContext context, category) {
+                                    return category.isEmpty
+                                        ? const SizedBox.shrink()
+                                        : ListView.separated(
                                             controller: _scrollController,
                                             scrollDirection: Axis.horizontal,
                                             itemCount: category.length,
@@ -1029,6 +1030,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                     MaterialPageRoute(
                                                       builder: (context) =>
                                                           RestaurantDetailScreen(
+                                                        types: data.type ?? [],
                                                         distance: data.distance
                                                             .toString(),
                                                         walkingTime:
@@ -1067,7 +1069,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                       address:
                                                           data.vicinity ?? "",
                                                       type: formatCategory(
-                                                          data.type ?? ""),
+                                                          data.type ?? ["All"]),
                                                       image: data.photoUrls!
                                                               .isEmpty
                                                           ? ""
@@ -1088,40 +1090,36 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                               );
                                             },
                                           );
-                                        },
-                                        loadingBuilder: Skeletonizer(
-                                          child: ListView.separated(
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: 3,
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 15,
-                                            ),
-                                            separatorBuilder:
-                                                (context, index) =>
-                                                    const SizedBox(width: 12.0),
-                                            itemBuilder: (context, index) {
-                                              return const SizedBox(
-                                                width: 400,
-                                                child: RecommendedItem(
-                                                  address: "hkjkhjh",
-                                                  type: "data.name",
-                                                  image: " data.phot",
-                                                  name: "data.name",
-                                                  distance:
-                                                      "data.distance.toString()",
-                                                  rating:
-                                                      "data.rating.toString()",
-                                                ),
-                                              );
-                                            },
+                                  },
+                                  loadingBuilder: Skeletonizer(
+                                    child: ListView.separated(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: 3,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 15,
+                                      ),
+                                      separatorBuilder: (context, index) =>
+                                          const SizedBox(width: 12.0),
+                                      itemBuilder: (context, index) {
+                                        return const SizedBox(
+                                          width: 400,
+                                          child: RecommendedItem(
+                                            address: "hkjkhjh",
+                                            type: "data.name",
+                                            image: " data.phot",
+                                            name: "data.name",
+                                            distance:
+                                                "data.distance.toString()",
+                                            rating: "data.rating.toString()",
                                           ),
-                                        ),
-                                        errorBuilder: (error, stack) =>
-                                            const Center(
-                                                child: Text(
-                                                    "No Itinerary Found")))),
-                              ),
-                            )
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  errorBuilder: (error, stack) => const Center(
+                                      child: Text("No Itinerary Found")))),
+                        ),
+                      )
                   ],
                 );
               }),

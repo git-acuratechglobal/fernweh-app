@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fernweh/services/local_storage_service/local_storage_service.dart';
 import 'package:fernweh/utils/common/app_button.dart';
 import 'package:fernweh/utils/common/app_mixin.dart';
@@ -14,7 +12,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-
 import '../../../utils/common/common.dart';
 import '../../../utils/common/config.dart';
 import '../../../utils/common/extensions.dart';
@@ -162,7 +159,7 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                       style: TextStyle(fontVariations: FVariations.w600),
                     ),
                   ),
-                  const SizedBox(height: 16.0),
+                  const SizedBox().setHeight(16.0),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: TextFormField(

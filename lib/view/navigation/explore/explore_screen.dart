@@ -202,11 +202,11 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       return InkWell(
                         onTap: () {
                           if (category.title == mapViewState.selectedCategory) {
-                            mapState.update((_) => MapViewState(
+                            mapState.update(
                                   categoryView: true,
                                   itineraryView: false,
                                   selectedCategory: "",
-                                ));
+                                );
                             filterData = {
                               'type': null,
                               'rating': filters['rating'],
@@ -224,11 +224,11 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                 .updateFilter(filterData);
                             return;
                           } else {
-                            mapState.update((_) => MapViewState(
+                            mapState.update(
                                   categoryView: true,
                                   itineraryView: false,
                                   selectedCategory: category.title,
-                                ));
+                                );
                             filterData = {
                               'type': category.type,
                               'rating': filters['rating'],
@@ -310,6 +310,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                       MaterialPageRoute(
                                         builder: (context) =>
                                             RestaurantDetailScreen(
+                                              types: [],
                                           address: data.vicinity,
                                           distance: data.distance.toString(),
                                           walkingTime: convertMinutes(int.parse(
@@ -324,7 +325,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                   },
                                   child: RecommendedItem(
                                     address: data.vicinity.toString(),
-                                    type: formatCategory(data.type ?? ""),
+                                    type: formatCategory(data.type??["All"]),
                                     image: data.photoUrls!.isEmpty
                                         ? ""
                                         : data.photoUrls?[0],
@@ -456,6 +457,7 @@ class _FriendListState extends ConsumerState<FriendList> {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => RestaurantDetailScreen(
+                                types: const [],
                                 walkingTime: convertMinutes(
                                     int.parse(data.walkingTime.toString())),
                                 distance: data.distance.toString(),
@@ -470,7 +472,7 @@ class _FriendListState extends ConsumerState<FriendList> {
                         },
                         child: FriendsListItems(
                           address: data.vicinity.toString(),
-                          categoryName: formatCategory(data.type ?? ""),
+                          categoryName: formatCategory(data.type ?? ["All"]),
                           image:
                               data.photoUrls!.isEmpty ? "" : data.photoUrls?[0],
                           type: data.name,
@@ -634,8 +636,8 @@ String convertMinutes(int minutes) {
   return '$hours hr${hours != 1 ? 's' : ''} and $remainingMinutes min${remainingMinutes != 1 ? 's' : ''}';
 }
 
-String formatCategory(String categories) {
-  String firstName = categories.split('|').first;
+String formatCategory(List<String> categories) {
+  String firstName = categories[0];
 
   firstName = firstName.replaceAll('_', ' ');
 

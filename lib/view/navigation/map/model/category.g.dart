@@ -12,7 +12,7 @@ Category _$CategoryFromJson(Map<String, dynamic> json) => Category(
       compoundCode: json['compound_code'] as String?,
       userRatingsTotal: (json['user_ratings_total'] as num?)?.toInt(),
       vicinity: json['vicinity'] as String?,
-      type: json['type'] as String?,
+      type: (json['type'] as List<dynamic>?)?.map((e) => e as String).toList(),
       photoUrls: (json['photo_urls'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),

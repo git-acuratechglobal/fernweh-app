@@ -174,49 +174,71 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                   ],
                                 ),
                               )
-                            : ListView.separated(
+                            : ReorderableListView.builder(
                                 padding: const EdgeInsets.all(24),
                                 itemCount: userItinerary.userIteneries!.length,
                                 itemBuilder: (context, index) {
                                   final itinary = userItinerary
                                       .userIteneries![index].itinerary;
-                                  return InkWell(
-                                    onTap: () {
-                                      switch (isEditing) {
-                                        case true:
-                                          null;
+                                  return Column(
+                                      key: ValueKey(itinary?.id??0),
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          switch (isEditing) {
+                                            case true:
+                                              null;
 
-                                        case false:
-
-                                          Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ItenaryDetailsScreen(
-                                                title: itinary.name ?? "",
-                                                itineraryId: itinary.id ?? 0,
-                                              ),
-                                            ),
-                                          );
-                                        default:
-                                      }
-                                    },
-                                    child: MyCreatedItinerary(
-                                      placeCount: userItinerary
-                                              .userIteneries![index]
-                                              .placesCount ??
-                                          0,
-                                      itinary: itinary!,
-                                      editList: [...?userItinerary
-                                          .userIteneries![index].canEdit,...?userItinerary
-                                          .userIteneries![index].canView]
-                                    ),
+                                            case false:
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ItenaryDetailsScreen(
+                                                    title: itinary.name ?? "",
+                                                    itineraryId:
+                                                        itinary.id ?? 0,
+                                                  ),
+                                                ),
+                                              );
+                                            default:
+                                          }
+                                        },
+                                        child: MyCreatedItinerary(
+                                            placeCount: userItinerary
+                                                    .userIteneries![index]
+                                                    .placesCount ??
+                                                0,
+                                            itinary: itinary!,
+                                            editList: [
+                                              ...?userItinerary
+                                                  .userIteneries![index]
+                                                  .canEdit,
+                                              ...?userItinerary
+                                                  .userIteneries![index].canView
+                                            ]),
+                                      ),
+                                      const SizedBox(height: 10),
+                                    ],
                                   );
                                 },
-                                separatorBuilder:
-                                    (BuildContext context, int index) {
-                                  return const SizedBox(
-                                    height: 10,
-                                  );
+                                // separatorBuilder:
+                                //     (BuildContext context, int index) {
+                                //   return const SizedBox(
+                                //     height: 10,
+                                //   );
+                                // },
+                                onReorder: (int oldIndex, int newIndex) {
+                                  setState(() {
+                                    if (newIndex > oldIndex) {
+                                      newIndex -= 1;
+                                    }
+
+                                    // Reorder the itinerary items
+                                    final item = userItinerary
+                                        .userIteneries!.removeAt(oldIndex);
+                                    userItinerary
+                                        .userIteneries!.insert(newIndex, item);
+                                  });
                                 },
                               );
                       },

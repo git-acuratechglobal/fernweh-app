@@ -98,12 +98,18 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
                                     //   };
                                     //
                                     // }
-                                    mapState.update((_) => MapViewState(
-                                        categoryView: true,
-                                        itineraryView: false));
+
                                     ref
                                         .read(filtersProvider.notifier)
                                         .updateFilter(filter);
+                                    ref
+                                        .read(
+                                            itineraryNotifierProvider.notifier)
+                                        .filteredItinerary();
+                                    mapState.update(
+                                        selectedItinerary: -1,
+                                        categoryView: true,
+                                        itineraryView: false);
                                     _removeOverlay();
                                   },
                                   title: Text(
@@ -137,12 +143,17 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
                                       'input': data[index - 1].placeId,
                                     };
                                   }
-                                  mapState.update((_) => MapViewState(
-                                      categoryView: true,
-                                      itineraryView: false));
+
                                   ref
                                       .read(filtersProvider.notifier)
                                       .updateFilter(filter);
+                                  ref
+                                      .read(itineraryNotifierProvider.notifier)
+                                      .filteredItinerary();
+                                  mapState.update(
+                                      selectedItinerary: -1,
+                                      categoryView: true,
+                                      itineraryView: false);
                                   _removeOverlay();
                                 },
                                 title: Text(
@@ -177,6 +188,7 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
   Widget build(BuildContext context) {
     final searchController = ref.watch(searchControllerProvider);
     final filters = ref.watch(filtersProvider);
+    final mapState = ref.read(mapViewStateProvider.notifier);
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: CompositedTransformTarget(
@@ -239,12 +251,16 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
                             'selected_category': filters['selected_category'],
                           };
                           _removeOverlay();
-                          ref.read(mapViewStateProvider.notifier).update((_) =>
-                              MapViewState(
-                                  categoryView: true, itineraryView: false));
+                          mapState.update(
+                              selectedItinerary: -1,
+                              categoryView: true,
+                              itineraryView: false);
                           ref
                               .read(filtersProvider.notifier)
                               .updateFilter(filter);
+                          ref
+                              .read(itineraryNotifierProvider.notifier)
+                              .filteredItinerary();
                         },
                         decoration: InputDecoration(
                             prefixIcon: Image.asset('assets/images/search.png'),
@@ -265,6 +281,16 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
                                       ref
                                           .read(filtersProvider.notifier)
                                           .updateFilter(resetFilter);
+                                      // ref
+                                      //     .read(itineraryNotifierProvider
+                                      //         .notifier)
+                                      //     .filteredItinerary();
+                                      // mapState.update(
+                                      //     selectedItinerary: -1,
+                                      //     categoryView: true,
+                                      //     itineraryView: false);
+                                      ref.invalidate(mapViewStateProvider);
+                                      ref.invalidate(itineraryNotifierProvider);
                                       ref.read(latlngProvider.notifier).state =
                                           null;
                                       _removeOverlay();

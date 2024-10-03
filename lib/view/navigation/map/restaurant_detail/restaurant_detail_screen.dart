@@ -34,6 +34,7 @@ class RestaurantDetailScreen extends ConsumerWidget {
     this.distance,
     this.walkingTime,
     this.locationId,
+    this.types,
   });
 
   final List<String>? images;
@@ -44,7 +45,7 @@ class RestaurantDetailScreen extends ConsumerWidget {
   final String? distance;
   final String? walkingTime;
   final String? locationId;
-
+  final List<String>? types;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -197,9 +198,14 @@ class RestaurantDetailScreen extends ConsumerWidget {
                     Wrap(
                       spacing: 16,
                       runSpacing: 16,
-                      children: Config.categories
-                          .map((e) => e.title)
-                          .take(3)
+                      children: types!
+                          .where((e) =>
+                              e.contains("bar") ||
+                              e.contains("restaurant") ||
+                              e.contains("cafe") ||
+                              e.contains("theater") ||
+                              e.contains("attractions"))
+                          .take(4)
                           .map((e) {
                         return Container(
                           padding: const EdgeInsets.symmetric(
@@ -296,18 +302,18 @@ class RestaurantDetailScreen extends ConsumerWidget {
                               ],
                             ),
                           ),
-                          const Divider(),
-                          TextButton(
-                            onPressed: () {},
-                            child: Text(
-                              'Get Direction',
-                              style: TextStyle(
-                                color: const Color(0xFFCF5253),
-                                fontSize: 16,
-                                fontVariations: FVariations.w700,
-                              ),
-                            ),
-                          ),
+                          // const Divider(),
+                          // TextButton(
+                          //   onPressed: () {},
+                          //   child: Text(
+                          //     'Get Direction',
+                          //     style: TextStyle(
+                          //       color: const Color(0xFFCF5253),
+                          //       fontSize: 16,
+                          //       fontVariations: FVariations.w700,
+                          //     ),
+                          //   ),
+                          // ),
                           const SizedBox(height: 8),
                         ],
                       ),
@@ -437,7 +443,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
     final selectedItineraryId =
         ref.watch(localStorageServiceProvider).getItineraryId();
     final validation = ref.watch(validatorsProvider);
-    final user=ref.watch(userDetailProvider);
+    final user = ref.watch(userDetailProvider);
     return Form(
       key: fkey,
       child: Column(
@@ -524,7 +530,8 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                   AsyncDataWidgetB(
                     dataProvider: getUserItineraryProvider,
                     dataBuilder: (context, userItinerary) {
-                      List<Itenery> combinedItineraries = userItinerary.getCombinedItineraries(user?.id??0);
+                      List<Itenery> combinedItineraries =
+                          userItinerary.getCombinedItineraries(user?.id ?? 0);
                       return combinedItineraries.isEmpty
                           ? Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -574,8 +581,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                 childAspectRatio: 0.78,
                               ),
                               itemBuilder: (context, index) {
-                                if (index ==
-                                    combinedItineraries.length) {
+                                if (index == combinedItineraries.length) {
                                   return Padding(
                                     padding: const EdgeInsets.only(
                                         bottom: 35, right: 10),
@@ -604,15 +610,14 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                     ),
                                   );
                                 }
-                                final itinary =
-                                combinedItineraries[index];
+                                final itinary = combinedItineraries[index];
                                 if (selectedItineraryId != null) {
-                                  _selectedItinerary = combinedItineraries
-                                      .indexWhere((e) =>
+                                  _selectedItinerary =
+                                      combinedItineraries.indexWhere((e) =>
                                           e.itinerary!.id ==
                                           selectedItineraryId);
-                                  itinerary = combinedItineraries
-                                      .firstWhere((e) =>
+                                  itinerary = combinedItineraries.firstWhere(
+                                      (e) =>
                                           e.itinerary!.id ==
                                           selectedItineraryId);
                                 }

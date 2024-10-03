@@ -127,10 +127,10 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                         setState(() {
                           filtersData['type'] = data.type;
                         });
-                        mapState.update((_) => MapViewState(
+                        mapState.update(
                             categoryView: true,
                             itineraryView: false,
-                            selectedCategory: data.title));
+                            selectedCategory: data.title);
                       },
                     );
                   }).toList(),

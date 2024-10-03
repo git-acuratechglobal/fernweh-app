@@ -47,3 +47,18 @@ extension NavigationPageExtension on BuildContext {
     );
   }
 }
+extension SizedBoxExtension on SizedBox {
+  SizedBox setHeight(double height) {
+    return SizedBox(
+      height: height,
+      width: this.width,
+    );
+  }
+
+  SizedBox setWidth(double width) {
+    return SizedBox(
+      height: this.height,
+      width: width,
+    );
+  }
+}

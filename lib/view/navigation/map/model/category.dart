@@ -29,7 +29,7 @@ class Category {
   @JsonKey(name: 'user_ratings_total')
   final int? userRatingsTotal;
   final String? vicinity;
-  final String? type;
+  final List<String>? type;
   @JsonKey(name: 'photo_urls')
   final List<String>? photoUrls;
 
@@ -58,7 +58,7 @@ List <Category> get dummyCategoryList{
       compoundCode: 'CP123456',
       userRatingsTotal: 1000,
       vicinity: '123 Main St',
-      type: 'Restaurant',
+      type: [],
       photoUrls: ['https://example.com/photo1.jpg', 'https://example.com/photo2.jpg'],
       placeId: '1234567890',
       latitude: 37.7749,

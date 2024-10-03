@@ -61,7 +61,7 @@ class AuthNotifier extends _$AuthNotifier {
       state = Loading();
       final user = await ref.watch(authServiceProvider).updateUser(_formData);
       final data=  await ref.watch(apiServiceProvider).createUserItinerary({
-        'name': "My Album",
+        'name': "Default list",
         'type': 1
       });
       if(data.id!=null){

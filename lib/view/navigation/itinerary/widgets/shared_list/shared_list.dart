@@ -12,13 +12,18 @@ import '../my_curated_list/edit_itenerary/edit_itenerary.dart';
 import '../my_itenary_screen.dart';
 import 'add_notes/add_notes_sheet.dart';
 
-class SharedListTab extends ConsumerWidget {
+class SharedListTab extends ConsumerStatefulWidget {
   final bool isMapView;
 
   const SharedListTab({super.key, required this.isMapView});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SharedListTab> createState() => _SharedListTabState();
+}
+
+class _SharedListTabState extends ConsumerState<SharedListTab> {
+  @override
+  Widget build(BuildContext context, ) {
     return RefreshIndicator(
       color: const Color(0xffCF5253),
       edgeOffset: 10,
@@ -53,21 +58,36 @@ class SharedListTab extends ConsumerWidget {
                       ],
                     ),
                   )
-                : ListView.separated(
+                : ReorderableListView.builder(
                     padding: const EdgeInsets.all(24),
                     itemCount: sharedItinerary.sharedIteneries!.length,
                     itemBuilder: (context, index) {
                       final itinary = sharedItinerary.sharedIteneries![index];
-                      return SharedItem(
-                        itinerary: itinary,
-                        placesCount: sharedItinerary
-                                .sharedIteneries?[index].placesCount ??
-                            0,
+                      return Column(
+                        key: ValueKey(itinary.itinerary?.id??0),
+                        children: [
+                          SharedItem(
+                            itinerary: itinary,
+                            placesCount: sharedItinerary
+                                    .sharedIteneries?[index].placesCount ??
+                                0,
+                          ),
+                          const SizedBox(height: 10),
+                        ],
                       );
                     },
-                    separatorBuilder: (BuildContext context, int index) {
-                      return const SizedBox(height: 16);
-                    },
+                    // separatorBuilder: (BuildContext context, int index) {
+                    //   return const SizedBox(height: 16);
+                    // },
+              onReorder: (int oldIndex, int newIndex) {
+                setState(() {
+                  if (newIndex > oldIndex) {
+                    newIndex -= 1;
+                  }
+                  final item = sharedItinerary.sharedIteneries!.removeAt(oldIndex);
+                  sharedItinerary.sharedIteneries!.insert(newIndex, item);
+                });
+              },
                   );
           },
           loadingBuilder: Skeletonizer(

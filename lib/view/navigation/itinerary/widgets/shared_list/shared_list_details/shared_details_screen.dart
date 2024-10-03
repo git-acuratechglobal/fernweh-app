@@ -264,10 +264,10 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                                                     width: 350,
                                                     child: DetailItem(
                                                       selection: data.type == 1
-                                                          ? "VISITED"
+                                                          ? "WANT TO VISIT"
                                                           : data.type == 2
-                                                              ? "WILL VISIT"
-                                                              : "WANT TO VISIT",
+                                                          ? "VISITED"
+                                                          : "WILL VISIT AGAIN",
                                                       placeType:
                                                           data.placeTypes ?? "",
                                                       name: data.name,

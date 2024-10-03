@@ -226,9 +226,9 @@ class _FriendsListState extends ConsumerState<FriendsList> {
                         ),
                       ),
                     ),
-                    const Text(
-                      '5 Itinerary',
-                      style: TextStyle(
+                     Text(
+                      '${user.itineraryCount} Itinerary',
+                      style: const TextStyle(
                         color: Color(0xFF505050),
                       ),
                     ),
@@ -461,12 +461,12 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                                       ),
                                     ),
                                   ),
-                                  const Text(
-                                    '5 Itinerary',
-                                    style: TextStyle(
-                                      color: Color(0xFF505050),
-                                    ),
-                                  ),
+                                  // const Text(
+                                  //   '5 Itinerary',
+                                  //   style: TextStyle(
+                                  //     color: Color(0xFF505050),
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                             ),

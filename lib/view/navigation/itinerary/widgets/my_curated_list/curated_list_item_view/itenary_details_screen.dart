@@ -343,7 +343,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                                     selection: data.type == 1
                                         ? "WANT TO VISIT"
                                         : data.type == 2
-                                            ? " VISITED"
+                                            ? "VISITED"
                                             : "WILL VISIT AGAIN",
                                     placeType: data.placeTypes ?? "",
                                     width:
@@ -422,7 +422,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                     selection: data.type == 1
                         ? "WANT TO VISIT"
                         : data.type == 2
-                            ? " VISITED"
+                            ? "VISITED"
                             : "WILL VISIT AGAIN",
                     placeType: data.placeTypes ?? "",
                     name: data.name,
@@ -511,6 +511,7 @@ class _DetailItemState extends State<DetailItem> {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => RestaurantDetailScreen(
+              types: const [],
               image: widget.url ?? "",
               name: widget.name,
               rating: widget.rating,
@@ -709,6 +710,7 @@ class ItineraryMarkersInfo extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => RestaurantDetailScreen(
+              types: const [],
               distance: data.distance.toString(),
               walkingTime:
                   convertMinutes(int.parse(data.walkingTime.toString())),

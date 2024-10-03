@@ -185,6 +185,7 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
                   itemBuilder: (context, index) {
                     return FriendListItem(
                       user: Friends(
+                        itineraryCount: 0,
                           id: null,
                           name: 'dummy',
                           email: '',
@@ -277,7 +278,7 @@ class _FriendListItemState extends State<FriendListItem> {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Expanded(
                     child: Text(
@@ -290,12 +291,12 @@ class _FriendListItemState extends State<FriendListItem> {
                       ),
                     ),
                   ),
-                  const Text(
-                    '5 Iternerary',
-                    style: TextStyle(
-                      color: Color(0xFF505050),
-                    ),
-                  ),
+                  // const Text(
+                  //   '5 Iternerary',
+                  //   style: TextStyle(
+                  //     color: Color(0xFF505050),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

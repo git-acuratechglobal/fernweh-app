@@ -18,6 +18,7 @@ class Friends {
     required this.emailVerifiedAt,
     required this.createdAt,
     required this.updatedAt,
+    required this.itineraryCount,
   });
 
   final int? id;
@@ -46,6 +47,8 @@ class Friends {
 
   @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
+  @JsonKey(name: 'itinerary_count')
+  final int? itineraryCount;
 
   factory Friends.fromJson(Map<String, dynamic> json) => _$FriendsFromJson(json);
 
