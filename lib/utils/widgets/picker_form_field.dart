@@ -71,7 +71,7 @@ class _TimePickerState<T> extends FormFieldState<T> {
       return "";
     }
     if (value is DateTime) {
-      return DateFormat("dd/MM/yyyy").format(value);
+      return DateFormat("MM/dd/yy").format(value);
     }
     if (value is TimeOfDay) {
       return value.format(context);

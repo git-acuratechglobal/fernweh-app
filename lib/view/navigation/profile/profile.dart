@@ -322,8 +322,20 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
 
   DateTime? parseDate(String? dateString) {
     if (dateString == null) return null;
-    // Adjust the format according to your date string format
-    final DateFormat format = DateFormat('dd/MM/yyyy');
-    return format.parse(dateString);
+    final DateFormat inputFormat = DateFormat('d/M/yyyy');
+    final DateTime parsedDate = inputFormat.parse(dateString);
+
+    final DateFormat outputFormat = DateFormat('MM/dd/yy');
+    String formattedDate = outputFormat.format(parsedDate);
+final formattedData=convertStringToDate(formattedDate);
+
+    return formattedData;
+  }
+  DateTime? convertStringToDate(String? formattedDateString) {
+    if (formattedDateString == null) return null;
+    final DateFormat inputFormat = DateFormat('MM/dd/yy');
+    final DateTime parsedDate = inputFormat.parse(formattedDateString);
+
+    return parsedDate;
   }
 }

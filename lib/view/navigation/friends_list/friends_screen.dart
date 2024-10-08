@@ -127,7 +127,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
                   controller: tabController,
                   tabs: const [
                     Tab(
-                      text: 'Friends List',
+                      text: 'Friends',
                     ),
                     Tab(
                       text: 'Friend Requests',

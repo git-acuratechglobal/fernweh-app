@@ -705,63 +705,79 @@ class ListViewItems extends StatefulWidget {
 }
 
 class _ListViewItemsState extends State<ListViewItems> {
+  String? selectedType;
+  @override
+  void initState() {
+setState(() {
+  selectedType=widget.selection;
+});
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => RestaurantDetailScreen(
-              locationId: widget.placeId,
-              latitude: widget.latitude,
-              longitude: widget.longitude,
-              types: const [],
-              image: widget.url ?? "",
-              name: widget.name,
-              rating: widget.rating,
-              walkingTime: widget.walkTime,
-              distance: widget.distance,
-              address: widget.address,
+    return Column(
+      children: [
+        Container(
+          width: widget.width ?? MediaQuery.sizeOf(context).width,
+          height: 35,
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+            color: Color(0xffF7F7F7),
+            border: Border(
+              top: BorderSide(color: Color(0xffE2E2E2)),
+              left: BorderSide(color: Color(0xffE2E2E2)),
+              right: BorderSide(color: Color(0xffE2E2E2)),
             ),
           ),
-        );
-      },
-      child: Column(
-        children: [
-          Container(
-            width: widget.width ?? MediaQuery.sizeOf(context).width,
-            height: 30,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
-              color: Color(0xffF7F7F7),
-              border: Border(
-                top: BorderSide(color: Color(0xffE2E2E2)),
-                left: BorderSide(color: Color(0xffE2E2E2)),
-                right: BorderSide(color: Color(0xffE2E2E2)),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children:
-                    List.generate(Config.selectionOptions.length, (index) {
-                  final option = Config.selectionOptions[index].toUpperCase();
-                  return Text(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children:
+                  List.generate(Config.selectionOptions.length, (index) {
+                final option = Config.selectionOptions[index].toUpperCase();
+                return InkWell(
+                  onTap: (){
+                    setState(() {
+                      selectedType= option;
+                    });
+                  },
+                  child: Text(
                     option,
                     style: TextStyle(
                       fontSize: 12,
                       fontVariations: FVariations.w600,
-                      color: widget.selection == option
+                      color: selectedType == option
                           ? const Color(0xff12B347)
                           : Colors.grey,
                     ),
-                  );
-                }),
-              ),
+                  ),
+                );
+              }),
             ),
           ),
-          Container(
+        ),
+        InkWell(
+          onTap: (){
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => RestaurantDetailScreen(
+                  locationId: widget.placeId,
+                  latitude: widget.latitude,
+                  longitude: widget.longitude,
+                  types: const [],
+                  image: widget.url ?? "",
+                  name: widget.name,
+                  rating: widget.rating,
+                  walkingTime: widget.walkTime,
+                  distance: widget.distance,
+                  address: widget.address,
+                ),
+              ),
+            );
+          },
+          child: Container(
             width: widget.width ?? MediaQuery.sizeOf(context).width,
             padding:
                 const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 8),
@@ -808,7 +824,7 @@ class _ListViewItemsState extends State<ListViewItems> {
                         ),
                       ),
                     ),
-                    const Positioned(top: 12, right: 0, child: FavButton()),
+                    const Positioned(top: 12, right: 10, child: FavButton()),
                   ],
                 ),
                 const SizedBox(height: 8.0),
@@ -886,8 +902,8 @@ class _ListViewItemsState extends State<ListViewItems> {
               ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
