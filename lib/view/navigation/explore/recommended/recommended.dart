@@ -18,6 +18,7 @@ class RecommendedItem extends StatelessWidget {
       this.rating,
       this.walkingTime,
       this.distance,
+        this.placeId,
       required this.address});
 
   final String? type;
@@ -27,6 +28,7 @@ class RecommendedItem extends StatelessWidget {
   final String? walkingTime;
   final String? distance;
   final String address;
+  final String? placeId;
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +102,7 @@ class RecommendedItem extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const FavButton()
+                          FavButton(name: name,image: image,placeId: placeId,)
                         // InkWell(
                         //   onTap: () {
                         //     // showModalBottomSheet(

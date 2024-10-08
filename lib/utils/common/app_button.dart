@@ -7,12 +7,14 @@ class AppButton extends StatelessWidget {
     required this.isLoading,
     this.onTap,
     required this.child,
-    this.size
+    this.size,
+    this.backgroundColor,
   });
 final Size? size;
   final Widget child;
   final bool isLoading;
   final Function()? onTap;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,7 @@ final Size? size;
         onPressed: isLoading ? null : onTap,
         style: ElevatedButton.styleFrom(
           minimumSize: size,
-            elevation: 0, backgroundColor: const Color(0xff1A72FF)),
+            elevation: 0, backgroundColor:backgroundColor?? const Color(0xff1A72FF)),
         child: switch (isLoading) {
           false => child,
           true => LoadingAnimationWidget.twistingDots(

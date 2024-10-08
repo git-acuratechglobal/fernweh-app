@@ -12,9 +12,12 @@ import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/navigation/itinerary/models/states/itinerary_state.dart';
 import 'package:fernweh/view/navigation/itinerary/models/states/my_itinerary_state.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
+import 'package:fernweh/view/navigation/map/add_to_wishlist_sheet/add_to_wishlist_sheet.dart';
+import 'package:fernweh/view/navigation/map/notifier/wish_list_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:map_launcher/map_launcher.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../services/local_storage_service/local_storage_service.dart';
 import '../../../auth/login/login_screen.dart';
@@ -35,6 +38,8 @@ class RestaurantDetailScreen extends ConsumerWidget {
     this.walkingTime,
     this.locationId,
     this.types,
+    this.latitude,
+    this.longitude,
   });
 
   final List<String>? images;
@@ -46,6 +51,8 @@ class RestaurantDetailScreen extends ConsumerWidget {
   final String? walkingTime;
   final String? locationId;
   final List<String>? types;
+  final double? latitude;
+  final double? longitude;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -104,7 +111,7 @@ class RestaurantDetailScreen extends ConsumerWidget {
                             child: const Icon(Icons.arrow_back_rounded),
                           ),
                         ),
-                        Row(
+                        const Row(
                           children: [
                             // Container(
                             //   width: 48,
@@ -115,42 +122,42 @@ class RestaurantDetailScreen extends ConsumerWidget {
                             //   ),
                             //   child: const ShareIcon(""),
                             // ),
-                            const SizedBox(width: 16),
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: IconButton(
-                                icon: Image.asset(
-                                  'assets/images/heart.png',
-                                  color: const Color(0xffCF5253),
-                                ),
-                                onPressed: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    backgroundColor: Colors.white,
-                                    isScrollControlled: true,
-                                    constraints: BoxConstraints.tightFor(
-                                      height:
-                                          MediaQuery.sizeOf(context).height *
-                                              0.6,
-                                    ),
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(20)),
-                                    ),
-                                    builder: (context) {
-                                      return AddToItineraySheet(
-                                        locationId: locationId,
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                            ),
+                            SizedBox(width: 16),
+                            // Container(
+                            //   width: 48,
+                            //   height: 48,
+                            //   decoration: const BoxDecoration(
+                            //     color: Colors.white,
+                            //     shape: BoxShape.circle,
+                            //   ),
+                            //   child: IconButton(
+                            //     icon: Image.asset(
+                            //       'assets/images/heart.png',
+                            //       color: const Color(0xffCF5253),
+                            //     ),
+                            //     onPressed: () {
+                            //       showModalBottomSheet(
+                            //         context: context,
+                            //         backgroundColor: Colors.white,
+                            //         isScrollControlled: true,
+                            //         constraints: BoxConstraints.tightFor(
+                            //           height:
+                            //               MediaQuery.sizeOf(context).height *
+                            //                   0.6,
+                            //         ),
+                            //         shape: const RoundedRectangleBorder(
+                            //           borderRadius: BorderRadius.vertical(
+                            //               top: Radius.circular(20)),
+                            //         ),
+                            //         builder: (context) {
+                            //           return AddToItineraySheet(
+                            //             locationId: locationId,
+                            //           );
+                            //         },
+                            //       );
+                            //     },
+                            //   ),
+                            // ),
                           ],
                         )
                       ],
@@ -164,21 +171,13 @@ class RestaurantDetailScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            name ?? '',
-                            style: TextStyle(
-                              color: const Color(0xFF1A1B28),
-                              fontSize: 28,
-                              fontVariations: FVariations.w800,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Image.asset('assets/images/call.png')
-                      ],
+                    Text(
+                      name ?? '',
+                      style: TextStyle(
+                        color: const Color(0xFF1A1B28),
+                        fontSize: 28,
+                        fontVariations: FVariations.w800,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Row(
@@ -188,10 +187,12 @@ class RestaurantDetailScreen extends ConsumerWidget {
                           size: 24,
                           color: Color(0xffF4CA12),
                         ),
-                        Text(
-                          rating ?? '4.5 ',
-                          style: const TextStyle(fontSize: 16),
-                        )
+                        rating == null
+                            ? const SizedBox.shrink()
+                            : Text(
+                                rating ?? '4.5 ',
+                                style: const TextStyle(fontSize: 16),
+                              )
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -232,6 +233,95 @@ class RestaurantDetailScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (guest == true) {
+                                  ref
+                                      .read(localStorageServiceProvider)
+                                      .clearGuestSession();
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LoginScreen()),
+                                    (Route<dynamic> route) => false,
+                                  );
+                                } else {
+                                  if (locationId != null) {
+                                    ref
+                                        .read(wishListProvider.notifier)
+                                        .addToItinerary(WishList(
+                                            name: name ?? "",
+                                            image: images?[0] ?? "",
+                                            placeId: locationId ?? ""));
+                                    showModalBottomSheet(
+                                      context: context,
+                                      backgroundColor: Colors.white,
+                                      isScrollControlled: true,
+                                      constraints: BoxConstraints.tightFor(
+                                        height:
+                                            MediaQuery.sizeOf(context).height *
+                                                0.8,
+                                      ),
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.vertical(
+                                            top: Radius.circular(20)),
+                                      ),
+                                      builder: (context) {
+                                        return const AddToWishlistSheet();
+                                      },
+                                    );
+                                  }
+
+                                  // Navigator.push(context, MaterialPageRoute(builder: (context){
+                                  //   return  AddToItineraySheet(locationId: locationId,);
+                                  // }));
+                                }
+                              },
+                              child: const Text(
+                                textAlign: TextAlign.center,
+                                "Add to My Itinerary",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ),
+                          const SizedBox().setWidth(20),
+                          Expanded(
+                              child: AppButton(
+                                  onTap: () async {
+                                    // String googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+                                    // if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+                                    //   await launchUrl(Uri.parse(googleMapsUrl));
+                                    // } else {
+                                    //   throw 'Could not open Google Maps';
+                                    // }
+                                    if (latitude != null && longitude != null) {
+                                      final availableMaps =
+                                          await MapLauncher.installedMaps;
+                                      await availableMaps.first.showMarker(
+                                        coords: Coords(latitude!, longitude!),
+                                        title: name ?? "",
+                                      );
+                                    }
+                                  },
+                                  backgroundColor: Colors.white,
+                                  isLoading: false,
+                                  child: Text(
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    "Open in Google Maps",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: Theme.of(context).primaryColor),
+                                  )))
+                        ],
+                      ),
+                    ),
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -314,49 +404,10 @@ class RestaurantDetailScreen extends ConsumerWidget {
                           //     ),
                           //   ),
                           // ),
-                          const SizedBox(height: 8),
                         ],
                       ),
                     ),
                   ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (guest == true) {
-                      ref.read(localStorageServiceProvider).clearGuestSession();
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginScreen()),
-                        (Route<dynamic> route) => false,
-                      );
-                    } else {
-                      showModalBottomSheet(
-                        context: context,
-                        backgroundColor: Colors.white,
-                        isScrollControlled: true,
-                        constraints: BoxConstraints.tightFor(
-                          height: MediaQuery.sizeOf(context).height * 0.9,
-                        ),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(20)),
-                        ),
-                        builder: (context) {
-                          return AddToItineraySheet(
-                            locationId: locationId,
-                          );
-                        },
-                      );
-                      // Navigator.push(context, MaterialPageRoute(builder: (context){
-                      //   return  AddToItineraySheet(locationId: locationId,);
-                      // }));
-                    }
-                  },
-                  child: const Text("Add to My Itinerary"),
                 ),
               ),
             ],
@@ -368,12 +419,10 @@ class RestaurantDetailScreen extends ConsumerWidget {
 }
 
 class AddToItineraySheet extends ConsumerStatefulWidget {
-  const AddToItineraySheet({
-    super.key,
-    this.locationId,
-  });
+  const AddToItineraySheet({super.key, this.locationId, this.locationIds});
 
   final String? locationId;
+  final List<String>? locationIds;
 
   @override
   ConsumerState<AddToItineraySheet> createState() => _AddToItineraySheetState();

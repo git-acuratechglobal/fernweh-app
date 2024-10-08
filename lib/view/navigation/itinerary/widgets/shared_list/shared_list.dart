@@ -1,3 +1,4 @@
+import 'package:fernweh/services/local_storage_service/local_storage_service.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
@@ -33,7 +34,10 @@ class _SharedListTabState extends ConsumerState<SharedListTab> {
       child: AsyncDataWidgetB(
           dataProvider: getUserItineraryProvider,
           dataBuilder: (context, sharedItinerary) {
-            return sharedItinerary.sharedIteneries!.isEmpty
+            final localSharedList = ref
+                .watch(localStorageServiceProvider)
+                .getSharedItinerary(sharedItinerary.sharedIteneries ?? []);
+            return localSharedList!.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -60,16 +64,15 @@ class _SharedListTabState extends ConsumerState<SharedListTab> {
                   )
                 : ReorderableListView.builder(
                     padding: const EdgeInsets.all(24),
-                    itemCount: sharedItinerary.sharedIteneries!.length,
+                    itemCount: localSharedList.length,
                     itemBuilder: (context, index) {
-                      final itinary = sharedItinerary.sharedIteneries![index];
+                      final itinary = localSharedList[index];
                       return Column(
                         key: ValueKey(itinary.itinerary?.id??0),
                         children: [
                           SharedItem(
                             itinerary: itinary,
-                            placesCount: sharedItinerary
-                                    .sharedIteneries?[index].placesCount ??
+                            placesCount: localSharedList[index].placesCount ??
                                 0,
                           ),
                           const SizedBox(height: 10),
@@ -84,9 +87,10 @@ class _SharedListTabState extends ConsumerState<SharedListTab> {
                   if (newIndex > oldIndex) {
                     newIndex -= 1;
                   }
-                  final item = sharedItinerary.sharedIteneries!.removeAt(oldIndex);
-                  sharedItinerary.sharedIteneries!.insert(newIndex, item);
+                  final item = localSharedList.removeAt(oldIndex);
+                  localSharedList.insert(newIndex, item);
                 });
+                ref.read(localStorageServiceProvider).setSharedItinerary(localSharedList);
               },
                   );
           },

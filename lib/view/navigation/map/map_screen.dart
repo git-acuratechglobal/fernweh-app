@@ -16,6 +16,7 @@ import '../explore/current_location/current_location.dart';
 import '../explore/explore_screen.dart';
 import '../explore/recommended/recommended.dart';
 import '../explore/search_filter/search_and_filter_widget.dart';
+import '../itinerary/models/itinerary_model.dart';
 import '../itinerary/models/itinerary_places.dart';
 import '../itinerary/notifier/itinerary_notifier.dart';
 import 'model/category.dart';
@@ -102,6 +103,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const SizedBox(),
+
+                  ///***when no filter is applied then we have to hide floating button
                   mapViewState.selectedCategory == "null"
                       ? const SizedBox.shrink()
                       : ActionButton(
@@ -241,6 +244,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ),
             ),
             const SizedBox(height: 16),
+
+            ///*** this map widget is used when we press on categories list then marker show of categories list
+
             Expanded(
               child: LayoutBuilder(builder: (context, snapshot) {
                 return Stack(
@@ -360,6 +366,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 errorBuilder: (error, stack) =>
                                     const SizedBox())),
                       ),
+
+                    ///*** here we show map of itinerary list when we press on itinerary list then marker show of itinerary
+
                     if (mapViewState.itineraryView)
                       Padding(
                         padding: const EdgeInsets.only(top: 30),
@@ -476,6 +485,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             },
                           ),
 
+                          ///*** this is category list
+
                           SizedBox(
                             width: MediaQuery.sizeOf(context).width,
                             height: 56,
@@ -584,24 +595,30 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                               itemCount: Config.dashboardCategories.length,
                             ),
                           ),
+
+                          ///*** here is the user itinerary list widget
+
                           SizedBox(
                             width: MediaQuery.sizeOf(context).width,
                             height: 36,
                             child: AsyncDataWidgetB(
                               dataProvider: getUserItineraryProvider,
                               dataBuilder: (context, itinerary) {
-                                return itinerary.userIteneries!.isEmpty
+                                final List<Itenery> filteredList = itinerary
+                                    .userIteneries!
+                                    .where((e) => e.placesCount != 0)
+                                    .toList();
+                                return filteredList.isEmpty
                                     ? const SizedBox.shrink()
                                     : ListView.separated(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 24),
                                         scrollDirection: Axis.horizontal,
-                                        itemCount:
-                                            itinerary.userIteneries!.length,
+                                        itemCount: filteredList.length,
                                         itemBuilder:
                                             (BuildContext context, int index) {
-                                          final userItinerary = itinerary
-                                              .userIteneries![index].itinerary;
+                                          final userItinerary =
+                                              filteredList[index].itinerary;
                                           return RawChip(
                                             onPressed: () {
                                               // setState(() {
@@ -715,6 +732,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           const SizedBox(
                             height: 10,
                           ),
+
+                          ///*** here is the logic that if category map is widget is showing then if user scrool the map then this message will show
+
                           if (_categoryMapView &&
                               mapViewState.categoryView &&
                               showSearchMessage)
@@ -735,6 +755,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         ],
                       ),
                     ),
+
+                    ///*** here if itinerary widget is list view and view of screen is itinerary then this widget is show
+
                     if (!_itineraryMapView && mapViewState.itineraryView)
                       Positioned.fill(
                         child: Padding(
@@ -756,6 +779,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   RestaurantDetailScreen(
+                                                latitude: data.latitude,
+                                                longitude: data.longitude,
                                                 types: const [],
                                                 distance:
                                                     data.distance.toString(),
@@ -806,6 +831,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 errorBuilder: (error, stack) => const Center(
                                     child: Text("No Itinerary Found")))),
                       ),
+
+                    ///*** if titinearay is map view then this widget show
+
                     if (_itineraryMapView && mapViewState.itineraryView)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 80),
@@ -837,6 +865,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     RestaurantDetailScreen(
+                                                  latitude: data.latitude,
+                                                  longitude: data.longitude,
                                                   types: const [],
                                                   distance:
                                                       data.distance.toString(),
@@ -914,6 +944,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       child: Text("No Itinerary Found")))),
                         ),
                       ),
+
+                    ///*** if category view is list view
                     if (!_categoryMapView && mapViewState.categoryView)
                       Positioned.fill(
                         child: Padding(
@@ -935,6 +967,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   RestaurantDetailScreen(
+                                                latitude: data.latitude,
+                                                longitude: data.longitude,
                                                 types: data.type ?? [],
                                                 distance:
                                                     data.distance.toString(),
@@ -955,6 +989,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                         child: SizedBox(
                                           height: 130,
                                           child: RecommendedItem(
+                                            placeId: data.placeId,
                                             address: data.vicinity ?? "",
                                             type: formatCategory(
                                                 data.type ?? ["All"]),
@@ -996,6 +1031,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     child: Text("No Itinerary Found")))),
                       ),
 
+                    ///*** this widget show when category view is map view
+
                     if (_categoryMapView && mapViewState.categoryView)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 80),
@@ -1030,6 +1067,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                     MaterialPageRoute(
                                                       builder: (context) =>
                                                           RestaurantDetailScreen(
+                                                        latitude: data.latitude,
+                                                        longitude:
+                                                            data.longitude,
                                                         types: data.type ?? [],
                                                         distance: data.distance
                                                             .toString(),
@@ -1066,6 +1106,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                   child: SizedBox(
                                                     width: 330,
                                                     child: RecommendedItem(
+                                                      placeId: data.placeId,
                                                       address:
                                                           data.vicinity ?? "",
                                                       type: formatCategory(

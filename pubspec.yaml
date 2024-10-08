@@ -31,6 +31,7 @@ dependencies:
   animated_hint_textfield: ^1.0.3
   carousel_slider: ^5.0.0
   bottom_sheet: ^4.0.4
+  map_launcher: ^3.5.0
 
 
 

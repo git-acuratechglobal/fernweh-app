@@ -1,13 +1,11 @@
 import 'dart:io';
-
-import 'package:fernweh/utils/common/action_button.dart';
+import 'package:fernweh/services/local_storage_service/local_storage_service.dart';
 import 'package:fernweh/utils/common/app_mixin.dart';
 import 'package:fernweh/utils/common/app_validation.dart';
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
-import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/add_notes/add_notes_sheet.dart';
 import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/shared_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -147,7 +145,15 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                     child: AsyncDataWidgetB(
                       dataProvider: getUserItineraryProvider,
                       dataBuilder: (context, userItinerary) {
-                        return userItinerary.userIteneries!.isEmpty
+                        final localStorageItinerary = ref
+                            .watch(localStorageServiceProvider)
+                            .getUserItinerary(
+                                userItinerary.userIteneries ?? []);
+                        final List<Itenery> filteredList =
+                            localStorageItinerary!
+                                .where((e) => e.placesCount != 0)
+                                .toList();
+                        return filteredList.isEmpty
                             ? Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -176,12 +182,12 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                               )
                             : ReorderableListView.builder(
                                 padding: const EdgeInsets.all(24),
-                                itemCount: userItinerary.userIteneries!.length,
+                                itemCount: filteredList.length,
                                 itemBuilder: (context, index) {
-                                  final itinary = userItinerary
-                                      .userIteneries![index].itinerary;
+                                  final itinary = filteredList[index].itinerary;
                                   return Column(
-                                      key: ValueKey(itinary?.id??0),
+                                    key: ValueKey(
+                                        '${itinary?.id ?? 'no-id'}-$index'),
                                     children: [
                                       InkWell(
                                         onTap: () {
@@ -204,17 +210,13 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                           }
                                         },
                                         child: MyCreatedItinerary(
-                                            placeCount: userItinerary
-                                                    .userIteneries![index]
+                                            placeCount: filteredList[index]
                                                     .placesCount ??
                                                 0,
                                             itinary: itinary!,
                                             editList: [
-                                              ...?userItinerary
-                                                  .userIteneries![index]
-                                                  .canEdit,
-                                              ...?userItinerary
-                                                  .userIteneries![index].canView
+                                              ...?filteredList[index].canEdit,
+                                              ...?filteredList[index].canView
                                             ]),
                                       ),
                                       const SizedBox(height: 10),
@@ -234,11 +236,14 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                     }
 
                                     // Reorder the itinerary items
-                                    final item = userItinerary
-                                        .userIteneries!.removeAt(oldIndex);
-                                    userItinerary
-                                        .userIteneries!.insert(newIndex, item);
+                                    final item = localStorageItinerary
+                                        .removeAt(oldIndex);
+                                    localStorageItinerary.insert(
+                                        newIndex, item);
                                   });
+                                  ref
+                                      .read(localStorageServiceProvider)
+                                      .setUserItinerary(localStorageItinerary);
                                 },
                               );
                       },
@@ -254,7 +259,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                             return MyCreatedItinerary(
                               placeCount: 0,
                               itinary: userItinerarydummyList[index],
-                              editList: [],
+                              editList: const [],
                             );
                           },
                           separatorBuilder: (BuildContext context, int index) {

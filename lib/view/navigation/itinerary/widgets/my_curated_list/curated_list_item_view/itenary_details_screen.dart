@@ -53,7 +53,7 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         elevation: 0,
         heroTag: null,
         shape: const StadiumBorder(),
@@ -63,15 +63,8 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
             mapView = !mapView;
           });
         },
-        icon: Image.asset(
+        child: Image.asset(
             mapView ? 'assets/images/task.png' : 'assets/images/map.png'),
-        label: Text(
-          mapView ? "ListView" : "MapView",
-          style: TextStyle(
-            color: Colors.white,
-            fontVariations: FVariations.w800,
-          ),
-        ),
       ),
       body: Container(
         constraints: const BoxConstraints.expand(),
@@ -340,6 +333,9 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                                 itemBuilder: (context, index) {
                                   final data = itineraryPlaces[index];
                                   return DetailItem(
+                                    placeId: data.locationId,
+                                    latitude: data.latitude,
+                                    longitude: data.longitude,
                                     selection: data.type == 1
                                         ? "WANT TO VISIT"
                                         : data.type == 2
@@ -418,7 +414,10 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 itemBuilder: (context, index) {
                   final data = itineraryPlace[index];
-                  return DetailItem(
+                  return ListViewItems(
+                    placeId: data.locationId,
+                    latitude: data.latitude,
+                    longitude: data.longitude,
                     selection: data.type == 1
                         ? "WANT TO VISIT"
                         : data.type == 2
@@ -447,7 +446,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
           itemCount: 4,
           padding: const EdgeInsets.symmetric(horizontal: 24),
           itemBuilder: (context, index) {
-            return const DetailItem(
+            return const ListViewItems(
               placeType: "kkklkk",
               name: "data.name",
               url:
@@ -486,18 +485,25 @@ class DetailItem extends StatefulWidget {
   final String? distance;
   final String placeType;
   final String? selection;
+  final double? latitude;
+  final double? longitude;
+  final String? placeId;
 
-  const DetailItem(
-      {super.key,
-      this.width,
-      this.url,
-      this.name,
-      this.address,
-      this.rating,
-      this.walkTime,
-      this.distance,
-      required this.placeType,
-      this.selection});
+  const DetailItem({
+    super.key,
+    this.width,
+    this.url,
+    this.name,
+    this.address,
+    this.rating,
+    this.walkTime,
+    this.distance,
+    required this.placeType,
+    this.selection,
+    this.latitude,
+    this.placeId,
+    this.longitude,
+  });
 
   @override
   State<DetailItem> createState() => _DetailItemState();
@@ -511,6 +517,204 @@ class _DetailItemState extends State<DetailItem> {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => RestaurantDetailScreen(
+              locationId: widget.placeId,
+              latitude: widget.latitude,
+              longitude: widget.longitude,
+              types: const [],
+              image: widget.url ?? "",
+              name: widget.name,
+              rating: widget.rating,
+              walkingTime: widget.walkTime,
+              distance: widget.distance,
+              address: widget.address,
+            ),
+          ),
+        );
+      },
+      child: Column(
+        children: [
+          Container(
+            width: widget.width ?? MediaQuery.sizeOf(context).width,
+            height: 30,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+              color: Color(0xffF7F7F7),
+              border: Border(
+                top: BorderSide(color: Color(0xffE2E2E2)),
+                left: BorderSide(color: Color(0xffE2E2E2)),
+                right: BorderSide(color: Color(0xffE2E2E2)),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children:
+                    List.generate(Config.selectionOptions.length, (index) {
+                  final option = Config.selectionOptions[index].toUpperCase();
+                  return Text(
+                    option,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontVariations: FVariations.w600,
+                      color: widget.selection == option
+                          ? const Color(0xff12B347)
+                          : Colors.grey,
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+          Container(
+            height: 150,
+            width: widget.width ?? MediaQuery.sizeOf(context).width,
+            padding:
+                const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 8),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
+              border: Border(
+                bottom: BorderSide(color: Color(0xffE2E2E2)),
+                left: BorderSide(color: Color(0xffE2E2E2)),
+                right: BorderSide(color: Color(0xffE2E2E2)),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: AspectRatio(
+                          aspectRatio: 1.0,
+                          child: ImageWidget(
+                            url: widget.url ?? "",
+                          )),
+                    ),
+                    Positioned(
+                      top: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: const BoxDecoration(
+                          color: Color(0xffFFE9E9),
+                          borderRadius: BorderRadius.horizontal(
+                            right: Radius.circular(6.0),
+                          ),
+                        ),
+                        child: Text(
+                          widget.placeType,
+                          style: TextStyle(
+                            color: const Color(0xFFCF5253),
+                            fontSize: 11,
+                            fontVariations: FVariations.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 8.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            widget.name ?? "",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontVariations: FVariations.w700,
+                              color: const Color(0xFF1A1B28),
+                            ),
+                          ),
+                          const FavButton(),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.star_rounded,
+                            size: 18,
+                            color: Color(0xffF4CA12),
+                          ),
+                          Text(
+                            widget.rating ?? "0",
+                            style: const TextStyle(fontSize: 12),
+                          )
+                        ],
+                      ),
+                      LocationRow(
+                        address: widget.address ?? "",
+                      ),
+                      DistanceRow(
+                        walkingTime: widget.walkTime ?? "",
+                        distance: widget.distance ?? "",
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ListViewItems extends StatefulWidget {
+  final double? width;
+  final String? url;
+  final String? name;
+  final String? address;
+  final String? rating;
+  final String? walkTime;
+  final String? distance;
+  final String placeType;
+  final String? selection;
+  final double? latitude;
+  final double? longitude;
+  final String? placeId;
+
+  const ListViewItems({
+    super.key,
+    this.width,
+    this.url,
+    this.name,
+    this.address,
+    this.rating,
+    this.walkTime,
+    this.distance,
+    required this.placeType,
+    this.selection,
+    this.latitude,
+    this.placeId,
+    this.longitude,
+  });
+
+  @override
+  State<ListViewItems> createState() => _ListViewItemsState();
+}
+
+class _ListViewItemsState extends State<ListViewItems> {
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => RestaurantDetailScreen(
+              locationId: widget.placeId,
+              latitude: widget.latitude,
+              longitude: widget.longitude,
               types: const [],
               image: widget.url ?? "",
               name: widget.name,
@@ -559,7 +763,6 @@ class _DetailItemState extends State<DetailItem> {
           ),
           Container(
             width: widget.width ?? MediaQuery.sizeOf(context).width,
-            height: 150,
             padding:
                 const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 8),
             decoration: const BoxDecoration(
@@ -571,14 +774,15 @@ class _DetailItemState extends State<DetailItem> {
                 right: BorderSide(color: Color(0xffE2E2E2)),
               ),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Stack(
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: AspectRatio(
-                          aspectRatio: 1.0,
+                          aspectRatio: 1.7,
                           child: ImageWidget(
                             url: widget.url ?? "",
                           )),
@@ -604,89 +808,80 @@ class _DetailItemState extends State<DetailItem> {
                         ),
                       ),
                     ),
+                    const Positioned(top: 12, right: 0, child: FavButton()),
                   ],
                 ),
-                const SizedBox(width: 8.0),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  widget.name ?? "",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontVariations: FVariations.w700,
-                                    color: const Color(0xFF1A1B28),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.star_rounded,
-                                      size: 18,
-                                      color: Color(0xffF4CA12),
-                                    ),
-                                    Text(
-                                      widget.rating ?? "0",
-                                      style: const TextStyle(fontSize: 12),
-                                    )
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                          // InkWell(
-                          //   onTap: () {
-                          //     showModalBottomSheet(
-                          //       context: context,
-                          //       backgroundColor: Colors.white,
-                          //       isScrollControlled: true,
-                          //       constraints: BoxConstraints.tightFor(
-                          //         height: MediaQuery.sizeOf(context).height * 0.6,
-                          //       ),
-                          //       shape: const RoundedRectangleBorder(
-                          //         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                          //       ),
-                          //       builder: (context) {
-                          //         return const AddToItineraySheet();
-                          //       },
-                          //     );
-                          //   },
-                          //   child: Container(
-                          //     width: 35,
-                          //     height: 35,
-                          //     decoration: BoxDecoration(
-                          //       color: Colors.white,
-                          //       shape: BoxShape.circle,
-                          //       border: Border.all(color: const Color(0xffE2E2E2)),
-                          //     ),
-                          //     child: Padding(
-                          //       padding: const EdgeInsets.all(6.0),
-                          //       child: Image.asset(
-                          //         'assets/images/un_heart.png',
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
-                          const FavButton(),
-                        ],
+                const SizedBox(height: 8.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      widget.name ?? "",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontVariations: FVariations.w700,
+                        color: const Color(0xFF1A1B28),
                       ),
-                      LocationRow(
-                        address: widget.address ?? "",
-                      ),
-                      DistanceRow(
-                        walkingTime: widget.walkTime ?? "",
-                        distance: widget.distance ?? "",
-                      ),
-                    ],
-                  ),
+                    ),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.star_rounded,
+                          size: 18,
+                          color: Color(0xffF4CA12),
+                        ),
+                        Text(
+                          widget.rating ?? "0",
+                          style: const TextStyle(fontSize: 12),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+
+                // InkWell(
+                //   onTap: () {
+                //     showModalBottomSheet(
+                //       context: context,
+                //       backgroundColor: Colors.white,
+                //       isScrollControlled: true,
+                //       constraints: BoxConstraints.tightFor(
+                //         height: MediaQuery.sizeOf(context).height * 0.6,
+                //       ),
+                //       shape: const RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                //       ),
+                //       builder: (context) {
+                //         return const AddToItineraySheet();
+                //       },
+                //     );
+                //   },
+                //   child: Container(
+                //     width: 35,
+                //     height: 35,
+                //     decoration: BoxDecoration(
+                //       color: Colors.white,
+                //       shape: BoxShape.circle,
+                //       border: Border.all(color: const Color(0xffE2E2E2)),
+                //     ),
+                //     child: Padding(
+                //       padding: const EdgeInsets.all(6.0),
+                //       child: Image.asset(
+                //         'assets/images/un_heart.png',
+                //       ),
+                //     ),
+                //   ),
+                // ),
+                const SizedBox(height: 8.0),
+                LocationRow(
+                  address: widget.address ?? "",
+                ),
+                const SizedBox(height: 8.0),
+                DistanceRow(
+                  walkingTime: widget.walkTime ?? "",
+                  distance: widget.distance ?? "",
                 ),
               ],
             ),
@@ -710,6 +905,8 @@ class ItineraryMarkersInfo extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => RestaurantDetailScreen(
+              longitude: data.longitude,
+              latitude: data.latitude,
               types: const [],
               distance: data.distance.toString(),
               walkingTime:

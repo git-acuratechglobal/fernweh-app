@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'itinerary_model.g.dart';
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class UserItinerary {
   UserItinerary({
     required this.userIteneries,
@@ -14,7 +14,7 @@ class UserItinerary {
 
   factory UserItinerary.fromJson(Map<String, dynamic> json) =>
       _$UserItineraryFromJson(json);
-
+  Map<String, dynamic> toJson() => _$UserItineraryToJson(this);
   List<Itenery> getCombinedItineraries(int currentUserId) {
     List<Itenery> combinedItineraries = [];
     if (userIteneries != null) {
@@ -29,7 +29,7 @@ class UserItinerary {
   }
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class Itenery {
   Itenery({
     required this.itinerary,
@@ -45,9 +45,10 @@ class Itenery {
 
   factory Itenery.fromJson(Map<String, dynamic> json) =>
       _$IteneryFromJson(json);
+  Map<String, dynamic> toJson() => _$IteneryToJson(this);
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class Can {
   Can({
     required this.id,
@@ -60,9 +61,10 @@ class Can {
   final String? image;
 
   factory Can.fromJson(Map<String, dynamic> json) => _$CanFromJson(json);
+  Map<String, dynamic> toJson() => _$CanToJson(this);
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class Itinerary {
   Itinerary({
     required this.id,
@@ -108,6 +110,8 @@ class Itinerary {
 
   factory Itinerary.fromJson(Map<String, dynamic> json) =>
       _$ItineraryFromJson(json);
+  Map<String, dynamic> toJson() => _$ItineraryToJson(this);
+
 
   String get imageUrl{
     if(image==null){

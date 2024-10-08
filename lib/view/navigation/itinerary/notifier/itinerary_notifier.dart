@@ -1,9 +1,8 @@
 import 'package:fernweh/services/api_service/api_service.dart';
+import 'package:fernweh/services/local_storage_service/local_storage_service.dart';
 import 'package:fernweh/view/navigation/itinerary/models/itinerary_places.dart';
 import 'package:fernweh/view/navigation/itinerary/models/states/my_itinerary_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../../map/model/category.dart';
 import '../models/itinerary_model.dart';
 import '../models/states/itinerary_state.dart';
 
