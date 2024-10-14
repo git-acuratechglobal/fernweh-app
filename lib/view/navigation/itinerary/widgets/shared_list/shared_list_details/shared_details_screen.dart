@@ -217,12 +217,12 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                               errorBuilder: (e, st) => const SizedBox(),
                               loadingBuilder: const Stack(
                                 children: [
-                                  GoogleMap(
-                                    initialCameraPosition: CameraPosition(
-                                      zoom: 14.4746,
-                                      target: LatLng(30.7333, 76.7794),
-                                    ),
-                                  ),
+                                  // GoogleMap(
+                                  //   initialCameraPosition: CameraPosition(
+                                  //     zoom: 14.4746,
+                                  //     target: LatLng(30.7333, 76.7794),
+                                  //   ),
+                                  // ),
                                   Scaffold(
                                     backgroundColor: Colors.black45,
                                     body: Center(

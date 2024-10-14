@@ -160,6 +160,24 @@ class ApiService {
     });
   }
 
+  Future<String> updateMyItinerary(Map<String, dynamic> formData,int id) async {
+    print(formData.toString());
+    return asyncGuard(() async {
+      final response = await _dio.post('itinerary/user-itinerary-update/$id',
+          data: FormData.fromMap(formData),
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }));
+      final myItineraryJson = response.data["message"];
+
+      return myItineraryJson ;
+    });
+  }
+
+
+
   Future<List<SearchResult>> getPlaceSearch(String search) async {
     return asyncGuard(() async {
       var url =

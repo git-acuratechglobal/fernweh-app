@@ -248,7 +248,30 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                               );
                       },
                       errorBuilder: (error, stack) => Center(
-                        child: Text(error.toString()),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                             Text(error.toString()),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12),
+                                minimumSize: const Size(60, 40),
+                              ),
+                              onPressed: () {
+                                ref.invalidate(
+                                    getUserItineraryProvider);
+                              },
+                              child: const Text(
+                                "Refresh",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       loadingBuilder: Skeletonizer(
                         enableSwitchAnimation: true,

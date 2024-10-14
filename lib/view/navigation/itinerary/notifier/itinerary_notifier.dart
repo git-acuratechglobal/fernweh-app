@@ -74,6 +74,22 @@ class MyItineraryNotifier extends _$MyItineraryNotifier {
           await ref.watch(apiServiceProvider).createMyItinerary(_formData);
       ref.invalidate(getUserItineraryProvider);
       state = MyItineraryCreatedState(myItinerary: data);
+      _formData.clear();
+    } catch (e) {
+      state = MyItineraryErrorState(error: e);
+    }
+  }
+
+  Future<void> updateMyItinerary(
+      {required int id, required Map<String, dynamic> form}) async {
+    try {
+      state = MyItineraryLoading();
+      await ref.watch(apiServiceProvider).updateMyItinerary(form, id);
+      ref
+          .read(itineraryPlacesNotifierProvider.notifier)
+          .getTypeItineraryPlace(_formData["itinerary_id"], _formData["type"]);
+      state = MyItineraryUpdatedState();
+      _formData.clear();
     } catch (e) {
       state = MyItineraryErrorState(error: e);
     }

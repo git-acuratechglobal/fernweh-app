@@ -37,16 +37,32 @@ class MyCuratedListTab extends StatelessWidget {
             ),
             child: AspectRatio(
               aspectRatio: 1,
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child:ImageWidget(
-                      url:itinary.imageUrl)
-                     ),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child:ImageWidget(
+                          url:itinary.imageUrl)
+                         ),
+                  Positioned(
+                    top: 1,
+                    right: 1,
+                    child: Image.asset(
+                      isSelected
+                          ? 'assets/images/selected.png'
+                          : 'assets/images/unselected.png',
+                    ),
+                  )
+                ],
+              ),
             )),
         const SizedBox(
           height: 10,
         ),
         Text(
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
           itinary.name ?? "",
           style: const TextStyle(
             color: Colors.black,
@@ -100,15 +116,14 @@ class MyCreatedItinerary extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        overflow: TextOverflow.fade,
-                        itinary.name ?? "",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontVariations: FVariations.w700,
-                        ),
+                    Text(
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      itinary.name ?? "",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontVariations: FVariations.w700,
                       ),
                     ),
                     const SizedBox(

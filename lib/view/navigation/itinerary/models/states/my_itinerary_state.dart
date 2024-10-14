@@ -1,7 +1,8 @@
 import 'package:fernweh/view/navigation/itinerary/models/my_itinerary.dart';
 
 sealed class MyItineraryState {}
-class MyItineraryInitialState extends MyItineraryState{}
+
+class MyItineraryInitialState extends MyItineraryState {}
 
 class MyItineraryLoading extends MyItineraryState {}
 
@@ -10,7 +11,11 @@ class MyItineraryCreatedState extends MyItineraryState {
 
   MyItineraryCreatedState({required this.myItinerary});
 }
-class MyItineraryErrorState extends MyItineraryState{
+
+class MyItineraryUpdatedState extends MyItineraryState {}
+
+class MyItineraryErrorState extends MyItineraryState {
   final Object? error;
+
   MyItineraryErrorState({required this.error});
 }

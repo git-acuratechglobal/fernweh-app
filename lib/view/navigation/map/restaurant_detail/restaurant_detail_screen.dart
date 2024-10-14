@@ -12,13 +12,12 @@ import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/navigation/itinerary/models/states/itinerary_state.dart';
 import 'package:fernweh/view/navigation/itinerary/models/states/my_itinerary_state.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
-import 'package:fernweh/view/navigation/map/add_to_wishlist_sheet/add_to_wishlist_sheet.dart';
 import 'package:fernweh/view/navigation/map/notifier/wish_list_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:map_launcher/map_launcher.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../services/local_storage_service/local_storage_service.dart';
 import '../../../auth/login/login_screen.dart';
 import '../../../auth/signup/profile_setup/create_profile_screen.dart';
@@ -253,12 +252,12 @@ class RestaurantDetailScreen extends ConsumerWidget {
                                   );
                                 } else {
                                   if (locationId != null) {
-                                    ref
-                                        .read(wishListProvider.notifier)
-                                        .addToItinerary(WishList(
-                                            name: name ?? "",
-                                            image: images?[0] ?? "",
-                                            placeId: locationId ?? ""));
+                                    // ref
+                                    //     .read(wishListProvider.notifier)
+                                    //     .addToItinerary(WishList(
+                                    //         name: name ?? "",
+                                    //         image: images?[0] ?? "",
+                                    //         placeId: locationId ?? ""));
                                     showModalBottomSheet(
                                       context: context,
                                       backgroundColor: Colors.white,
@@ -273,7 +272,9 @@ class RestaurantDetailScreen extends ConsumerWidget {
                                             top: Radius.circular(20)),
                                       ),
                                       builder: (context) {
-                                        return const AddToWishlistSheet();
+                                        return AddToItineraySheet(
+                                          locationId: locationId,
+                                        );
                                       },
                                     );
                                   }
@@ -294,19 +295,13 @@ class RestaurantDetailScreen extends ConsumerWidget {
                           Expanded(
                               child: AppButton(
                                   onTap: () async {
-                                    // String googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
-                                    // if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
-                                    //   await launchUrl(Uri.parse(googleMapsUrl));
-                                    // } else {
-                                    //   throw 'Could not open Google Maps';
-                                    // }
-                                    if (latitude != null && longitude != null) {
-                                      final availableMaps =
-                                          await MapLauncher.installedMaps;
-                                      await availableMaps.first.showMarker(
-                                        coords: Coords(latitude!, longitude!),
-                                        title: name ?? "",
-                                      );
+                                    String googleUrl =
+                                        'https://www.google.com/maps/search/?api=1&query=Google&query_place_id=$locationId';
+                                    if (await canLaunchUrl(
+                                        Uri.parse(googleUrl))) {
+                                      await launchUrl(Uri.parse(googleUrl));
+                                    } else {
+                                      throw 'Could not open the place details.';
                                     }
                                   },
                                   backgroundColor: Colors.white,
@@ -437,6 +432,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
   ];
   int? type = 0;
   int? _selectedItinerary;
+  List<int> _slectedItineraryId = [];
 
   XFile? file;
   final itineraryController = TextEditingController();
@@ -444,7 +440,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
   String? itineraryId;
 
   Itenery? itinerary;
-
+  List<Itenery> combinedList=[];
   @override
   Widget build(BuildContext context) {
     ref.listen(userItineraryNotifierProvider, (previous, next) {
@@ -660,6 +656,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                   );
                                 }
                                 final itinary = combinedItineraries[index];
+                                combinedList=combinedItineraries;
                                 if (selectedItineraryId != null) {
                                   _selectedItinerary =
                                       combinedItineraries.indexWhere((e) =>
@@ -672,9 +669,14 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                 }
                                 return GestureDetector(
                                   onTap: () {
-                                    setState(() {
-                                      _selectedItinerary = index;
-                                    });
+                                    _slectedItineraryId
+                                        .toggle(itinary.itinerary?.id ?? 0);
+                                    if(_slectedItineraryId.isNotEmpty){
+                                      setState(() {
+                                        _selectedItinerary = _slectedItineraryId[0];
+                                      });
+                                    }
+
 
                                     ref
                                         .read(localStorageServiceProvider)
@@ -684,7 +686,10 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                   child: MyCuratedListTab(
                                       itinary: itinary.itinerary!,
                                       isEditing: false,
-                                      isSelected: _selectedItinerary == index),
+                                      isSelected: _slectedItineraryId.isNotEmpty
+                                          ? _slectedItineraryId.contains(
+                                              itinary.itinerary?.id ?? 0)
+                                          : _selectedItinerary == index),
                                 );
                               },
                             );
@@ -883,23 +888,49 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                 .createItinerary();
                           }
                         } else {
-                          ref
-                              .read(myItineraryNotifierProvider.notifier)
-                              .updateForm('type', selectedOption);
-                          ref
-                              .read(myItineraryNotifierProvider.notifier)
-                              .updateForm(
-                                  'userId', itinerary?.itinerary!.userId);
-                          ref
-                              .read(myItineraryNotifierProvider.notifier)
-                              .updateForm(
-                                  'intineraryListId', itinerary?.itinerary!.id);
-                          ref
-                              .read(myItineraryNotifierProvider.notifier)
-                              .updateForm('locationId', widget.locationId);
-                          ref
-                              .read(myItineraryNotifierProvider.notifier)
-                              .createMyItinerary();
+                          if(_slectedItineraryId.isNotEmpty){
+                            for (var itineraryId in _slectedItineraryId) {
+                              final itinerary = combinedList.firstWhere(
+                                    (e) => e.itinerary!.id == itineraryId,
+                              );
+                              ref
+                                  .read(myItineraryNotifierProvider.notifier)
+                                  .updateForm('type', selectedOption);
+                              ref
+                                  .read(myItineraryNotifierProvider.notifier)
+                                  .updateForm(
+                                  'userId', itinerary.itinerary!.userId);
+                              ref
+                                  .read(myItineraryNotifierProvider.notifier)
+                                  .updateForm(
+                                  'intineraryListId', itinerary.itinerary!.id);
+                              ref
+                                  .read(myItineraryNotifierProvider.notifier)
+                                  .updateForm('locationId', widget.locationId);
+                              ref
+                                  .read(myItineraryNotifierProvider.notifier)
+                                  .createMyItinerary();
+                            }
+                          }else{
+                            ref
+                                .read(myItineraryNotifierProvider.notifier)
+                                .updateForm('type', selectedOption);
+                            ref
+                                .read(myItineraryNotifierProvider.notifier)
+                                .updateForm(
+                                'userId', itinerary?.itinerary!.userId);
+                            ref
+                                .read(myItineraryNotifierProvider.notifier)
+                                .updateForm(
+                                'intineraryListId', itinerary?.itinerary!.id);
+                            ref
+                                .read(myItineraryNotifierProvider.notifier)
+                                .updateForm('locationId', widget.locationId);
+                            ref
+                                .read(myItineraryNotifierProvider.notifier)
+                                .createMyItinerary();
+                          }
+
                         }
                       },
                       child: _isSelected

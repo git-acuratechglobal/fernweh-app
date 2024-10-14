@@ -124,9 +124,30 @@ class _SharedListTabState extends ConsumerState<SharedListTab> {
               return const SizedBox(height: 16);
             },
           )),
-          errorBuilder: (error, st) => Center(
-                child: Text(error.toString()),
-              )),
+          errorBuilder: (error, st) => Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(error.toString()),
+              const SizedBox(
+                height: 10,
+              ),
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12),
+                  minimumSize: const Size(60, 40),
+                ),
+                onPressed: () {
+                  ref.invalidate(
+                      getUserItineraryProvider);
+                },
+                child: const Text(
+                  "Refresh",
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+            ],
+          ),),
     );
   }
 }
@@ -154,12 +175,6 @@ class _SharedItemState extends ConsumerState<SharedItem> {
     final userId = ref.watch(userDetailProvider);
     return InkWell(
       onTap: () {
-        // ref
-        //     .read(
-        //     itineraryPlacesNotifierProvider
-        //         .notifier)
-        //     .getItineraryPlaces(
-        //     widget.itinerary.itinerary!.id??0);
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => SharedDetailsScreen(
@@ -194,14 +209,14 @@ class _SharedItemState extends ConsumerState<SharedItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Expanded(
-                    child: Text(
-                      widget.itinerary.itinerary!.name ?? "",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontVariations: FVariations.w700,
-                      ),
+                  Text(
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    widget.itinerary.itinerary!.name ?? "",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontVariations: FVariations.w700,
                     ),
                   ),
                   Text(

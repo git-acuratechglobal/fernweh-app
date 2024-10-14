@@ -17,7 +17,17 @@ class AddToWishlistSheet extends ConsumerStatefulWidget {
 
 class _AddToWishlistSheetState extends ConsumerState<AddToWishlistSheet> {
   List<String> selectedItems = [];
+@override
+  void initState() {
+  WidgetsBinding.instance.addPostFrameCallback((_){
+    final wishListItem = ref.watch(wishListProvider);
+    setState(() {
+      selectedItems.add(wishListItem.last.placeId);
+    });
+  });
 
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     final wishListItem = ref.watch(wishListProvider);

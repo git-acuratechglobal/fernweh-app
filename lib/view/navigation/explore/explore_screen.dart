@@ -222,6 +222,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             ref
                                 .read(filtersProvider.notifier)
                                 .updateFilter(filterData);
+                            ref.invalidate(itineraryNotifierProvider);
                             return;
                           } else {
                             mapState.update(
@@ -244,6 +245,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             ref
                                 .read(filtersProvider.notifier)
                                 .updateFilter(filterData);
+                            ref
+                                .read(itineraryNotifierProvider
+                                .notifier)
+                                .filteredItinerary();
                           }
                         },
                         child: CategoryItem(

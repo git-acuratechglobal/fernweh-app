@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:fernweh/utils/common/fav_button.dart';
@@ -5,16 +7,20 @@ import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/utils/widgets/loading_widget.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import '../../../../../../utils/common/common.dart';
 import '../../../../../../utils/common/config.dart';
 import '../../../../../../utils/common/extensions.dart';
 import '../../../../explore/explore_screen.dart';
 import '../../../../map/notifier/category_notifier.dart';
 import '../../../../map/restaurant_detail/restaurant_detail_screen.dart';
 import '../../../models/itinerary_places.dart';
+import '../../../models/states/my_itinerary_state.dart';
 import '../../shared_list/shared_list_details/shared_details_screen.dart';
 
 class ItenaryDetailsScreen extends ConsumerStatefulWidget {
@@ -37,6 +43,15 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
       ref
           .read(itineraryPlacesNotifierProvider.notifier)
           .getItineraryPlaces(widget.itineraryId);
+      ref.listenManual(myItineraryNotifierProvider, (previous, next) {
+        switch (next) {
+          case MyItineraryUpdatedState() when previous is MyItineraryLoading:
+            Common.showSnackBar(context, "Place tag updated");
+          case MyItineraryErrorState(error: e):
+            Common.showSnackBar(context, e.toString());
+          default:
+        }
+      });
     });
   }
 
@@ -91,6 +106,7 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
                 ],
               ),
               TabBar(
+                tabAlignment: TabAlignment.start,
                 isScrollable: true,
                 onTap: (val) {
                   switch (val) {
@@ -125,75 +141,27 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
                   return Tab(text: e);
                 }).toList(),
               ),
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(vertical: 16.0),
-              //   child: SizedBox.fromSize(
-              //     size: const Size.fromHeight(56),
-              //     child: ListView.separated(
-              //       padding: const EdgeInsets.symmetric(horizontal: 24),
-              //       itemCount: dates.length,
-              //       scrollDirection: Axis.horizontal,
-              //       itemBuilder: (context, index) {
-              //         final date = dates[index];
-              //         return InkWell(
-              //           onTap: () {
-              //             setState(() {
-              //               selectedDate = date;
-              //             });
-              //           },
-              //           child: Container(
-              //             width: 55,
-              //             height: 50,
-              //             decoration: ShapeDecoration(
-              //               color: Colors.white,
-              //               shape: RoundedRectangleBorder(
-              //                 side: BorderSide(
-              //                   width: 1,
-              //                   color: selectedDate.day == date.day
-              //                       ? const Color(0xff1A72FF)
-              //                       : const Color(0xFFE2E2E2),
-              //                 ),
-              //                 borderRadius: BorderRadius.circular(10),
-              //               ),
-              //             ),
-              //             child: Column(
-              //               mainAxisAlignment: MainAxisAlignment.center,
-              //               children: [
-              //                 Text(
-              //                   "${date.day}/${date.month}",
-              //                   style: TextStyle(
-              //                     fontSize: 16,
-              //                     fontVariations: FVariations.w700,
-              //                   ),
-              //                 ),
-              //                 Text(
-              //                   DateFormat("EEE").format(date),
-              //                   textAlign: TextAlign.center,
-              //                   style: const TextStyle(
-              //                     color: Color(0xFF9A9A9A),
-              //                     fontSize: 12,
-              //                   ),
-              //                 )
-              //               ],
-              //             ),
-              //           ),
-              //         );
-              //       },
-              //       separatorBuilder: (BuildContext context, int index) {
-              //         return const SizedBox(width: 8.0);
-              //       },
-              //     ),
-              //   ),
-              // ),
               const SizedBox(height: 12),
               Expanded(
                 child: TabBarView(
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
-                      DetailPage(isMapView: mapView),
-                      DetailPage(isMapView: mapView),
-                      DetailPage(isMapView: mapView),
-                      DetailPage(isMapView: mapView),
+                      DetailPage(
+                        isMapView: mapView,
+                        type: type,
+                      ),
+                      DetailPage(
+                        isMapView: mapView,
+                        type: type,
+                      ),
+                      DetailPage(
+                        isMapView: mapView,
+                        type: type,
+                      ),
+                      DetailPage(
+                        isMapView: mapView,
+                        type: type,
+                      ),
                     ]),
               ),
             ],
@@ -206,11 +174,9 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
 
 class DetailPage extends ConsumerStatefulWidget {
   final bool isMapView;
+  final int? type;
 
-  const DetailPage({
-    super.key,
-    required this.isMapView,
-  });
+  const DetailPage({super.key, required this.isMapView, this.type});
 
   @override
   ConsumerState<DetailPage> createState() => _DetailPageState();
@@ -257,6 +223,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                 }
 
                 return GoogleMap(
+                  zoomControlsEnabled: false,
                   myLocationButtonEnabled: false,
                   initialCameraPosition: CameraPosition(
                     zoom: 14.4746,
@@ -293,12 +260,12 @@ class _DetailPageState extends ConsumerState<DetailPage> {
               ),
               loadingBuilder: const Stack(
                 children: [
-                  GoogleMap(
-                    initialCameraPosition: CameraPosition(
-                      zoom: 14.4746,
-                      target: LatLng(30.7333, 76.7794),
-                    ),
-                  ),
+                  // GoogleMap(
+                  //   initialCameraPosition: CameraPosition(
+                  //     zoom: 14.4746,
+                  //     target: LatLng(30.7333, 76.7794),
+                  //   ),
+                  // ),
                   Scaffold(
                     backgroundColor: Colors.black45,
                     body: Center(
@@ -333,6 +300,10 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                                 itemBuilder: (context, index) {
                                   final data = itineraryPlaces[index];
                                   return DetailItem(
+                                    id: data.id,
+                                    itineraryId: data.intineraryListId,
+                                    userId: data.userId,
+                                    locationId: data.locationId,
                                     placeId: data.locationId,
                                     latitude: data.latitude,
                                     longitude: data.longitude,
@@ -355,7 +326,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                                 },
                                 separatorBuilder:
                                     (BuildContext context, int index) {
-                                  return const SizedBox(width: 24.0);
+                                  return const SizedBox(width: 10.0);
                                 },
                               );
                             },
@@ -414,23 +385,52 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 itemBuilder: (context, index) {
                   final data = itineraryPlace[index];
-                  return ListViewItems(
-                    placeId: data.locationId,
-                    latitude: data.latitude,
-                    longitude: data.longitude,
-                    selection: data.type == 1
-                        ? "WANT TO VISIT"
-                        : data.type == 2
-                            ? "VISITED"
-                            : "WILL VISIT AGAIN",
-                    placeType: data.placeTypes ?? "",
-                    name: data.name,
-                    url: data.photo,
-                    address: data.formattedAddress,
-                    rating: data.rating.toString(),
-                    walkTime:
-                        convertMinutes(int.parse(data.walkingTime.toString())),
-                    distance: data.distance.toString(),
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(7),
+                    child: SwipeActionCell(
+                      key: Key(data.id.toString()),
+                      trailingActions: <SwipeAction>[
+                        SwipeAction(
+                          color: Colors.transparent,
+                          icon: Container(
+                            height: 60,
+                            width: double.infinity,
+                            color: Colors.red,
+                            child: const Icon(
+                              Icons.delete,
+                              color: Colors.black,
+                            ),
+                          ),
+                          title: "Delete",
+                          onTap: (CompletionHandler handler) async {
+                            itineraryPlace.removeAt(index);
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                      child: ListViewItems(
+                        id: data.id,
+                        itineraryId: data.intineraryListId,
+                        userId: data.userId,
+                        locationId: data.locationId,
+                        placeId: data.locationId,
+                        latitude: data.latitude,
+                        longitude: data.longitude,
+                        selection: data.type == 1
+                            ? "WANT TO VISIT"
+                            : data.type == 2
+                                ? "VISITED"
+                                : "WILL VISIT AGAIN",
+                        placeType: data.placeTypes ?? "",
+                        name: data.name,
+                        url: data.photo,
+                        address: data.formattedAddress,
+                        rating: data.rating.toString(),
+                        walkTime: convertMinutes(
+                            int.parse(data.walkingTime.toString())),
+                        distance: data.distance.toString(),
+                      ),
+                    ),
                   );
                 },
                 separatorBuilder: (BuildContext context, int index) {
@@ -475,7 +475,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
   }
 }
 
-class DetailItem extends StatefulWidget {
+class DetailItem extends ConsumerStatefulWidget {
   final double? width;
   final String? url;
   final String? name;
@@ -488,71 +488,87 @@ class DetailItem extends StatefulWidget {
   final double? latitude;
   final double? longitude;
   final String? placeId;
+  final int? itineraryId;
+  final int? userId;
+  final String? locationId;
+  final int? id;
+  final int? type;
 
-  const DetailItem({
-    super.key,
-    this.width,
-    this.url,
-    this.name,
-    this.address,
-    this.rating,
-    this.walkTime,
-    this.distance,
-    required this.placeType,
-    this.selection,
-    this.latitude,
-    this.placeId,
-    this.longitude,
-  });
+  const DetailItem(
+      {super.key,
+      this.width,
+      this.url,
+      this.name,
+      this.address,
+      this.rating,
+      this.walkTime,
+      this.distance,
+      required this.placeType,
+      this.selection,
+      this.latitude,
+      this.placeId,
+      this.longitude,
+      this.id,
+      this.locationId,
+      this.userId,
+      this.itineraryId,
+      this.type});
 
   @override
-  State<DetailItem> createState() => _DetailItemState();
+  ConsumerState<DetailItem> createState() => _DetailItemState();
 }
 
-class _DetailItemState extends State<DetailItem> {
+class _DetailItemState extends ConsumerState<DetailItem> {
+  String? selectedType;
+
+  @override
+  void initState() {
+    setState(() {
+      selectedType = widget.selection;
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => RestaurantDetailScreen(
-              locationId: widget.placeId,
-              latitude: widget.latitude,
-              longitude: widget.longitude,
-              types: const [],
-              image: widget.url ?? "",
-              name: widget.name,
-              rating: widget.rating,
-              walkingTime: widget.walkTime,
-              distance: widget.distance,
-              address: widget.address,
+    return Column(
+      children: [
+        Container(
+          width: widget.width ?? MediaQuery.sizeOf(context).width,
+          height: 30,
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+            color: Color(0xffF7F7F7),
+            border: Border(
+              top: BorderSide(color: Color(0xffE2E2E2)),
+              left: BorderSide(color: Color(0xffE2E2E2)),
+              right: BorderSide(color: Color(0xffE2E2E2)),
             ),
           ),
-        );
-      },
-      child: Column(
-        children: [
-          Container(
-            width: widget.width ?? MediaQuery.sizeOf(context).width,
-            height: 30,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
-              color: Color(0xffF7F7F7),
-              border: Border(
-                top: BorderSide(color: Color(0xffE2E2E2)),
-                left: BorderSide(color: Color(0xffE2E2E2)),
-                right: BorderSide(color: Color(0xffE2E2E2)),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children:
-                    List.generate(Config.selectionOptions.length, (index) {
-                  final option = Config.selectionOptions[index].toUpperCase();
-                  return Text(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(Config.selectionOptions.length, (index) {
+                final option = Config.selectionOptions[index].toUpperCase();
+                return InkWell(
+                  onTap: () {
+                    ref
+                        .read(myItineraryNotifierProvider.notifier)
+                        .updateForm("type", widget.type);
+                    ref
+                        .read(myItineraryNotifierProvider.notifier)
+                        .updateForm("itinerary_id", widget.itineraryId);
+                    ref
+                        .read(myItineraryNotifierProvider.notifier)
+                        .updateMyItinerary(id: widget.id ?? 0, form: {
+                      "intineraryListId": widget.itineraryId,
+                      "type": index + 1,
+                      "locationId": widget.locationId,
+                      "userId": widget.userId
+                    });
+                  },
+                  child: Text(
                     option,
                     style: TextStyle(
                       fontSize: 12,
@@ -561,12 +577,32 @@ class _DetailItemState extends State<DetailItem> {
                           ? const Color(0xff12B347)
                           : Colors.grey,
                     ),
-                  );
-                }),
-              ),
+                  ),
+                );
+              }),
             ),
           ),
-          Container(
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => RestaurantDetailScreen(
+                  locationId: widget.placeId,
+                  latitude: widget.latitude,
+                  longitude: widget.longitude,
+                  types: const [],
+                  image: widget.url ?? "",
+                  name: widget.name,
+                  rating: widget.rating,
+                  walkingTime: widget.walkTime,
+                  distance: widget.distance,
+                  address: widget.address,
+                ),
+              ),
+            );
+          },
+          child: Container(
             height: 150,
             width: widget.width ?? MediaQuery.sizeOf(context).width,
             padding:
@@ -625,14 +661,17 @@ class _DetailItemState extends State<DetailItem> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            widget.name ?? "",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontVariations: FVariations.w700,
-                              color: const Color(0xFF1A1B28),
+                          SizedBox(
+                            width: 140.0,
+                            child: Text(
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              widget.name ?? "",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontVariations: FVariations.w700,
+                                color: const Color(0xFF1A1B28),
+                              ),
                             ),
                           ),
                           const FavButton(),
@@ -664,13 +703,13 @@ class _DetailItemState extends State<DetailItem> {
               ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
-class ListViewItems extends StatefulWidget {
+class ListViewItems extends ConsumerStatefulWidget {
   final double? width;
   final String? url;
   final String? name;
@@ -683,36 +722,47 @@ class ListViewItems extends StatefulWidget {
   final double? latitude;
   final double? longitude;
   final String? placeId;
+  final int? itineraryId;
+  final int? userId;
+  final String? locationId;
+  final int? id;
+  final int? type;
 
-  const ListViewItems({
-    super.key,
-    this.width,
-    this.url,
-    this.name,
-    this.address,
-    this.rating,
-    this.walkTime,
-    this.distance,
-    required this.placeType,
-    this.selection,
-    this.latitude,
-    this.placeId,
-    this.longitude,
-  });
+  const ListViewItems(
+      {super.key,
+      this.width,
+      this.url,
+      this.name,
+      this.address,
+      this.rating,
+      this.walkTime,
+      this.distance,
+      required this.placeType,
+      this.selection,
+      this.latitude,
+      this.placeId,
+      this.longitude,
+      this.id,
+      this.locationId,
+      this.userId,
+      this.itineraryId,
+      this.type});
 
   @override
-  State<ListViewItems> createState() => _ListViewItemsState();
+  ConsumerState<ListViewItems> createState() => _ListViewItemsState();
 }
 
-class _ListViewItemsState extends State<ListViewItems> {
+class _ListViewItemsState extends ConsumerState<ListViewItems> {
   String? selectedType;
+
   @override
   void initState() {
-setState(() {
-  selectedType=widget.selection;
-});
+    setState(() {
+      selectedType = widget.selection;
+    });
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -734,13 +784,26 @@ setState(() {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children:
-                  List.generate(Config.selectionOptions.length, (index) {
+              children: List.generate(Config.selectionOptions.length, (index) {
                 final option = Config.selectionOptions[index].toUpperCase();
                 return InkWell(
-                  onTap: (){
-                    setState(() {
-                      selectedType= option;
+                  onTap: () {
+                    // setState(() {
+                    //   selectedType= option;
+                    // });
+                    ref
+                        .read(myItineraryNotifierProvider.notifier)
+                        .updateForm("type", widget.type);
+                    ref
+                        .read(myItineraryNotifierProvider.notifier)
+                        .updateForm("itinerary_id", widget.itineraryId);
+                    ref
+                        .read(myItineraryNotifierProvider.notifier)
+                        .updateMyItinerary(id: widget.id ?? 0, form: {
+                      "intineraryListId": widget.itineraryId,
+                      "type": index + 1,
+                      "locationId": widget.locationId,
+                      "userId": widget.userId
                     });
                   },
                   child: Text(
@@ -759,7 +822,7 @@ setState(() {
           ),
         ),
         InkWell(
-          onTap: (){
+          onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => RestaurantDetailScreen(

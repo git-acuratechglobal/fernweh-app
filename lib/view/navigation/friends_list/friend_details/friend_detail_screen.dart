@@ -1,24 +1,28 @@
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/view/navigation/friends_list/controller/friends_itinerary_notifier.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/widgets/async_widget.dart';
 import '../../../../utils/widgets/image_widget.dart';
 import '../../itinerary/notifier/itinerary_notifier.dart';
 import '../../itinerary/widgets/my_curated_list/curated_list_item_view/itenary_details_screen.dart';
-import '../../itinerary/widgets/my_curated_list/my_curated_list.dart';
-import '../add_friend/add_friend_screen.dart';
 import '../model/friends.dart';
 import '../model/friends_itinerary.dart';
 
-class FriendDetailScreen extends StatelessWidget {
+class FriendDetailScreen extends ConsumerStatefulWidget {
   final bool isAddFriend;
   final Friends friends;
 
   const FriendDetailScreen(
       {super.key, this.isAddFriend = false, required this.friends});
 
+  @override
+  ConsumerState<FriendDetailScreen> createState() => _FriendDetailScreenState();
+}
+
+class _FriendDetailScreenState extends ConsumerState<FriendDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,22 +60,23 @@ class FriendDetailScreen extends StatelessWidget {
                   color: Theme.of(context).colorScheme.secondary,
                 ),
               ),
-              child: ClipOval(child: ImageWidget(url: friends.imageUrl)),
+              child: ClipOval(child: ImageWidget(url: widget.friends.imageUrl)),
             ),
             const SizedBox(height: 16.0),
             Text(
-              friends.fullName,
+              widget.friends.fullName,
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 20,
                 fontVariations: FVariations.w700,
               ),
             ),
-            if (isAddFriend) const SizedBox(height: 16),
+            if (widget.isAddFriend) const SizedBox(height: 16),
             // if (isAddFriend) const AddRequestButton(size: Size(100, 46)),
             const SizedBox(height: 24),
             Expanded(
               child: Container(
+                width: double.infinity,
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.vertical(
@@ -79,97 +84,140 @@ class FriendDetailScreen extends StatelessWidget {
                   ),
                 ),
                 child: AsyncDataWidgetB(
-                    dataProvider:
-                        getFriendsItineraryListProvider(friends.id ?? 0),
-                    dataBuilder: (context, itinerary) {
-                      List<FriendsItinerary> filteredList =
-                          itinerary.where((e) => e.type == "1").toList();
-                      return itinerary.isEmpty
-                          ? const Center(child: Text("No itinerary found!"))
-                          : GridView.builder(
-                              padding: const EdgeInsets.all(24),
-                              itemCount: filteredList.length,
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 25,
-                                mainAxisSpacing: 25,
-                                childAspectRatio: 0.85,
+                  dataProvider:
+                      getFriendsItineraryListProvider(widget.friends.id ?? 0),
+                  dataBuilder: (context, itinerary) {
+                    List<FriendsItinerary> filteredList =
+                        itinerary.where((e) => e.type == "1").toList();
+                    return itinerary.isEmpty
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text("No itinerary found!"),
+                              const SizedBox(
+                                height: 10,
                               ),
-                              itemBuilder: (context, index) {
-                                return InkWell(
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ItenaryDetailsScreen(
-                                          title: filteredList[index].name ?? "",
-                                          itineraryId:
-                                              filteredList[index].id ?? 0,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: FriendItineraryList(
-                                    itinary: filteredList[index],
-                                    isEditing: false,
-                                    isSelected: false,
-                                  ),
-                                );
-                              },
-                            );
-                    },
-                    loadingBuilder: Skeletonizer(
-                        child: GridView.builder(
-                      padding: const EdgeInsets.all(24),
-                      itemCount: 6,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 25,
-                        mainAxisSpacing: 25,
-                        childAspectRatio: 0.75,
-                      ),
-                      itemBuilder: (context, index) {
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                                padding: const EdgeInsets.all(8.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(
-                                    width: 1,
-                                    color: const Color(0xffE2E2E2),
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
+                              OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12),
+                                  minimumSize: const Size(60, 40),
                                 ),
-                                child: AspectRatio(
-                                  aspectRatio: 1,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.asset(
-                                      "assets/images/avatar1.png",
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                )),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            const Text(
-                              "dummy name",
-                              style: TextStyle(
-                                color: Colors.black,
+                                onPressed: () {
+                                  ref.invalidate(
+                                      getFriendsItineraryListProvider);
+                                },
+                                child: const Text(
+                                  "Refresh",
+                                  style: TextStyle(fontSize: 14),
+                                ),
                               ),
+                            ],
+                          )
+                        : GridView.builder(
+                            padding: const EdgeInsets.all(24),
+                            itemCount: filteredList.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 25,
+                              mainAxisSpacing: 25,
+                              childAspectRatio: 0.85,
                             ),
-                          ],
-                        );
-                      },
-                    )),
-                    errorBuilder: (error, stack) => Center(
-                          child: Text(error.toString()),
-                        )),
+                            itemBuilder: (context, index) {
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ItenaryDetailsScreen(
+                                        title: filteredList[index].name ?? "",
+                                        itineraryId:
+                                            filteredList[index].id ?? 0,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: FriendItineraryList(
+                                  itinary: filteredList[index],
+                                  isEditing: false,
+                                  isSelected: false,
+                                ),
+                              );
+                            },
+                          );
+                  },
+                  loadingBuilder: Skeletonizer(
+                      child: GridView.builder(
+                    padding: const EdgeInsets.all(24),
+                    itemCount: 6,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 25,
+                      mainAxisSpacing: 25,
+                      childAspectRatio: 0.75,
+                    ),
+                    itemBuilder: (context, index) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                  width: 1,
+                                  color: const Color(0xffE2E2E2),
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: AspectRatio(
+                                aspectRatio: 1,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.asset(
+                                    "assets/images/avatar1.png",
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              )),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text(
+                            "dummy name",
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  )),
+                  errorBuilder: (error, stack) => Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(error.toString()),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          minimumSize: const Size(60, 40),
+                        ),
+                        onPressed: () {
+                          ref.invalidate(getFriendsItineraryListProvider);
+                        },
+                        child: const Text(
+                          "Refresh",
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
@@ -210,8 +258,7 @@ class FriendItineraryList extends StatelessWidget {
               aspectRatio: 1,
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: ImageWidget(
-                      url:itinary.imageUrl)),
+                  child: ImageWidget(url: itinary.imageUrl)),
             )),
         const SizedBox(
           height: 5,

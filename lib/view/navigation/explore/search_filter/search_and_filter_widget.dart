@@ -1,4 +1,5 @@
 import 'package:animated_hint_textfield/animated_hint_textfield.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:fernweh/view/navigation/map/notifier/category_notifier.dart';
 import 'package:fernweh/view/navigation/map/state/map_view_state.dart';
 import 'package:flutter/material.dart';
@@ -228,13 +229,22 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
                         },
                         onChanged: (val) {
                           if (val.isNotEmpty) {
-                            ref
-                                .read(searchPlaceNotifierProvider.notifier)
-                                .setSearch(val);
-                            ref
-                                .read(searchControllerProvider.notifier)
-                                .state
-                                .text = val;
+                            EasyDebounce.debounce(
+                              'search-theater',
+                              const Duration(seconds: 1),
+                                  () {
+                                    ref
+                                        .read(searchPlaceNotifierProvider.notifier)
+                                        .setSearch(val);
+                              },
+                            );
+                            // ref
+                            //     .read(searchPlaceNotifierProvider.notifier)
+                            //     .setSearch(val);
+                            // ref
+                            //     .read(searchControllerProvider.notifier)
+                            //     .state
+                            //     .text = val;
                             if (_overlayEntry == null) {
                               _showOverlay(
                                 context,
