@@ -4,16 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FavButton extends ConsumerStatefulWidget {
-  const FavButton({
-    super.key,
-    this.placeId,
-    this.name,
-    this.image,
-  });
+  const FavButton(
+      {super.key,
+      this.placeId,
+      this.name,
+      this.image,
+      this.type,
+      this.distance,
+      this.walkingTime,
+      this.rating,
+      this.address});
 
-  final String? placeId;
-  final String? name;
+  final String? type;
   final String? image;
+  final String? name;
+  final String? rating;
+  final String? walkingTime;
+  final String? distance;
+  final String? address;
+  final String? placeId;
 
   @override
   ConsumerState<FavButton> createState() => _FavButtonState();
@@ -31,9 +40,15 @@ class _FavButtonState extends ConsumerState<FavButton> {
             widget.placeId != null &&
             widget.image != null) {
           ref.read(wishListProvider.notifier).addToItinerary(WishList(
-              name: widget.name ?? "",
-              image: widget.image ?? "",
-              placeId: widget.placeId ?? ""));
+                name: widget.name ?? "",
+                image: widget.image ?? "",
+                placeId: widget.placeId ?? "",
+                address: widget.address ?? "",
+                type: widget.type ?? "",
+                rating: widget.rating ?? "",
+                walkingTime: widget.walkingTime ?? "",
+                distance: widget.distance ?? "",
+              ));
           showModalBottomSheet(
             context: context,
             backgroundColor: Colors.white,
@@ -48,9 +63,7 @@ class _FavButtonState extends ConsumerState<FavButton> {
               return const AddToWishlistSheet();
             },
           );
-          setState(() {
-
-          });
+          setState(() {});
         }
       },
       child: Container(
@@ -63,7 +76,7 @@ class _FavButtonState extends ConsumerState<FavButton> {
         ),
         child: Padding(
           padding: const EdgeInsets.all(6.0),
-          child: wishList.any((e)=>e.placeId==widget.placeId)
+          child: wishList.any((e) => e.placeId == widget.placeId)
               ? Image.asset(
                   'assets/images/heart.png',
                   color: const Color(0xffCF5253),

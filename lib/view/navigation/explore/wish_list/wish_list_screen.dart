@@ -1,14 +1,23 @@
+import 'package:fernweh/view/navigation/map/notifier/wish_list_notifier.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/common/extensions.dart';
+import '../../itinerary/widgets/my_curated_list/curated_list_item_view/itenary_details_screen.dart';
 import '../../map/restaurant_detail/restaurant_detail_screen.dart';
 import '../explore_screen.dart';
 
-class WishListScreen extends StatelessWidget {
+class WishListScreen extends ConsumerStatefulWidget {
   const WishListScreen({super.key});
 
   @override
+  ConsumerState<WishListScreen> createState() => _WishListScreenState();
+}
+
+class _WishListScreenState extends ConsumerState<WishListScreen> {
+  @override
   Widget build(BuildContext context) {
+    final wishListData = ref.watch(wishListProvider);
     return Scaffold(
       body: Container(
         constraints: const BoxConstraints.expand(),
@@ -33,26 +42,30 @@ class WishListScreen extends StatelessWidget {
                 ),
               ),
             ),
-            Expanded(
-              child: ListView.separated(
-                itemCount: 3,
-                padding: const EdgeInsets.all(24),
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 12.0),
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const RestaurantDetailScreen(),
-                        ),
-                      );
-                    },
-                    child: const WishListItems(),
-                  );
-                },
-              ),
-            )
+            wishListData.isEmpty
+                ? const Center(child: Text("No wish list"))
+                : Expanded(
+                    child: ListView.separated(
+                      itemCount: wishListData.length,
+                      padding: const EdgeInsets.all(24),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 12.0),
+                      itemBuilder: (context, index) {
+                        final wishList = wishListData[index];
+                        return ListViewItems(
+                          placeType: wishList.type,
+                          name: wishList.name,
+                          placeId: wishList.placeId,
+                          address: wishList.address,
+                          rating: wishList.rating,
+                          distance: wishList.distance,
+                          url: wishList.image,
+                          selection: null,
+                          walkTime: wishList.walkingTime,
+                        );
+                      },
+                    ),
+                  )
           ],
         ),
       ),

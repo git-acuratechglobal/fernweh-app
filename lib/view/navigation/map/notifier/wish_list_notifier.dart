@@ -4,8 +4,22 @@ class WishList {
   final String name;
   final String image;
   final String placeId;
+  final String type;
+  final String rating;
+  final String walkingTime;
+  final String distance;
+  final String address;
 
-  WishList({required this.name, required this.image, required this.placeId});
+  WishList(
+      {required this.name,
+      required this.image,
+      required this.placeId,
+      required this.address,
+      required this.type,
+      required this.rating,
+      required this.walkingTime,
+      required this.distance});
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -25,21 +39,20 @@ class WishListNotifier extends StateNotifier<List<WishList>> {
   WishListNotifier() : super([]);
 
   void addItemToWishList(WishList item) {
-     final data=state;
-     if(data.contains(item)){
-       data.remove(item);
-     }else{
-       data.add(item);
-     }
+    final data = state;
+    if (data.contains(item)) {
+      data.remove(item);
+    } else {
+      data.add(item);
+    }
     state = data;
   }
 
-  void addToItinerary(WishList item){
-    final data=state;
-    if(!data.contains(item)){
+  void addToItinerary(WishList item) {
+    final data = state;
+    if (!data.contains(item)) {
       data.add(item);
     }
-    state=data;
+    state = data;
   }
-
 }

@@ -791,20 +791,22 @@ class _ListViewItemsState extends ConsumerState<ListViewItems> {
                     // setState(() {
                     //   selectedType= option;
                     // });
-                    ref
-                        .read(myItineraryNotifierProvider.notifier)
-                        .updateForm("type", widget.type);
-                    ref
-                        .read(myItineraryNotifierProvider.notifier)
-                        .updateForm("itinerary_id", widget.itineraryId);
-                    ref
-                        .read(myItineraryNotifierProvider.notifier)
-                        .updateMyItinerary(id: widget.id ?? 0, form: {
-                      "intineraryListId": widget.itineraryId,
-                      "type": index + 1,
-                      "locationId": widget.locationId,
-                      "userId": widget.userId
-                    });
+                if(selectedType!=null){
+                  ref
+                      .read(myItineraryNotifierProvider.notifier)
+                      .updateForm("type", widget.type);
+                  ref
+                      .read(myItineraryNotifierProvider.notifier)
+                      .updateForm("itinerary_id", widget.itineraryId);
+                  ref
+                      .read(myItineraryNotifierProvider.notifier)
+                      .updateMyItinerary(id: widget.id ?? 0, form: {
+                    "intineraryListId": widget.itineraryId,
+                    "type": index + 1,
+                    "locationId": widget.locationId,
+                    "userId": widget.userId
+                  });
+                }
                   },
                   child: Text(
                     option,

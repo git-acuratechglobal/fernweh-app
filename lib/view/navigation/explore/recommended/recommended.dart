@@ -7,18 +7,15 @@ import '../../../../utils/widgets/loading_widget.dart';
 import '../explore_screen.dart';
 
 class RecommendedItem extends StatelessWidget {
-  final bool isFavorite;
-
   const RecommendedItem(
       {super.key,
-      this.isFavorite = false,
       this.type,
       this.image,
       this.name,
       this.rating,
       this.walkingTime,
       this.distance,
-        this.placeId,
+      this.placeId,
       required this.address});
 
   final String? type;
@@ -102,7 +99,16 @@ class RecommendedItem extends StatelessWidget {
                             ],
                           ),
                         ),
-                          FavButton(name: name,image: image,placeId: placeId,)
+                        FavButton(
+                          name: name,
+                          image: image,
+                          placeId: placeId,
+                          type: type,
+                          distance: distance,
+                          walkingTime: walkingTime,
+                          rating: rating,
+                          address: address,
+                        )
                         // InkWell(
                         //   onTap: () {
                         //     // showModalBottomSheet(
@@ -163,27 +169,26 @@ class RecommendedItem extends StatelessWidget {
             top: 10,
             left: 0,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: const BoxDecoration(
-                color: Color(0xffFFE9E9),
-                borderRadius: BorderRadius.horizontal(
-                  right: Radius.circular(6.0),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: const BoxDecoration(
+                  color: Color(0xffFFE9E9),
+                  borderRadius: BorderRadius.horizontal(
+                    right: Radius.circular(6.0),
+                  ),
                 ),
-              ),
-              child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 80),
-                    child: Text(
-                      type ?? 'All',
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: false,
-                      style: const TextStyle(
-                        color: Color(0xFFCF5253),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                      ),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 80),
+                  child: Text(
+                    type ?? 'All',
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    style: const TextStyle(
+                      color: Color(0xFFCF5253),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
                     ),
-                  )
-            ),
+                  ),
+                )),
           ),
         ],
       ),

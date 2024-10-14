@@ -1,5 +1,6 @@
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
+import 'package:fernweh/view/navigation/explore/wish_list/wish_list_screen.dart';
 import 'package:fernweh/view/navigation/map/notifier/category_notifier.dart';
 import 'package:fernweh/view/navigation/map/state/map_view_state.dart';
 import 'package:flutter/material.dart';
@@ -239,6 +240,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       ],
                     ),
                   )),
+                  GestureDetector(
+                    onTap: (){
+                      context.navigateTo(const WishListScreen());
+                    },
+                    child: Image.asset(
+                      'assets/images/heart.png',
+                      color: const Color(0xffCF5253),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
                   Image.asset('assets/images/notification.png'),
                 ]),
               ),
