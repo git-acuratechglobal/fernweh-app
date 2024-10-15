@@ -1,19 +1,14 @@
-import 'package:custom_info_window/custom_info_window.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/view/navigation/explore/wish_list/wish_list_screen.dart';
 import 'package:fernweh/view/navigation/map/notifier/category_notifier.dart';
-import 'package:fernweh/view/navigation/map/state/map_view_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import '../../../utils/common/action_button.dart';
-import '../../../utils/common/config.dart';
-import '../../../utils/common/extensions.dart';
+import '../../../utils/common/widgets.dart';
 import '../../../utils/widgets/loading_widget.dart';
 import '../../location_permission/location_service.dart';
-import '../explore/current_location/current_location.dart';
 import '../explore/explore_screen.dart';
 import '../explore/recommended/recommended.dart';
 import '../explore/search_filter/search_and_filter_widget.dart';
@@ -31,8 +26,7 @@ class MapScreen extends ConsumerStatefulWidget {
 }
 
 class _MapScreenState extends ConsumerState<MapScreen> {
-  final CustomInfoWindowController _customInfoWindowController =
-      CustomInfoWindowController();
+
   bool _categoryMapView = true;
   bool _itineraryMapView = true;
   bool itemsHide = false;
@@ -43,13 +37,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   late ScrollController _scrollController;
   bool floatingButtonsHide = true;
 
-  Map<String, dynamic> filterData = {
-    'type': null,
-    'rating': null,
-    'radius': null,
-    'sort_by': null,
-    'selected_category': null,
-  };
+  Map<String, dynamic> filterData = {};
   bool showSearchMessage = false;
   LatLng? _latLng;
 
@@ -79,7 +67,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   @override
   void dispose() {
-    _customInfoWindowController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -193,10 +180,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   Expanded(
                       child: GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const CurrentLocation()));
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => const CurrentLocation()));
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -433,8 +420,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 ),
                                 onMapCreated: (controller) async {
                                   mapController = controller;
-                                  _customInfoWindowController
-                                      .googleMapController = controller;
                                   final latlng = LatLng(
                                     double.parse(
                                         itineraryPlace[0].latitude.toString()),

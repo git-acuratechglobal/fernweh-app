@@ -2,6 +2,7 @@ import 'package:fernweh/services/api_service/api_service.dart';
 import 'package:fernweh/services/local_storage_service/local_storage_service.dart';
 import 'package:fernweh/view/navigation/itinerary/models/itinerary_places.dart';
 import 'package:fernweh/view/navigation/itinerary/models/states/my_itinerary_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/itinerary_model.dart';
 import '../models/states/itinerary_state.dart';
@@ -113,6 +114,7 @@ class ItineraryPlacesNotifier extends _$ItineraryPlacesNotifier {
       final itineraryPlaces = await ref
           .read(apiServiceProvider)
           .getItineraryPlace(itineraryId, null);
+      ref.read(itineraryLocalListProvider.notifier).loadList(itineraryPlaces);
       state = AsyncData(itineraryPlaces);
     } catch (e, st) {
       state = AsyncError<List<ItineraryPlaces>>(e, st);
@@ -125,9 +127,64 @@ class ItineraryPlacesNotifier extends _$ItineraryPlacesNotifier {
       final itineraryPlaces = await ref
           .read(apiServiceProvider)
           .getItineraryPlace(itineraryId, type);
+      ref.read(itineraryLocalListProvider.notifier).loadList(itineraryPlaces);
       state = AsyncData(itineraryPlaces);
     } catch (e, st) {
       state = AsyncError<List<ItineraryPlaces>>(e, st);
     }
+  }
+}
+
+final itineraryLocalListProvider =
+    StateNotifierProvider<LocalItineraryNotifier, LocalItineraryState>(
+        (ref) => LocalItineraryNotifier());
+
+class LocalItineraryNotifier extends StateNotifier<LocalItineraryState> {
+  LocalItineraryNotifier()
+      : super(LocalItineraryState(itineraryPlaces: [], selectedItems: {}));
+
+  void loadList(List<ItineraryPlaces> data) {
+    state = state.copyWith(data: data);
+  }
+
+  void toggleSelection(int id) {
+    final selectedItems = Set<int>.from(state.selectedItems);
+    if (selectedItems.contains(id)) {
+      selectedItems.remove(id);
+    } else {
+      selectedItems.add(id);
+    }
+    state = state.copyWith(selected: selectedItems);
+  }
+
+  void removeSelectedItems() {
+    final updatedList = state.itineraryPlaces
+        .where((item) => !state.selectedItems.contains(item.id))
+        .toList();
+
+    state = state.copyWith(
+      data: updatedList,
+      selected: {},
+    );
+  }
+
+  void clearSelection() {
+    state = state.copyWith(selected: {});
+  }
+}
+
+class LocalItineraryState {
+  final List<ItineraryPlaces> itineraryPlaces;
+  final Set<int> selectedItems;
+
+  LocalItineraryState(
+      {required this.itineraryPlaces, required this.selectedItems});
+
+  LocalItineraryState copyWith(
+      {List<ItineraryPlaces>? data, Set<int>? selected}) {
+    return LocalItineraryState(
+      itineraryPlaces: data ?? itineraryPlaces,
+      selectedItems: selected ?? selectedItems,
+    );
   }
 }

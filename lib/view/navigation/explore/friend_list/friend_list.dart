@@ -157,11 +157,9 @@ class FriendsListItems extends StatelessWidget {
                       )
                     ],
                   ),
-                  SizedBox(
-                      width: 280,
-                      child: LocationRow(
-                        address: address,
-                      )),
+                  LocationRow(
+                    address: address,
+                  ),
                   DistanceRow(
                     walkingTime: walkingTime,
                     distance: distance,

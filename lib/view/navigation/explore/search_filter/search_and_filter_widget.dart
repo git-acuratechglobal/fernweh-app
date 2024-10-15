@@ -301,8 +301,7 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
                                       //     itineraryView: false);
                                       ref.invalidate(mapViewStateProvider);
                                       ref.invalidate(itineraryNotifierProvider);
-                                      ref.read(latlngProvider.notifier).state =
-                                          null;
+                                      // ref.invalidate(latlngProvider);
                                       _removeOverlay();
                                     },
                                     child: const Icon(Icons.clear))),

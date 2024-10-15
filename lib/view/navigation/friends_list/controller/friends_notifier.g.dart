@@ -52,7 +52,7 @@ final searchFriendProvider =
 );
 
 typedef _$SearchFriend = AutoDisposeAsyncNotifier<List<Friends>?>;
-String _$friendListHash() => r'd1a9287937dfa433b6780e06d6572c9fd70a5bae';
+String _$friendListHash() => r'9503cf4099c0b573baad9e3851808ab6f7a00ef0';
 
 /// See also [FriendList].
 @ProviderFor(FriendList)

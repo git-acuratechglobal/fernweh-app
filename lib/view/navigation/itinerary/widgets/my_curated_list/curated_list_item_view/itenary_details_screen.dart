@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:fernweh/utils/common/fav_button.dart';
@@ -7,10 +6,8 @@ import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/utils/widgets/loading_widget.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../../../utils/common/common.dart';
@@ -66,6 +63,7 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final itineraryState = ref.watch(itineraryLocalListProvider);
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
@@ -102,7 +100,45 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
                   style: const TextStyle(fontSize: 18),
                 ),
                 actions: [
-                  ShareIcon(widget.itineraryId.toString()),
+                  itineraryState.selectedItems.isNotEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  ref
+                                      .read(itineraryLocalListProvider.notifier)
+                                      .clearSelection();
+                                },
+                                child: Text(
+                                  "Cancel",
+                                  style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      fontSize: 15),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              GestureDetector(
+                                onTap: () {
+                                  ref
+                                      .read(itineraryLocalListProvider.notifier)
+                                      .removeSelectedItems();
+                                },
+                                child: Text(
+                                  "Delete",
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                      fontSize: 15),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ShareIcon(widget.itineraryId.toString()),
                 ],
               ),
               TabBar(
@@ -192,6 +228,8 @@ class _DetailPageState extends ConsumerState<DetailPage> {
   @override
   Widget build(BuildContext context) {
     final icon = ref.watch(bitmapIconProvider);
+    final itineraryState = ref.watch(itineraryLocalListProvider);
+    final itineraryNotifier = ref.read(itineraryLocalListProvider.notifier);
     if (widget.isMapView) {
       return LayoutBuilder(builder: (context, snapshot) {
         return Stack(
@@ -359,7 +397,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
     return AsyncDataWidgetB(
       dataProvider: itineraryPlacesNotifierProvider,
       dataBuilder: (context, itineraryPlace) {
-        return itineraryPlace.isEmpty
+        return itineraryState.itineraryPlaces.isEmpty
             ? Skeletonizer(
                 child: ListView.separated(
                   itemCount: 4,
@@ -381,34 +419,29 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                 ),
               )
             : ListView.separated(
-                itemCount: itineraryPlace.length,
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                itemCount: itineraryState.itineraryPlaces.length,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 itemBuilder: (context, index) {
-                  final data = itineraryPlace[index];
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(7),
-                    child: SwipeActionCell(
-                      key: Key(data.id.toString()),
-                      trailingActions: <SwipeAction>[
-                        SwipeAction(
-                          color: Colors.transparent,
-                          icon: Container(
-                            height: 60,
-                            width: double.infinity,
-                            color: Colors.red,
-                            child: const Icon(
-                              Icons.delete,
-                              color: Colors.black,
-                            ),
-                          ),
-                          title: "Delete",
-                          onTap: (CompletionHandler handler) async {
-                            itineraryPlace.removeAt(index);
-                            setState(() {});
-                          },
+                  final data = itineraryState.itineraryPlaces[index];
+                  bool isSelected =
+                      itineraryState.selectedItems.contains(data.id);
+                  return GestureDetector(
+                    onLongPress: () {
+                      itineraryNotifier.toggleSelection(data.id ?? 0);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: isSelected
+                              ? Colors.blue
+                              : Colors.transparent,
+                          width: 2.0,
                         ),
-                      ],
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
                       child: ListViewItems(
+                        isSelected:
+                            itineraryState.selectedItems.isNotEmpty,
                         id: data.id,
                         itineraryId: data.intineraryListId,
                         userId: data.userId,
@@ -727,6 +760,7 @@ class ListViewItems extends ConsumerStatefulWidget {
   final String? locationId;
   final int? id;
   final int? type;
+  final bool isSelected;
 
   const ListViewItems(
       {super.key,
@@ -746,6 +780,7 @@ class ListViewItems extends ConsumerStatefulWidget {
       this.locationId,
       this.userId,
       this.itineraryId,
+      this.isSelected = false,
       this.type});
 
   @override
@@ -791,22 +826,22 @@ class _ListViewItemsState extends ConsumerState<ListViewItems> {
                     // setState(() {
                     //   selectedType= option;
                     // });
-                if(selectedType!=null){
-                  ref
-                      .read(myItineraryNotifierProvider.notifier)
-                      .updateForm("type", widget.type);
-                  ref
-                      .read(myItineraryNotifierProvider.notifier)
-                      .updateForm("itinerary_id", widget.itineraryId);
-                  ref
-                      .read(myItineraryNotifierProvider.notifier)
-                      .updateMyItinerary(id: widget.id ?? 0, form: {
-                    "intineraryListId": widget.itineraryId,
-                    "type": index + 1,
-                    "locationId": widget.locationId,
-                    "userId": widget.userId
-                  });
-                }
+                    if (selectedType != null) {
+                      ref
+                          .read(myItineraryNotifierProvider.notifier)
+                          .updateForm("type", widget.type);
+                      ref
+                          .read(myItineraryNotifierProvider.notifier)
+                          .updateForm("itinerary_id", widget.itineraryId);
+                      ref
+                          .read(myItineraryNotifierProvider.notifier)
+                          .updateMyItinerary(id: widget.id ?? 0, form: {
+                        "intineraryListId": widget.itineraryId,
+                        "type": index + 1,
+                        "locationId": widget.locationId,
+                        "userId": widget.userId
+                      });
+                    }
                   },
                   child: Text(
                     option,
@@ -825,22 +860,26 @@ class _ListViewItemsState extends ConsumerState<ListViewItems> {
         ),
         InkWell(
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => RestaurantDetailScreen(
-                  locationId: widget.placeId,
-                  latitude: widget.latitude,
-                  longitude: widget.longitude,
-                  types: const [],
-                  image: widget.url ?? "",
-                  name: widget.name,
-                  rating: widget.rating,
-                  walkingTime: widget.walkTime,
-                  distance: widget.distance,
-                  address: widget.address,
-                ),
-              ),
-            );
+            widget.isSelected
+                ? ref
+                    .read(itineraryLocalListProvider.notifier)
+                    .toggleSelection(widget.id ?? 0)
+                : Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => RestaurantDetailScreen(
+                        locationId: widget.placeId,
+                        latitude: widget.latitude,
+                        longitude: widget.longitude,
+                        types: const [],
+                        image: widget.url ?? "",
+                        name: widget.name,
+                        rating: widget.rating,
+                        walkingTime: widget.walkTime,
+                        distance: widget.distance,
+                        address: widget.address,
+                      ),
+                    ),
+                  );
           },
           child: Container(
             width: widget.width ?? MediaQuery.sizeOf(context).width,

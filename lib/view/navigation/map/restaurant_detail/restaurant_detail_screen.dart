@@ -12,7 +12,6 @@ import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/navigation/itinerary/models/states/itinerary_state.dart';
 import 'package:fernweh/view/navigation/itinerary/models/states/my_itinerary_state.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
-import 'package:fernweh/view/navigation/map/notifier/wish_list_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';

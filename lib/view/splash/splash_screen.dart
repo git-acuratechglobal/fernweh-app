@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:fernweh/services/auth_service/auth_service.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/auth/login/login_screen.dart';
 import 'package:fernweh/view/navigation/navigation_screen.dart';

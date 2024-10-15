@@ -12,26 +12,17 @@ import '../state/map_view_state.dart';
 
 part 'category_notifier.g.dart';
 
+
+/////*************THIS IS USED FOR MAP SCREEN DATA PROVIDER *****************////////////
 @Riverpod(keepAlive: true)
 class ItineraryNotifier extends _$ItineraryNotifier {
   @override
   FutureOr<List<Category>> build() async {
-    // final position = await ref.watch(currentPositionProvider.future);
-    // final filters = ref.watch(filtersProvider);
-    // final data = await ref.watch(apiServiceProvider).getCategory(
-    //     position.latitude.toString(), position.longitude.toString(),
-    //     filter: filters);
-    // if (data.isNotEmpty) {
-    //   ref.read(latlngProvider.notifier).state = LatLng(
-    //       double.parse(data[0].latitude.toString()),
-    //       double.parse(data[0].longitude.toString()));
-    // }
     ref.invalidate(latlngProvider);
     return [];
   }
 
   Future<void> filteredItinerary() async {
-    print("filter method called===================");
     try {
       state = const AsyncLoading();
       final position = await ref.watch(currentPositionProvider.future);
@@ -53,6 +44,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
   }
 }
 
+////**********MAP MARKER SHOW PROVIDER********************
 final bitmapIconProvider = FutureProvider<BitmapDescriptor>((ref) async {
   ByteData data = await rootBundle.load("assets/images/location-pin.png");
   ui.Codec codec = await ui.instantiateImageCodec(
@@ -67,21 +59,15 @@ final bitmapIconProvider = FutureProvider<BitmapDescriptor>((ref) async {
   return BitmapDescriptor.fromBytes(markerIcon!);
 });
 
+////**********ON MAP SCREEN FILTER TAB PROVIDER********************
 final filtersProvider =
     StateNotifierProvider<FilterNotifier, Map<String, dynamic>>(
         (ref) => FilterNotifier());
 
 class FilterNotifier extends StateNotifier<Map<String, dynamic>> {
   FilterNotifier()
-      : super({
-          // 'type': null,
-          // 'rating': null,
-          // 'radius': null,
-          // 'sort_by': null,
-          // 'selected_category': null,
-          // 'selected_radius': null,
-          // 'input': null
-        });
+      : super(
+            {}); ////INITIAL FILTER IS NULL SO WE NOT HAVE TO SHOW PLACES BASED ON FILTER
 
   void updateFilter(Map<String, dynamic> filters) {
     state = filters;
@@ -89,14 +75,20 @@ class FilterNotifier extends StateNotifier<Map<String, dynamic>> {
   }
 }
 
+////////***********SEARCH PROVIDER FOR SEARCH PLACES****************//////////
 final searchControllerProvider =
     StateProvider<TextEditingController>((ref) => TextEditingController());
 
+////////***********LATLNG PROVIDER FOR INITIAL CAMERA POSITION WHEN DATA SHOW ON MAP  ****************
 final latlngProvider = StateProvider<LatLng?>((ref) => null);
 
+////////*********** THIS IS USED FOR FILTER AND MAP SCREEN STATE LIKE WHEN WE HAVE TO SHOW DATA FILTER OR ITINERARY PLACES ****************
 class MapViewNotifier extends StateNotifier<MapViewState> {
   MapViewNotifier()
-      : super(MapViewState(categoryView: true, itineraryView: false,selectedCategory: "null"));
+      : super(MapViewState(
+            categoryView: true,
+            itineraryView: false,
+            selectedCategory: "null"));
 
   void update({
     String? selectedCategory,
@@ -113,5 +105,6 @@ class MapViewNotifier extends StateNotifier<MapViewState> {
   }
 }
 
-final mapViewStateProvider = StateNotifierProvider<MapViewNotifier,MapViewState>(
-    (ref) => MapViewNotifier());
+final mapViewStateProvider =
+    StateNotifierProvider<MapViewNotifier, MapViewState>(
+        (ref) => MapViewNotifier());

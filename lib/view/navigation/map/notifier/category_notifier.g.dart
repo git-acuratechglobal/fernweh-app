@@ -6,9 +6,10 @@ part of 'category_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$itineraryNotifierHash() => r'3cf5889f17937669a995f4384bf0975095ea8a28';
-
-/// See also [ItineraryNotifier].
+String _$itineraryNotifierHash() =>
+    r'5365378e9b04570d91e9c782c69b9b938e97920a'; /////*************THIS IS USED FOR MAP SCREEN DATA PROVIDER *****************////////////
+///
+/// Copied from [ItineraryNotifier].
 @ProviderFor(ItineraryNotifier)
 final itineraryNotifierProvider =
     AsyncNotifierProvider<ItineraryNotifier, List<Category>>.internal(

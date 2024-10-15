@@ -3,7 +3,6 @@ import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/view/navigation/guest_login/guest_login.dart';
 import 'package:fernweh/view/navigation/profile/profile.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/auth_service/auth_service.dart';
@@ -46,14 +45,15 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
       ),
     );
   }
-@override
+
+  @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_)async{
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       await ref.read(authServiceProvider).refreshToken();
     });
-
   }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);

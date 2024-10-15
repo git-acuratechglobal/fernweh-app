@@ -121,6 +121,21 @@ class FriendList extends _$FriendList {
       return ref.watch(apiServiceProvider).getFriends(1, search: search);
     });
   }
+  Future<PaginationResponse<Friends>> loadAllData() async {
+    int page = 1;
+    List<Friends> allData = [];
+    PaginationResponse<Friends> response;
+    do {
+      response = await ref.watch(apiServiceProvider).getFriends(page,);
+      allData.addAll(response.data);
+      page++;
+    } while (page <= response.totalPages);
+    return PaginationResponse<Friends>(
+      currentPage: response.totalPages,
+      totalPages: response.totalPages,
+      data: allData,
+    );
+  }
 
   bool canLoadMore() {
     if (state.isLoading) return false;

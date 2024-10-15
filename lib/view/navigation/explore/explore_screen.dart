@@ -1,20 +1,17 @@
 import 'package:fernweh/utils/common/config.dart';
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/view/location_permission/location_service.dart';
-import 'package:fernweh/view/navigation/explore/current_location/current_location.dart';
 import 'package:fernweh/view/navigation/explore/recommended/recommended.dart';
-import 'package:fernweh/view/navigation/explore/search_filter/search_and_filter_widget.dart';
-import 'package:fernweh/view/navigation/explore/wish_list/wish_list_screen.dart';
 import 'package:fernweh/view/navigation/map/notifier/category_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../utils/widgets/async_widget.dart';
-import '../map/model/category.dart';
+import '../itinerary/models/itinerary_places.dart';
 import '../map/restaurant_detail/restaurant_detail_screen.dart';
-import '../map/state/map_view_state.dart';
 import 'filter_sheet/filter_sheet.dart';
 import 'friend_list/friend_list.dart';
+import 'notifier/explore_notifier.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
@@ -24,20 +21,11 @@ class ExploreScreen extends ConsumerStatefulWidget {
 }
 
 class _ExploreScreenState extends ConsumerState<ExploreScreen> {
-  int? selectedIndex;
-  Map<String, dynamic> filterData = {
-    'type': null,
-    'rating': null,
-    'radius': null,
-    'sort_by': null,
-    'selected_category': null,
-  };
-
   @override
   Widget build(BuildContext context) {
     final filters = ref.watch(filtersProvider);
-    final mapViewState = ref.watch(mapViewStateProvider);
-    final mapState = ref.read(mapViewStateProvider.notifier);
+    // final mapViewState = ref.watch(mapViewStateProvider);
+    // final mapState = ref.read(mapViewStateProvider.notifier);
     return Scaffold(
       body: RefreshIndicator(
         color: const Color(0xffCF5253),
@@ -68,11 +56,11 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CurrentLocation()));
+                            // Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //         builder: (context) =>
+                            //             const CurrentLocation()));
                           },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -201,60 +189,60 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       final category = Config.dashboardCategories[index];
                       return InkWell(
                         onTap: () {
-                          if (category.title == mapViewState.selectedCategory) {
-                            mapState.update(
-                                  categoryView: true,
-                                  itineraryView: false,
-                                  selectedCategory: "",
-                                );
-                            filterData = {
-                              'type': null,
-                              'rating': filters['rating'],
-                              'radius': filters['radius'],
-                              'sort_by': filters['sort_by'],
-                              'selected_category': "All",
-                              'selected_rating': filters['selected_rating'],
-                              'selected_distance': filters['selected_distance'],
-                              'selected_radius': filters['selected_radius'],
-                              'input': filters['input'],
-                              'search_term': filters['search_term'],
-                            };
-                            ref
-                                .read(filtersProvider.notifier)
-                                .updateFilter(filterData);
-                            ref.invalidate(itineraryNotifierProvider);
-                            return;
-                          } else {
-                            mapState.update(
-                                  categoryView: true,
-                                  itineraryView: false,
-                                  selectedCategory: category.title,
-                                );
-                            filterData = {
-                              'type': category.type,
-                              'rating': filters['rating'],
-                              'radius': filters['radius'],
-                              'sort_by': filters['sort_by'],
-                              'selected_category': category.title,
-                              'selected_rating': filters['selected_rating'],
-                              'selected_distance': filters['selected_distance'],
-                              'selected_radius': filters['selected_radius'],
-                              'input': filters['input'],
-                              'search_term': filters['search_term'],
-                            };
-                            ref
-                                .read(filtersProvider.notifier)
-                                .updateFilter(filterData);
-                            ref
-                                .read(itineraryNotifierProvider
-                                .notifier)
-                                .filteredItinerary();
-                          }
+                          // if (category.title == mapViewState.selectedCategory) {
+                          //   mapState.update(
+                          //         categoryView: true,
+                          //         itineraryView: false,
+                          //         selectedCategory: "",
+                          //       );
+                          //   filterData = {
+                          //     'type': null,
+                          //     'rating': filters['rating'],
+                          //     'radius': filters['radius'],
+                          //     'sort_by': filters['sort_by'],
+                          //     'selected_category': "All",
+                          //     'selected_rating': filters['selected_rating'],
+                          //     'selected_distance': filters['selected_distance'],
+                          //     'selected_radius': filters['selected_radius'],
+                          //     'input': filters['input'],
+                          //     'search_term': filters['search_term'],
+                          //   };
+                          //   ref
+                          //       .read(filtersProvider.notifier)
+                          //       .updateFilter(filterData);
+                          //   ref.invalidate(itineraryNotifierProvider);
+                          //   return;
+                          // } else {
+                          //   mapState.update(
+                          //         categoryView: true,
+                          //         itineraryView: false,
+                          //         selectedCategory: category.title,
+                          //       );
+                          //   filterData = {
+                          //     'type': category.type,
+                          //     'rating': filters['rating'],
+                          //     'radius': filters['radius'],
+                          //     'sort_by': filters['sort_by'],
+                          //     'selected_category': category.title,
+                          //     'selected_rating': filters['selected_rating'],
+                          //     'selected_distance': filters['selected_distance'],
+                          //     'selected_radius': filters['selected_radius'],
+                          //     'input': filters['input'],
+                          //     'search_term': filters['search_term'],
+                          //   };
+                          //   ref
+                          //       .read(filtersProvider.notifier)
+                          //       .updateFilter(filterData);
+                          //   ref
+                          //       .read(itineraryNotifierProvider
+                          //       .notifier)
+                          //       .filteredItinerary();
+                          // }
                         },
                         child: CategoryItem(
                           category: category,
-                          isSelected:
-                              category.title == mapViewState.selectedCategory,
+                          isSelected:false,
+                              // category.title == mapViewState.selectedCategory,
                         ),
                       );
                     },
@@ -295,7 +283,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 ),
                 const SizedBox(height: 16),
                 AsyncDataWidgetB(
-                    dataProvider: itineraryNotifierProvider,
+                    dataProvider: exploreNotifierProvider,
                     dataBuilder: (context, category) {
                       return category.isEmpty
                           ? const Center(child: Text("No Itinerary Found"))
@@ -442,8 +430,8 @@ class _FriendListState extends ConsumerState<FriendList> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
-    return AsyncDataWidgetB<List<Category>>(
-        dataProvider: itineraryNotifierProvider,
+    return AsyncDataWidgetB<List<ItineraryPlaces>>(
+        dataProvider: friendsItineraryNotifierProvider,
         dataBuilder: (context, category) {
           return category.isEmpty
               ? const Center(child: Text("No Itinerary Found"))
@@ -466,20 +454,19 @@ class _FriendListState extends ConsumerState<FriendList> {
                                 walkingTime: convertMinutes(
                                     int.parse(data.walkingTime.toString())),
                                 distance: data.distance.toString(),
-                                address: data.vicinity,
-                                images: data.photoUrls,
+                                address: data.formattedAddress,
+                                images: [],
                                 name: data.name,
                                 rating: data.rating.toString(),
-                                locationId: data.placeId ?? '',
+                                locationId: data.locationId ?? '',
                               ),
                             ),
                           );
                         },
                         child: FriendsListItems(
-                          address: data.vicinity.toString(),
-                          categoryName: formatCategory(data.type ?? ["All"]),
-                          image:
-                              data.photoUrls!.isEmpty ? "" : data.photoUrls?[0],
+                          address: data.formattedAddress.toString(),
+                          categoryName: data.placeTypes??"",
+                          image:data.photo,
                           type: data.name,
                           name: data.name,
                           rating: data.rating.toString(),
@@ -541,6 +528,7 @@ class LocationRow extends StatelessWidget {
         const SizedBox(width: 6.0),
         Expanded(
           child: Text(
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
             address,
             style: const TextStyle(
