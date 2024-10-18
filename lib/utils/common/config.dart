@@ -43,7 +43,7 @@ abstract class Config {
       type: "restaurant|bakery|meal_delivery|meal_takeaway"
     ),
     (icon: Icons.coffee, title: "Cafe", type: "cafe"),
-    (icon: Icons.wine_bar, title: "Bars", type: "bar|night_club|liquor_store"),
+    (icon: Icons.wine_bar, title: "Bar", type: "bar|night_club|liquor_store"),
     (icon: Icons.movie, title: "Theater", type: "movie_theater"),
     (
       icon: Icons.attractions,
@@ -52,11 +52,10 @@ abstract class Config {
     ),
   ];
 
-  static List<({String name,int id})> itinaryOptions = [
-    (name:"Want to visit",id: 1 ),
-    (name: "Visited",id: 2 ),
-    (name: "Will visit again",id: 3 ),
-
+  static List<({String name, int id})> itinaryOptions = [
+    (name: "Want to visit", id: 1),
+    (name: "Visited", id: 2),
+    (name: "Will visit again", id: 3),
   ];
 
   static List<String> tabOptions = [
@@ -64,7 +63,6 @@ abstract class Config {
     "Want to visit",
     "Visited",
     "Will visit again",
-
   ];
 
   static List<({String image, String title})> onboarding = [
@@ -147,7 +145,7 @@ abstract class Config {
     (
       image:
           'https://assets.cntraveller.in/photos/633d574c470d9a1e7cfb43da/3:2/w_6090,h_4060,c_limit/Paradiso_photo_bar4-oct22-pr.jpg',
-      type: 'Bars'
+      type: 'Bar'
     ),
     (
       image:

@@ -169,7 +169,7 @@ class _FriendsListState extends ConsumerState<FriendsList> {
 
   @override
   Widget build(BuildContext context) {
-    return PaginationWidget(
+    return  PaginationWidget(
       retry: () => ref.refresh(friendListProvider),
       scrollController: scrollController,
       value: ref.watch(friendListProvider),

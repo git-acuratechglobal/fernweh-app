@@ -23,12 +23,12 @@ final exploreNotifierProvider =
 
 typedef _$ExploreNotifier = AsyncNotifier<List<Category>>;
 String _$friendsItineraryNotifierHash() =>
-    r'e8a57059c78f3b1fb293c3fb43f059b63c9ee709';
+    r'80f192b13a61b51d12764b9e91dfbaf2cb487bd1';
 
 /// See also [FriendsItineraryNotifier].
 @ProviderFor(FriendsItineraryNotifier)
 final friendsItineraryNotifierProvider = AsyncNotifierProvider<
-    FriendsItineraryNotifier, List<ItineraryPlaces>>.internal(
+    FriendsItineraryNotifier, FriendsPlacesState>.internal(
   FriendsItineraryNotifier.new,
   name: r'friendsItineraryNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -38,6 +38,6 @@ final friendsItineraryNotifierProvider = AsyncNotifierProvider<
   allTransitiveDependencies: null,
 );
 
-typedef _$FriendsItineraryNotifier = AsyncNotifier<List<ItineraryPlaces>>;
+typedef _$FriendsItineraryNotifier = AsyncNotifier<FriendsPlacesState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

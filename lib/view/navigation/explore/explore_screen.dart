@@ -2,13 +2,12 @@ import 'package:fernweh/utils/common/config.dart';
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/view/location_permission/location_service.dart';
 import 'package:fernweh/view/navigation/explore/recommended/recommended.dart';
-import 'package:fernweh/view/navigation/map/notifier/category_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../utils/widgets/async_widget.dart';
-import '../itinerary/models/itinerary_places.dart';
 import '../map/restaurant_detail/restaurant_detail_screen.dart';
+import 'current_location/current_location.dart';
 import 'filter_sheet/filter_sheet.dart';
 import 'friend_list/friend_list.dart';
 import 'notifier/explore_notifier.dart';
@@ -21,18 +20,16 @@ class ExploreScreen extends ConsumerStatefulWidget {
 }
 
 class _ExploreScreenState extends ConsumerState<ExploreScreen> {
+  int? selectedCategory;
+
   @override
   Widget build(BuildContext context) {
-    final filters = ref.watch(filtersProvider);
-    // final mapViewState = ref.watch(mapViewStateProvider);
-    // final mapState = ref.read(mapViewStateProvider.notifier);
     return Scaffold(
       body: RefreshIndicator(
         color: const Color(0xffCF5253),
         edgeOffset: 60,
         onRefresh: () async {
-          ref.invalidate(addressProvider);
-          ref.invalidate(itineraryNotifierProvider);
+        ref.invalidate(friendsItineraryNotifierProvider);
         },
         child: Container(
           height: double.infinity,
@@ -56,11 +53,11 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            // Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //         builder: (context) =>
-                            //             const CurrentLocation()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CurrentLocation()));
                           },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -79,7 +76,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                   return Row(
                                     children: [
                                       ConstrainedBox(
-                                        constraints: const BoxConstraints(maxWidth: 230),
+                                        constraints:
+                                            const BoxConstraints(maxWidth: 230),
                                         child: Text(
                                           overflow: TextOverflow.ellipsis,
                                           data,
@@ -189,6 +187,22 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       final category = Config.dashboardCategories[index];
                       return InkWell(
                         onTap: () {
+                          setState(() {
+                            if (selectedCategory == index) {
+                              selectedCategory = null;
+                              ref
+                                  .read(
+                                      friendsItineraryNotifierProvider.notifier)
+                                  .resetFilter();
+                            } else {
+                              selectedCategory = index;
+                              ref
+                                  .read(
+                                      friendsItineraryNotifierProvider.notifier)
+                                  .filterList(category.title.toLowerCase());
+                            }
+                          });
+
                           // if (category.title == mapViewState.selectedCategory) {
                           //   mapState.update(
                           //         categoryView: true,
@@ -241,8 +255,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                         },
                         child: CategoryItem(
                           category: category,
-                          isSelected:false,
-                              // category.title == mapViewState.selectedCategory,
+                          isSelected: selectedCategory == index,
+                          // category.title == mapViewState.selectedCategory,
                         ),
                       );
                     },
@@ -264,9 +278,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 const SizedBox(height: 16),
 
                 //****FriendList Widget ****
-                FriendList(
-                  categoryName: filters['selected_category'] ?? "All",
-                ),
+                const FriendList(),
 
                 const SizedBox(height: 34),
                 Padding(
@@ -283,54 +295,64 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 ),
                 const SizedBox(height: 16),
                 AsyncDataWidgetB(
-                    dataProvider: exploreNotifierProvider,
+                    dataProvider: friendsItineraryNotifierProvider,
                     dataBuilder: (context, category) {
-                      return category.isEmpty
+                      return category.isFilterApplied &&
+                              category.filterCategories.isEmpty
                           ? const Center(child: Text("No Itinerary Found"))
-                          : ListView.separated(
-                              shrinkWrap: true,
-                              itemCount: category.length,
-                              physics: const NeverScrollableScrollPhysics(),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              separatorBuilder: (context, index) =>
-                                  const SizedBox(height: 12.0),
-                              itemBuilder: (context, index) {
-                                final data = category[index];
-                                return InkWell(
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            RestaurantDetailScreen(
-                                              types: [],
-                                          address: data.vicinity,
-                                          distance: data.distance.toString(),
-                                          walkingTime: convertMinutes(int.parse(
-                                              data.walkingTime.toString())),
-                                          images: data.photoUrls,
-                                          name: data.name,
-                                          rating: data.rating.toString(),
-                                          locationId: data.placeId ?? "",
-                                        ),
+                          : category.categories.isEmpty
+                              ? const Center(child: Text("No Itinerary Found"))
+                              : ListView.separated(
+                                  shrinkWrap: true,
+                                  itemCount: category.isFilterApplied
+                                      ? category.filterCategories.length
+                                      : category.categories.length,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(height: 12.0),
+                                  itemBuilder: (context, index) {
+                                    final data = category.isFilterApplied
+                                        ? category.filterCategories[index]
+                                        : category.categories[index];
+                                    return InkWell(
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                RestaurantDetailScreen(
+                                              types: data.type,
+                                              address: data.vicinity,
+                                              distance:
+                                                  data.distance.toString(),
+                                              walkingTime: convertMinutes(
+                                                  int.parse(data.walkingTime
+                                                      .toString())),
+                                              images: data.photoUrls,
+                                              name: data.name,
+                                              rating: data.rating.toString(),
+                                              locationId: data.placeId ?? "",
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: RecommendedItem(
+                                        address: data.vicinity.toString(),
+                                        type: formatCategory(
+                                            data.type ?? ["All"]),
+                                        image: data.photoUrls!.isEmpty
+                                            ? ""
+                                            : data.photoUrls?[0],
+                                        name: data.name,
+                                        rating: data.rating.toString(),
+                                        walkingTime: convertMinutes(int.parse(
+                                            data.walkingTime.toString())),
+                                        distance: data.distance.toString(),
                                       ),
                                     );
                                   },
-                                  child: RecommendedItem(
-                                    address: data.vicinity.toString(),
-                                    type: formatCategory(data.type??["All"]),
-                                    image: data.photoUrls!.isEmpty
-                                        ? ""
-                                        : data.photoUrls?[0],
-                                    name: data.name,
-                                    rating: data.rating.toString(),
-                                    walkingTime: convertMinutes(
-                                        int.parse(data.walkingTime.toString())),
-                                    distance: data.distance.toString(),
-                                  ),
                                 );
-                              },
-                            );
                     },
                     loadingBuilder: Skeletonizer(
                       child: ListView.separated(
@@ -417,10 +439,7 @@ class CategoryItem extends StatelessWidget {
 class FriendList extends ConsumerStatefulWidget {
   const FriendList({
     super.key,
-    required this.categoryName,
   });
-
-  final String categoryName;
 
   @override
   ConsumerState<FriendList> createState() => _FriendListState();
@@ -430,54 +449,61 @@ class _FriendListState extends ConsumerState<FriendList> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
-    return AsyncDataWidgetB<List<ItineraryPlaces>>(
+    return AsyncDataWidgetB<FriendsPlacesState>(
         dataProvider: friendsItineraryNotifierProvider,
         dataBuilder: (context, category) {
-          return category.isEmpty
+          return category.isFilterApplied && category.filterList.isEmpty
               ? const Center(child: Text("No Itinerary Found"))
-              : SizedBox.fromSize(
-                  size: Size.fromHeight(height * 0.31),
-                  child: ListView.separated(
-                    itemCount: category.length,
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(width: 12.0),
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      final data = category[index];
-                      return InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => RestaurantDetailScreen(
-                                types: const [],
-                                walkingTime: convertMinutes(
-                                    int.parse(data.walkingTime.toString())),
-                                distance: data.distance.toString(),
-                                address: data.formattedAddress,
-                                images: [],
-                                name: data.name,
-                                rating: data.rating.toString(),
-                                locationId: data.locationId ?? '',
-                              ),
+              : category.placesList.isEmpty
+                  ? const Center(child: Text("No Itinerary Found"))
+                  : SizedBox.fromSize(
+                      size: Size.fromHeight(height * 0.31),
+                      child: ListView.separated(
+                        itemCount: category.isFilterApplied
+                            ? category.filterList.length
+                            : category.placesList.length,
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(width: 12.0),
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          final data = category.isFilterApplied
+                              ? category.filterList[index]
+                              : category.placesList[index];
+                          return InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => RestaurantDetailScreen(
+                                    image: data.photo,
+                                    types: const [],
+                                    walkingTime: convertMinutes(
+                                        int.parse(data.walkingTime.toString())),
+                                    distance: data.distance.toString(),
+                                    address: data.formattedAddress,
+                                    images: null,
+                                    name: data.name,
+                                    rating: data.rating.toString(),
+                                    locationId: data.locationId ?? '',
+                                  ),
+                                ),
+                              );
+                            },
+                            child: FriendsListItems(
+                              address: data.formattedAddress.toString(),
+                              categoryName: data.placeTypes ?? "",
+                              image: data.photo,
+                              type: data.name,
+                              name: data.name,
+                              rating: data.rating.toString(),
+                              walkingTime: convertMinutes(
+                                  int.parse(data.walkingTime.toString())),
+                              distance: data.distance.toString(),
                             ),
                           );
                         },
-                        child: FriendsListItems(
-                          address: data.formattedAddress.toString(),
-                          categoryName: data.placeTypes??"",
-                          image:data.photo,
-                          type: data.name,
-                          name: data.name,
-                          rating: data.rating.toString(),
-                          walkingTime: convertMinutes(
-                              int.parse(data.walkingTime.toString())),
-                          distance: data.distance.toString(),
-                        ),
-                      );
-                    },
-                  ),
-                );
+                      ),
+                    );
         },
         loadingBuilder: Skeletonizer(
           child: SizedBox.fromSize(

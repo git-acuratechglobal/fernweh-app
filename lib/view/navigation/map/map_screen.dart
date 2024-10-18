@@ -9,6 +9,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import '../../../utils/common/widgets.dart';
 import '../../../utils/widgets/loading_widget.dart';
 import '../../location_permission/location_service.dart';
+import '../explore/current_location/current_location.dart';
 import '../explore/explore_screen.dart';
 import '../explore/recommended/recommended.dart';
 import '../explore/search_filter/search_and_filter_widget.dart';
@@ -180,10 +181,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   Expanded(
                       child: GestureDetector(
                     onTap: () {
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) => const CurrentLocation()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const CurrentLocation()));
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -833,7 +834,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
                     if (_itineraryMapView && mapViewState.itineraryView)
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 80),
+                        padding: const EdgeInsets.only(bottom: 10),
                         child: Align(
                           alignment: Alignment.bottomCenter,
                           child: AspectRatio(
@@ -1159,8 +1160,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         ),
                       ),
                     Positioned(
-                      right: 0,
-                      bottom: 180,
+                      right:!_categoryMapView||!_itineraryMapView?170: 0,
+                      bottom: !_categoryMapView||!_itineraryMapView?10:180,
                       child: mapViewState.categoryView
                           ? Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 05),
@@ -1177,20 +1178,22 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                   border: Border.all(color: Colors.grey),
                                                   color: Colors.white,
                                                   shape: BoxShape.circle),
-                                              child: IconButton(
-                                                onPressed: () async {
-                                                  ref.invalidate(
-                                                      currentPositionProvider);
-                                                  ref.invalidate(
-                                                      mapViewStateProvider);
-                                                  ref.invalidate(
-                                                      itineraryNotifierProvider);
-                                                  setState(() {
-                                                    floatingButtonsHide = true;
-                                                  });
-                                                },
-                                                icon: const Icon(
-                                                    Icons.gps_fixed_outlined),
+                                              child: Center(
+                                                child: IconButton(
+                                                  onPressed: () async {
+                                                    ref.invalidate(
+                                                        currentPositionProvider);
+                                                    ref.invalidate(
+                                                        mapViewStateProvider);
+                                                    ref.invalidate(
+                                                        itineraryNotifierProvider);
+                                                    setState(() {
+                                                      floatingButtonsHide = true;
+                                                    });
+                                                  },
+                                                  icon: const Icon(
+                                                      Icons.gps_fixed_outlined),
+                                                ),
                                               ),
                                             ),
                                         )
@@ -1231,17 +1234,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                               decoration:  BoxDecoration(
                                                   color: Colors.white,
                                                   shape: BoxShape.circle,border: Border.all(color: Colors.grey)),
-                                              child: IconButton(
-                                                onPressed: () {
-                                                  ref.invalidate(
-                                                      currentPositionProvider);
-                                                  ref.invalidate(
-                                                      mapViewStateProvider);
-                                                  ref.invalidate(
-                                                      itineraryNotifierProvider);
-                                                },
-                                                icon: const Icon(
-                                                    Icons.gps_fixed_outlined),
+                                              child: Center(
+                                                child: IconButton(
+                                                  onPressed: () {
+                                                    ref.invalidate(
+                                                        currentPositionProvider);
+                                                    ref.invalidate(
+                                                        mapViewStateProvider);
+                                                    ref.invalidate(
+                                                        itineraryNotifierProvider);
+                                                  },
+                                                  icon: const Icon(
+                                                      Icons.gps_fixed_outlined),
+                                                ),
                                               ),
                                             ),
                                         )

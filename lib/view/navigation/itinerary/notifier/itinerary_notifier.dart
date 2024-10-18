@@ -136,7 +136,7 @@ class ItineraryPlacesNotifier extends _$ItineraryPlacesNotifier {
 }
 
 final itineraryLocalListProvider =
-    StateNotifierProvider<LocalItineraryNotifier, LocalItineraryState>(
+    StateNotifierProvider.autoDispose<LocalItineraryNotifier, LocalItineraryState>(
         (ref) => LocalItineraryNotifier());
 
 class LocalItineraryNotifier extends StateNotifier<LocalItineraryState> {

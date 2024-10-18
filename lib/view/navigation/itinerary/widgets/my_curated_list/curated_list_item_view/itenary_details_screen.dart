@@ -158,6 +158,9 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
                   ref
                       .read(itineraryPlacesNotifierProvider.notifier)
                       .getTypeItineraryPlace(widget.itineraryId, type);
+                  ref
+                      .read(itineraryLocalListProvider.notifier)
+                      .removeSelectedItems();
                 },
                 dividerColor: const Color(0xffE2E2E2),
                 labelColor: Theme.of(context).colorScheme.secondary,
@@ -398,26 +401,28 @@ class _DetailPageState extends ConsumerState<DetailPage> {
       dataProvider: itineraryPlacesNotifierProvider,
       dataBuilder: (context, itineraryPlace) {
         return itineraryState.itineraryPlaces.isEmpty
-            ? Skeletonizer(
-                child: ListView.separated(
-                  itemCount: 4,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  itemBuilder: (context, index) {
-                    return const DetailItem(
-                      placeType: "kjhjhjhkjh",
-                      name: "data.name",
-                      url: "data.photo",
-                      address: "data.vicinity",
-                      rating: "4",
-                      walkTime: "ytytyty",
-                      distance: "uyuyuyu",
-                    );
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return const SizedBox(height: 16.0);
-                  },
-                ),
-              )
+            ?const Center(child: Text("No Places found"),)
+        
+        // Skeletonizer(
+        //         child: ListView.separated(
+        //           itemCount: 4,
+        //           padding: const EdgeInsets.symmetric(horizontal: 24),
+        //           itemBuilder: (context, index) {
+        //             return const DetailItem(
+        //               placeType: "kjhjhjhkjh",
+        //               name: "data.name",
+        //               url: "data.photo",
+        //               address: "data.vicinity",
+        //               rating: "4",
+        //               walkTime: "ytytyty",
+        //               distance: "uyuyuyu",
+        //             );
+        //           },
+        //           separatorBuilder: (BuildContext context, int index) {
+        //             return const SizedBox(height: 16.0);
+        //           },
+        //         ),
+        //       )
             : ListView.separated(
                 itemCount: itineraryState.itineraryPlaces.length,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
