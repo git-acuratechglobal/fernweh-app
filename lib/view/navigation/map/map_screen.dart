@@ -1159,9 +1159,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       child: Text("No Itinerary Found")))),
                         ),
                       ),
-                    Positioned(
+                    AnimatedPositioned(
                       right:!_categoryMapView||!_itineraryMapView?170: 0,
                       bottom: !_categoryMapView||!_itineraryMapView?10:180,
+                      duration: const Duration(milliseconds: 200),
                       child: mapViewState.categoryView
                           ? Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 05),

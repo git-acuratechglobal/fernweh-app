@@ -266,6 +266,7 @@ class _FriendListItemState extends State<FriendListItem> {
           ],
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             ClipOval(
               child: SizedBox.square(
@@ -275,31 +276,36 @@ class _FriendListItemState extends State<FriendListItem> {
                   )),
             ),
             const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: Text(
-                      overflow: TextOverflow.fade,
-                      widget.user.fullName,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontVariations: FVariations.w700,
-                      ),
-                    ),
-                  ),
-                  // const Text(
-                  //   '5 Iternerary',
-                  //   style: TextStyle(
-                  //     color: Color(0xFF505050),
-                  //   ),
-                  // ),
-                ],
+            SizedBox(
+              width: 100,
+              child: Text(
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                widget.user.fullName,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18,
+                  fontVariations: FVariations.w700,
+                ),
               ),
             ),
+            // Expanded(
+            //   child: Column(
+            //     crossAxisAlignment: CrossAxisAlignment.start,
+            //     // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //     children: [
+            //       Expanded(
+            //         child:
+            //       ),
+            //       // const Text(
+            //       //   '5 Iternerary',
+            //       //   style: TextStyle(
+            //       //     color: Color(0xFF505050),
+            //       //   ),
+            //       // ),
+            //     ],
+            //   ),
+            // ),
             AddRequestButton(
               isLoading: widget.isloading,
               user: widget.user,

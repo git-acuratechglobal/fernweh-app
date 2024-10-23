@@ -1,4 +1,5 @@
 import 'package:fernweh/view/navigation/friends_list/controller/friends_notifier.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../services/api_service/api_service.dart';
 import '../../../location_permission/location_service.dart';
@@ -46,11 +47,24 @@ class FriendsItineraryNotifier extends _$FriendsItineraryNotifier {
     final List<int> itineraryIds =
         friendItineray.map((e) => e.id ?? 0).toList();
     final List<ItineraryPlaces> category = [];
+    const double maxDistance = 30000;
     for (var id in itineraryIds) {
       try {
         final List<ItineraryPlaces> categories =
             await ref.watch(apiServiceProvider).getItineraryPlace(id, null);
-        category.addAll(categories);
+        final List<ItineraryPlaces> friendItineraryPlacesBasedOnLocation =
+            categories.where((place) {
+          double placeLat = place.latitude!;
+          double placeLng = place.longitude!;
+          double distance = Geolocator.distanceBetween(
+            position.latitude,
+            position.longitude,
+            placeLat,
+            placeLng,
+          );
+          return distance <= maxDistance;
+        }).toList();
+        category.addAll(friendItineraryPlacesBasedOnLocation);
       } catch (e) {
         print("error:$e");
       }
@@ -73,11 +87,14 @@ class FriendsItineraryNotifier extends _$FriendsItineraryNotifier {
     final List<Category> filteredCategories =
         list.categories.where((e) => e.type![0] == type).toList();
     state = AsyncData(state.value!.copyWith(
-        filterList: filterList, filterCategories: filteredCategories,isFilterApplied: true));
+        filterList: filterList,
+        filterCategories: filteredCategories,
+        isFilterApplied: true));
   }
 
   Future<void> resetFilter() async {
-    state = AsyncData(state.value!.copyWith(filterList: [],filterCategories: [],isFilterApplied: false));
+    state = AsyncData(state.value!.copyWith(
+        filterList: [], filterCategories: [], isFilterApplied: false));
   }
 }
 

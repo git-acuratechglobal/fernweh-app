@@ -350,7 +350,6 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
         case AsyncData<FriendsState?> data when data.value != null:
           if (data.value!.friendsEvent == FriendsEvent.requestAccept) {
             setState(() {
-              print("api request get ============>${data.value!.response}");
               acceptedRequests.add(data.value!.response.toString());
               userIds.remove(data.value!.response);
             });
@@ -401,7 +400,6 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                       const SizedBox(height: 16),
                   itemCount: friends.length,
                   itemBuilder: (context, index) {
-                    print(friends[index].id);
                     final user = friends[index];
                     bool isSelected =
                         acceptedRequests.contains(user.id.toString());
@@ -442,34 +440,35 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                                         )),
                             ),
                             const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  SizedBox(
-                                    width: 130,
-                                    child: Text(
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      user.name ?? "",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 18,
-                                        fontVariations: FVariations.w700,
-                                      ),
-                                    ),
-                                  ),
-                                  // const Text(
-                                  //   '5 Itinerary',
-                                  //   style: TextStyle(
-                                  //     color: Color(0xFF505050),
-                                  //   ),
-                                  // ),
-                                ],
+                            SizedBox(
+                              width: 120,
+                              child: Text(
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                user.name ?? "",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontVariations: FVariations.w700,
+                                ),
                               ),
                             ),
+                            // Expanded(
+                            //   child: Column(
+                            //     crossAxisAlignment: CrossAxisAlignment.start,
+                            //     mainAxisAlignment:
+                            //         MainAxisAlignment.spaceEvenly,
+                            //     children: [
+                            //
+                            //       // const Text(
+                            //       //   '5 Itinerary',
+                            //       //   style: TextStyle(
+                            //       //     color: Color(0xFF505050),
+                            //       //   ),
+                            //       // ),
+                            //     ],
+                            //   ),
+                            // ),
                             isSelected
                                 ? OutlinedButton(
                                     style: OutlinedButton.styleFrom(

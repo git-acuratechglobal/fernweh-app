@@ -1,5 +1,4 @@
 import 'package:fernweh/services/local_storage_service/local_storage_service.dart';
-import 'package:fernweh/utils/app_theme/app_theme.dart';
 import 'package:fernweh/utils/common/app_button.dart';
 import 'package:fernweh/utils/common/app_validation.dart';
 import 'package:fernweh/utils/common/config.dart';
@@ -33,7 +32,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   void initState() {
-   ref.listenManual(authNotifierProvider, (previous, next) {
+    ref.listenManual(authNotifierProvider, (previous, next) {
       switch (next) {
         case Verified(:final user) when previous is Loading:
           ref.read(userDetailProvider.notifier).update((state) => user);
@@ -50,15 +49,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           break;
         case UserUpdated(:final user) when previous is Loading:
           ref.read(userDetailProvider.notifier).update((state) => user);
-          final locationService=ref.watch(locationServiceProvider);
+          final locationService = ref.watch(locationServiceProvider);
           print(locationService.isLocationPermissionGranted);
           if (!locationService.isLocationPermissionGranted) {
             context.navigateAndRemoveUntil(const LocationPermissionScreen());
             return;
-          }else{
-            ref
-                .read(localStorageServiceProvider)
-                .clearGuestSession();
+          } else {
+            ref.read(localStorageServiceProvider).clearGuestSession();
             context.navigateAndRemoveUntil(const NavigationScreen());
           }
           break;
@@ -69,8 +66,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
     super.initState();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +201,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 24),
                   OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () async{
+                    },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

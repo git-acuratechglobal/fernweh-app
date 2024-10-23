@@ -2,6 +2,7 @@ import 'package:fernweh/services/api_service/api_service.dart';
 import 'package:fernweh/view/navigation/friends_list/model/friends.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../explore/notifier/explore_notifier.dart';
 import '../model/friends_state.dart';
 
 part 'friends_notifier.g.dart';

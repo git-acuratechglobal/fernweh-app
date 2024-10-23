@@ -37,9 +37,11 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(itineraryPlacesNotifierProvider.notifier)
-          .getItineraryPlaces(widget.itineraryId);
+      Future.microtask(() {
+        ref
+            .read(itineraryPlacesNotifierProvider.notifier)
+            .getItineraryPlaces(widget.itineraryId);
+      });
       ref.listenManual(myItineraryNotifierProvider, (previous, next) {
         switch (next) {
           case MyItineraryUpdatedState() when previous is MyItineraryLoading:
@@ -401,28 +403,9 @@ class _DetailPageState extends ConsumerState<DetailPage> {
       dataProvider: itineraryPlacesNotifierProvider,
       dataBuilder: (context, itineraryPlace) {
         return itineraryState.itineraryPlaces.isEmpty
-            ?const Center(child: Text("No Places found"),)
-        
-        // Skeletonizer(
-        //         child: ListView.separated(
-        //           itemCount: 4,
-        //           padding: const EdgeInsets.symmetric(horizontal: 24),
-        //           itemBuilder: (context, index) {
-        //             return const DetailItem(
-        //               placeType: "kjhjhjhkjh",
-        //               name: "data.name",
-        //               url: "data.photo",
-        //               address: "data.vicinity",
-        //               rating: "4",
-        //               walkTime: "ytytyty",
-        //               distance: "uyuyuyu",
-        //             );
-        //           },
-        //           separatorBuilder: (BuildContext context, int index) {
-        //             return const SizedBox(height: 16.0);
-        //           },
-        //         ),
-        //       )
+            ? const Center(
+                child: Text("No Places found"),
+              )
             : ListView.separated(
                 itemCount: itineraryState.itineraryPlaces.length,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -437,16 +420,13 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                     child: Container(
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: isSelected
-                              ? Colors.blue
-                              : Colors.transparent,
+                          color: isSelected ? Colors.blue : Colors.transparent,
                           width: 2.0,
                         ),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: ListViewItems(
-                        isSelected:
-                            itineraryState.selectedItems.isNotEmpty,
+                        isSelected: itineraryState.selectedItems.isNotEmpty,
                         id: data.id,
                         itineraryId: data.intineraryListId,
                         userId: data.userId,

@@ -4,6 +4,7 @@ import 'package:fernweh/view/auth/signup/profile_setup/profile_step/model/intres
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../services/api_service/api_service.dart';
 import '../../../services/auth_service/auth_service.dart';
+import '../../navigation/itinerary/notifier/itinerary_notifier.dart';
 import '../model/user_model.dart';
 
 part 'auth_provider.g.dart';
@@ -37,7 +38,7 @@ class AuthNotifier extends _$AuthNotifier {
   Future<void> signUp() async {
     try {
       state = Loading();
-   final user=   await ref.watch(authServiceProvider).signUp(_formData);
+      final user = await ref.watch(authServiceProvider).signUp(_formData);
       _formData = {};
       state = SignUpVerified(user: user);
     } catch (e) {
@@ -60,14 +61,33 @@ class AuthNotifier extends _$AuthNotifier {
     try {
       state = Loading();
       final user = await ref.watch(authServiceProvider).updateUser(_formData);
-      final data=  await ref.watch(apiServiceProvider).createUserItinerary({
-        'name': "Default list",
-        'type': 1
-      });
-      if(data.id!=null){
+      final data = await ref
+          .watch(apiServiceProvider)
+          .createUserItinerary({'name': "Default list", 'type': 1});
+      final List<String> placeId = [
+        "ChIJmQJIxlVYwokRLgeuocVOGVU",
+        "ChIJCewJkL2LGGAR3Qmk0vCTGkg",
+        "ChIJwRSfq3btDzkRqpSJixUrNtY",
+        "ChIJRRBkmSulwoARC9tR7sO6xg0",
+        "ChIJbf8C1yFxdDkR3n12P4DkKt0",
+        "ChIJxRO7WVEDdkgRrGM1fCYoHqY"
+      ];
+      for (var id in placeId) {
+        ref.read(myItineraryNotifierProvider.notifier).updateForm('type', 1);
         ref
-            .read(localStorageServiceProvider)
-            .setItineraryId(data.id!.toInt());
+            .read(myItineraryNotifierProvider.notifier)
+            .updateForm('userId', data.userId);
+        ref
+            .read(myItineraryNotifierProvider.notifier)
+            .updateForm('intineraryListId', data.id);
+        ref
+            .read(myItineraryNotifierProvider.notifier)
+            .updateForm('locationId', id);
+        ref.read(myItineraryNotifierProvider.notifier).createMyItinerary();
+      }
+
+      if (data.id != null) {
+        ref.read(localStorageServiceProvider).setItineraryId(data.id!.toInt());
       }
       _formData = {};
       state = UserUpdated(user: user);
@@ -76,6 +96,7 @@ class AuthNotifier extends _$AuthNotifier {
       state = Error(error: e);
     }
   }
+
   Future<void> updateProfile() async {
     try {
       state = Loading();
