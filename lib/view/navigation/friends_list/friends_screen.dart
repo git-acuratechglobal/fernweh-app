@@ -169,7 +169,7 @@ class _FriendsListState extends ConsumerState<FriendsList> {
 
   @override
   Widget build(BuildContext context) {
-    return  PaginationWidget(
+    return PaginationWidget(
       retry: () => ref.refresh(friendListProvider),
       scrollController: scrollController,
       value: ref.watch(friendListProvider),
@@ -205,10 +205,7 @@ class _FriendsListState extends ConsumerState<FriendsList> {
               children: [
                 ClipOval(
                   child: SizedBox.square(
-                      dimension: 50,
-                      child: ImageWidget(
-                              url:
-                                  user.imageUrl)),
+                      dimension: 50, child: ImageWidget(url: user.imageUrl)),
                 ),
                 const SizedBox(width: 16),
                 Column(
@@ -226,7 +223,7 @@ class _FriendsListState extends ConsumerState<FriendsList> {
                         ),
                       ),
                     ),
-                     Text(
+                    Text(
                       '${user.itineraryCount} Itinerary',
                       style: const TextStyle(
                         color: Color(0xFF505050),
@@ -435,9 +432,8 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                               child: SizedBox.square(
                                   dimension: 50,
                                   child: ImageWidget(
-                                          url:
-                                              user.imageUrl,
-                                        )),
+                                    url: user.imageUrl,
+                                  )),
                             ),
                             const SizedBox(width: 16),
                             SizedBox(

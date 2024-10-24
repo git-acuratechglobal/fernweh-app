@@ -53,7 +53,9 @@ Dio dio(DioRef ref) {
               "Message: $message\n"
               "Error: ${e.error}",
         );
-        return handler.next(e);
+        return handler.reject(
+          DioException(requestOptions: e.requestOptions, error: message),
+        );
       },
     ),
   );

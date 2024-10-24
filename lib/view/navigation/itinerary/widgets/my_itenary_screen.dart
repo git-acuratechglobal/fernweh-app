@@ -335,7 +335,7 @@ class AvatarList extends StatelessWidget {
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: ImageWidget(
-                    url: "http://fernweh.acublock.in/public/${avtar.image}")),
+                    url: avtar.imageUrl)),
           ),
         );
       },

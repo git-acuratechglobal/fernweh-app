@@ -185,7 +185,7 @@ class _ShareItenarySheetState extends ConsumerState<ShareItenarySheet> {
                 child: SizedBox.square(
                   dimension: 50,
                   child: ImageWidget(
-                      url: 'http://fernweh.acublock.in/public/${user.image}'),
+                      url: user.imageUrl),
                 ),
               ),
               title: Text(
