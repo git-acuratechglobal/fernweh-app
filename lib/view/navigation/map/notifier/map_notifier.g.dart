@@ -1,26 +1,25 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'api_service.dart';
+part of 'map_notifier.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$apiServiceHash() => r'c50138d991612977363b163bd80dad079c844b09';
+String _$mapNotifierHash() => r'c1ecbd157c08c6f2ea1b518e287d7d32a5b5fdf4';
 
-/// See also [apiService].
-@ProviderFor(apiService)
-final apiServiceProvider = Provider<ApiService>.internal(
-  apiService,
-  name: r'apiServiceProvider',
+/// See also [MapNotifier].
+@ProviderFor(MapNotifier)
+final mapNotifierProvider =
+    AutoDisposeAsyncNotifierProvider<MapNotifier, MapState>.internal(
+  MapNotifier.new,
+  name: r'mapNotifierProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$apiServiceHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$mapNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef ApiServiceRef = ProviderRef<ApiService>;
+typedef _$MapNotifier = AutoDisposeAsyncNotifier<MapState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

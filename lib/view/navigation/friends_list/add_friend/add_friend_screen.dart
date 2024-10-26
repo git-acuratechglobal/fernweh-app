@@ -8,6 +8,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/common/extensions.dart';
 import '../../itinerary/widgets/my_curated_list/share_your_itinerary/invite_friend/invite_friend_sheet.dart';
+import '../../profile/profile.dart';
 import '../controller/friends_notifier.dart';
 import '../model/friends.dart';
 import '../model/friends_state.dart';
@@ -185,7 +186,7 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
                   itemBuilder: (context, index) {
                     return FriendListItem(
                       user: Friends(
-                        itineraryCount: 0,
+                          itineraryCount: 0,
                           id: null,
                           name: 'dummy',
                           email: '',
@@ -271,9 +272,9 @@ class _FriendListItemState extends State<FriendListItem> {
             ClipOval(
               child: SizedBox.square(
                   dimension: 50,
-                  child: ImageWidget(
-                    url: widget.user.imageUrl,
-                  )),
+                  child: widget.user.imageUrl == null
+                      ? UserInitials(name: widget.user.fullName)
+                      : ImageWidget(url: widget.user.imageUrl.toString())),
             ),
             const SizedBox(width: 16),
             SizedBox(

@@ -19,7 +19,9 @@ mixin _$FriendsState {
   FriendsEvent get friendsEvent => throw _privateConstructorUsedError;
   String? get response => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of FriendsState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $FriendsStateCopyWith<FriendsState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -43,6 +45,8 @@ class _$FriendsStateCopyWithImpl<$Res, $Val extends FriendsState>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of FriendsState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -81,6 +85,8 @@ class __$$FriendsStateImplCopyWithImpl<$Res>
       _$FriendsStateImpl _value, $Res Function(_$FriendsStateImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of FriendsState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -129,7 +135,9 @@ class _$FriendsStateImpl implements _FriendsState {
   @override
   int get hashCode => Object.hash(runtimeType, friendsEvent, response);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of FriendsState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$FriendsStateImplCopyWith<_$FriendsStateImpl> get copyWith =>
@@ -145,8 +153,11 @@ abstract class _FriendsState implements FriendsState {
   FriendsEvent get friendsEvent;
   @override
   String? get response;
+
+  /// Create a copy of FriendsState
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$FriendsStateImplCopyWith<_$FriendsStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

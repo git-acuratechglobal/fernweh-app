@@ -14,7 +14,7 @@ part 'explore_notifier.g.dart';
 class ExploreNotifier extends _$ExploreNotifier {
   @override
   FutureOr<List<Category>> build() async {
-    final position = await ref.watch(currentPositionProvider.future);
+    final position = await ref.read(currentPositionProvider.future);
     final data = await ref.watch(apiServiceProvider).getCategory(
         position.latitude.toString(), position.longitude.toString(),
         filter: {});
@@ -26,7 +26,7 @@ class ExploreNotifier extends _$ExploreNotifier {
 class FriendsItineraryNotifier extends _$FriendsItineraryNotifier {
   @override
   FutureOr<FriendsPlacesState> build() async {
-    final position = await ref.watch(currentPositionProvider.future);
+    final position = await ref.read(currentPositionProvider.future);
     final PaginationResponse<Friends> friendsList =
         await ref.watch(friendListProvider.notifier).loadAllData();
     final List<int> friendsId =

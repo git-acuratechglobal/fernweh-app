@@ -36,19 +36,23 @@ class _FavButtonState extends ConsumerState<FavButton> {
     final wishList = ref.watch(wishListProvider);
     return InkWell(
       onTap: () {
-        if (widget.name != null &&
-            widget.placeId != null &&
-            widget.image != null) {
-          ref.read(wishListProvider.notifier).addToItinerary(WishList(
-                name: widget.name ?? "",
-                image: widget.image ?? "",
-                placeId: widget.placeId ?? "",
-                address: widget.address ?? "",
-                type: widget.type ?? "",
-                rating: widget.rating ?? "",
-                walkingTime: widget.walkingTime ?? "",
-                distance: widget.distance ?? "",
-              ));
+      if (widget.name != null && widget.placeId != null && widget.image != null) {
+        final newItem = WishList(
+          name: widget.name ?? "",
+          image: widget.image ?? "",
+          placeId: widget.placeId ?? "",
+          address: widget.address ?? "",
+          type: widget.type ?? "",
+          rating: widget.rating ?? "",
+          walkingTime: widget.walkingTime ?? "",
+          distance: widget.distance ?? "",
+        );
+
+        final isAlreadyInWishList = wishList.wishList.any((e) => e.placeId == widget.placeId);
+
+        ref.read(wishListProvider.notifier).addItemToWishList(newItem);
+
+        if (!isAlreadyInWishList) {
           showModalBottomSheet(
             context: context,
             backgroundColor: Colors.white,
@@ -63,8 +67,8 @@ class _FavButtonState extends ConsumerState<FavButton> {
               return const AddToWishlistSheet();
             },
           );
-          setState(() {});
         }
+      }
       },
       child: Container(
         width: 35,
@@ -76,7 +80,7 @@ class _FavButtonState extends ConsumerState<FavButton> {
         ),
         child: Padding(
           padding: const EdgeInsets.all(6.0),
-          child: wishList.any((e) => e.placeId == widget.placeId)
+          child: wishList.wishList.any((e) => e.placeId == widget.placeId)
               ? Image.asset(
                   'assets/images/heart.png',
                   color: const Color(0xffCF5253),

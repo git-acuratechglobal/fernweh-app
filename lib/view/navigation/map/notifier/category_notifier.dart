@@ -25,7 +25,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
   Future<void> filteredItinerary() async {
     try {
       state = const AsyncLoading();
-      final position = await ref.watch(currentPositionProvider.future);
+      final position = await ref.read(currentPositionProvider.future);
       final filters = ref.watch(filtersProvider);
       final data = await ref.watch(apiServiceProvider).getCategory(
           position.latitude.toString(), position.longitude.toString(),

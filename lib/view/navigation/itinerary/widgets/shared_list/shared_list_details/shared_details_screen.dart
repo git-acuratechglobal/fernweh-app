@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:fernweh/utils/common/config.dart';
 import 'package:fernweh/utils/common/extensions.dart';
@@ -8,11 +7,9 @@ import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.da
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../../../utils/common/action_button.dart';
 import '../../../../../../utils/widgets/loading_widget.dart';
-import '../../../../../location_permission/location_service.dart';
 import '../../../../friends_list/friends_screen.dart';
 import '../../../../map/notifier/category_notifier.dart';
 import '../../../models/itinerary_model.dart';
@@ -58,7 +55,6 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
   Widget build(BuildContext context) {
     final icon =
         ref.watch(bitmapIconProvider);
-    final userCurrentPosition = ref.watch(currentPositionProvider);
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: ActionButton(

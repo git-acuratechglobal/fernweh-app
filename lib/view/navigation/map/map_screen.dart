@@ -27,7 +27,6 @@ class MapScreen extends ConsumerStatefulWidget {
 }
 
 class _MapScreenState extends ConsumerState<MapScreen> {
-
   bool _categoryMapView = true;
   bool _itineraryMapView = true;
   bool itemsHide = false;
@@ -80,87 +79,35 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final latLag = ref.watch(latlngProvider);
     final mapViewState = ref.watch(mapViewStateProvider);
     final mapState = ref.read(mapViewStateProvider.notifier);
-    // print(mapViewState.itineraryView);
-    // print(mapViewState.categoryView);
+    final categoryData = ref.watch(itineraryNotifierProvider);
+    final itineraryData = ref.watch(itineraryPlacesNotifierProvider);
+    final right = (categoryData.maybeWhen(
+              data: (data) => data.isEmpty,
+              orElse: () => true,
+            ) &&
+            itineraryData.maybeWhen(
+              data: (data) => data.isEmpty,
+              orElse: () => true,
+            ))
+        ? 0
+        : (!_categoryMapView || !_itineraryMapView)
+            ? 170
+            : 0;
+
+    final bottom = (categoryData.maybeWhen(
+              data: (data) => data.isEmpty,
+              orElse: () => true,
+            ) &&
+            itineraryData.maybeWhen(
+              data: (data) => data.isEmpty,
+              orElse: () => true,
+            ))
+        ? 10
+        : (!_categoryMapView || !_itineraryMapView)
+            ? 10
+            : 180;
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      // floatingActionButton: mapViewState.categoryView
-      //     ? SizedBox(
-      //         height: 50,
-      //         child: Row(
-      //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //           children: [
-      //             const SizedBox(),
-      //
-      //             ///***when no filter is applied then we have to hide floating button
-      //             mapViewState.selectedCategory == "null"
-      //                 ? const SizedBox.shrink()
-      //                 : ActionButton(
-      //                     value: _categoryMapView,
-      //                     onPressed: () {
-      //                       setState(() {
-      //                         _categoryMapView = !_categoryMapView;
-      //                       });
-      //                       // _customInfoWindowController.hideInfoWindow!();
-      //                     },
-      //                   ),
-      //             Padding(
-      //               padding: const EdgeInsets.only(right: 10),
-      //               child: Container(
-      //                 decoration: const BoxDecoration(
-      //                     color: Colors.white, shape: BoxShape.circle),
-      //                 child: IconButton(
-      //                   onPressed: () async {
-      //                     ref.invalidate(currentPositionProvider);
-      //                     ref.invalidate(mapViewStateProvider);
-      //                     ref.invalidate(itineraryNotifierProvider);
-      //                     setState(() {
-      //                       floatingButtonsHide = true;
-      //                     });
-      //                   },
-      //                   icon: const Icon(Icons.gps_fixed_outlined),
-      //                 ),
-      //               ),
-      //             ),
-      //           ],
-      //         ),
-      //       )
-      //     : SizedBox(
-      //         height: 50,
-      //         child: Row(
-      //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //           children: [
-      //             const SizedBox(),
-      //             floatingButtonsHide
-      //                 ? const SizedBox.shrink()
-      //                 : ActionButton(
-      //                     value: _itineraryMapView,
-      //                     onPressed: () {
-      //                       setState(() {
-      //                         _itineraryMapView = !_itineraryMapView;
-      //                       });
-      //                       // _customInfoWindowController.hideInfoWindow!();
-      //                     },
-      //                   ),
-      //             Padding(
-      //               padding: const EdgeInsets.only(right: 10),
-      //               child: Container(
-      //                 decoration: const BoxDecoration(
-      //                     color: Colors.white, shape: BoxShape.circle),
-      //                 child: IconButton(
-      //                   onPressed: () {
-      //                     ref.invalidate(currentPositionProvider);
-      //                     ref.invalidate(mapViewStateProvider);
-      //                     ref.invalidate(itineraryNotifierProvider);
-      //                   },
-      //                   icon: const Icon(Icons.gps_fixed_outlined),
-      //                 ),
-      //               ),
-      //             ),
-      //           ],
-      //         ),
-      //       ),
       body: Container(
         decoration: BoxDecoration(gradient: Config.backgroundGradient),
         child: Column(
@@ -229,7 +176,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     ),
                   )),
                   GestureDetector(
-                    onTap: (){
+                    onTap: () {
                       context.navigateTo(const WishListScreen());
                     },
                     child: Image.asset(
@@ -323,14 +270,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                         itemsHide = !itemsHide;
                                       });
                                     },
-                                    initialCameraPosition: CameraPosition(
-                                      zoom: 14,
-                                      target: latLag == null
-                                          ? LatLng(currentPosition!.latitude,
-                                              currentPosition.longitude)
-                                          : LatLng(latLag.latitude,
-                                              latLag.longitude),
-                                    ),
+                                    initialCameraPosition: latLag == null
+                                        ? CameraPosition(
+                                            zoom: 14,
+                                            target: LatLng(
+                                                currentPosition!.latitude,
+                                                currentPosition.longitude))
+                                        : CameraPosition(
+                                            zoom: 13,
+                                            target: LatLng(latLag.latitude,
+                                                latLag.longitude),
+                                          ),
                                     markers: Set.from(markers),
                                     onCameraMoveStarted: () {
                                       setState(() {
@@ -346,16 +296,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 },
                                 loadingBuilder: const Stack(
                                   children: [
-                                    // GoogleMap(
-                                    //   myLocationButtonEnabled: false,
-                                    //   myLocationEnabled: false,
-                                    //   initialCameraPosition: CameraPosition(
-                                    //     zoom: 14.4746,
-                                    //     target: LatLng(
-                                    //         currentPosition!.latitude,
-                                    //         currentPosition.longitude),
-                                    //   ),
-                                    // ),
                                     Scaffold(
                                       backgroundColor: Colors.black54,
                                       body: Center(child: LoadingWidget()),
@@ -444,14 +384,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             ),
                             loadingBuilder: const Stack(
                               children: [
-                                // GoogleMap(
-                                //   myLocationButtonEnabled: false,
-                                //   myLocationEnabled: false,
-                                //   initialCameraPosition: CameraPosition(
-                                //     zoom: 14.4746,
-                                //     target: LatLng(30.7333, 76.7794),
-                                //   ),
-                                // ),
                                 Scaffold(
                                   backgroundColor: Colors.black45,
                                   body: Center(
@@ -463,12 +395,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           ),
                         ),
                       ),
-                    // CustomInfoWindow(
-                    //   controller: _customInfoWindowController,
-                    //   height: 70,
-                    //   width: 220,
-                    //   offset: 5,
-                    // ),
                     Positioned(
                       top: 0,
                       left: 0,
@@ -530,7 +456,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                           .read(filtersProvider.notifier)
                                           .updateFilter(filterData);
                                       ref.invalidate(itineraryNotifierProvider);
-
                                       return;
                                     } else {
                                       setState(() {
@@ -563,6 +488,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                           .read(itineraryNotifierProvider
                                               .notifier)
                                           .filteredItinerary();
+                                      ref.invalidate(
+                                          itineraryPlacesNotifierProvider);
                                     }
                                   },
                                   avatar: Icon(
@@ -630,26 +557,28 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                     categoryView: true,
                                                     itineraryView: false,
                                                     selectedItinerary: -1);
-                                                filterData = {
-                                                  'type': null,
-                                                  'rating': filters['rating'],
-                                                  'radius': filters['radius'],
-                                                  'sort_by': filters['sort_by'],
-                                                  'selected_category': "All",
-                                                  'selected_rating': filters[
-                                                      'selected_rating'],
-                                                  'selected_distance': filters[
-                                                      'selected_distance'],
-                                                  'selected_radius': filters[
-                                                      'selected_radius'],
-                                                  'input': filters['input'],
-                                                  'search_term':
-                                                      filters['search_term'],
-                                                };
-                                                ref
-                                                    .read(filtersProvider
-                                                        .notifier)
-                                                    .updateFilter(filterData);
+                                                // filterData = {
+                                                //   'type': null,
+                                                //   'rating': filters['rating'],
+                                                //   'radius': filters['radius'],
+                                                //   'sort_by': filters['sort_by'],
+                                                //   'selected_category': "All",
+                                                //   'selected_rating': filters[
+                                                //       'selected_rating'],
+                                                //   'selected_distance': filters[
+                                                //       'selected_distance'],
+                                                //   'selected_radius': filters[
+                                                //       'selected_radius'],
+                                                //   'input': filters['input'],
+                                                //   'search_term':
+                                                //       filters['search_term'],
+                                                // };
+                                                // ref
+                                                //     .read(filtersProvider
+                                                //         .notifier)
+                                                //     .updateFilter(filterData);
+                                                ref.invalidate(
+                                                    itineraryPlacesNotifierProvider);
                                               } else {
                                                 setState(() {
                                                   floatingButtonsHide = false;
@@ -667,6 +596,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                         userItinerary?.id ?? 0);
                                                 // _itineraryView = true;
                                                 // _categoryView = false;
+                                                ref.invalidate(itineraryNotifierProvider);
                                               }
                                               // });
                                             },
@@ -1160,23 +1090,27 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         ),
                       ),
                     AnimatedPositioned(
-                      right:!_categoryMapView||!_itineraryMapView?170: 0,
-                      bottom: !_categoryMapView||!_itineraryMapView?10:180,
+                      right: right.toDouble(),
+                      bottom: bottom.toDouble(),
                       duration: const Duration(milliseconds: 200),
                       child: mapViewState.categoryView
                           ? Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 05),
-                            child: SizedBox(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 05),
+                              child: SizedBox(
                                 child: Column(
                                   children: [
                                     _categoryMapView
                                         ? Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 10,),
-                                          child: Container(
-                                            height: 40,
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 10,
+                                            ),
+                                            child: Container(
+                                              height: 40,
                                               width: 40,
-                                              decoration:  BoxDecoration(
-                                                  border: Border.all(color: Colors.grey),
+                                              decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color: Colors.grey),
                                                   color: Colors.white,
                                                   shape: BoxShape.circle),
                                               child: Center(
@@ -1189,7 +1123,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                     ref.invalidate(
                                                         itineraryNotifierProvider);
                                                     setState(() {
-                                                      floatingButtonsHide = true;
+                                                      floatingButtonsHide =
+                                                          true;
                                                     });
                                                   },
                                                   icon: const Icon(
@@ -1197,7 +1132,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                 ),
                                               ),
                                             ),
-                                        )
+                                          )
                                         : const SizedBox.shrink(),
 
                                     ///***when no filter is applied then we have to hide floating button
@@ -1220,21 +1155,25 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   ],
                                 ),
                               ),
-                          )
+                            )
                           : Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 05),
-                            child: SizedBox(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 05),
+                              child: SizedBox(
                                 child: Column(
                                   children: [
                                     _itineraryMapView
                                         ? Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 5),
-                                          child: Container(
-                                            height: 40,
-                                            width: 40,
-                                              decoration:  BoxDecoration(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 5),
+                                            child: Container(
+                                              height: 40,
+                                              width: 40,
+                                              decoration: BoxDecoration(
                                                   color: Colors.white,
-                                                  shape: BoxShape.circle,border: Border.all(color: Colors.grey)),
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                      color: Colors.grey)),
                                               child: Center(
                                                 child: IconButton(
                                                   onPressed: () {
@@ -1250,13 +1189,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                 ),
                                               ),
                                             ),
-                                        )
+                                          )
                                         : const SizedBox.shrink(),
                                     floatingButtonsHide
                                         ? const SizedBox.shrink()
                                         : SizedBox(
-                                      height: 40,
-                                      width: 40,
+                                            height: 40,
+                                            width: 40,
                                             child: ActionButton(
                                               value: _itineraryMapView,
                                               onPressed: () {
@@ -1271,7 +1210,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   ],
                                 ),
                               ),
-                          ),
+                            ),
                     )
                   ],
                 );

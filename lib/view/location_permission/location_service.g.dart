@@ -19,6 +19,8 @@ final addressProvider = FutureProvider<String>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef AddressRef = FutureProviderRef<String>;
 String _$currentPositionHash() => r'9844c279ec434921e24c9cfe3aafcf297f953666';
 
@@ -37,4 +39,4 @@ final currentPositionProvider =
 
 typedef _$CurrentPosition = AsyncNotifier<Position>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

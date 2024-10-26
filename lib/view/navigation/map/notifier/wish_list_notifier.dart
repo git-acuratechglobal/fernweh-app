@@ -31,28 +31,65 @@ class WishList {
   int get hashCode => placeId.hashCode;
 }
 
-final wishListProvider =
-    StateNotifierProvider<WishListNotifier, List<WishList>>(
-        (ref) => WishListNotifier());
+final wishListProvider = StateNotifierProvider.autoDispose<WishListNotifier, WishListState>(
+    (ref) => WishListNotifier());
 
-class WishListNotifier extends StateNotifier<List<WishList>> {
-  WishListNotifier() : super([]);
+class WishListNotifier extends StateNotifier<WishListState> {
+  WishListNotifier() : super(WishListState(wishList: [], selectedItems: {}));
 
   void addItemToWishList(WishList item) {
-    final data = state;
-    if (data.contains(item)) {
-      data.remove(item);
+    final List<WishList> updatedList = List.from(state.wishList);
+    if (updatedList.contains(item)) {
+      updatedList.remove(item);
     } else {
-      data.add(item);
+      updatedList.add(item);
     }
-    state = data;
+    state = WishListState(wishList: updatedList, selectedItems: {});
   }
 
-  void addToItinerary(WishList item) {
-    final data = state;
-    if (!data.contains(item)) {
-      data.add(item);
+  // void addToItinerary(WishList item) {
+  //   final data = state;
+  //   if (!data.contains(item)) {
+  //     data.add(item);
+  //   }
+  //   state = data;
+  // }
+
+  void toggleSelection(String id) {
+    final selectedItems = Set<String>.from(state.selectedItems);
+    if (selectedItems.contains(id)) {
+      selectedItems.remove(id);
+    } else {
+      selectedItems.add(id);
     }
-    state = data;
+    state = state.copyWith(selected: selectedItems);
+  }
+
+  void removeSelectedItems() {
+    final updatedList = state.wishList
+        .where((item) => !state.selectedItems.contains(item.placeId))
+        .toList();
+
+    state = state.copyWith(
+      data: updatedList,
+      selected: {},
+    );
+  }
+  void clearSelection() {
+    state = state.copyWith(selected: {});
+  }
+}
+
+class WishListState {
+  final List<WishList> wishList;
+  final Set<String> selectedItems;
+
+  WishListState({required this.wishList, required this.selectedItems});
+
+  WishListState copyWith({List<WishList>? data, Set<String>? selected}) {
+    return WishListState(
+      wishList: data ?? wishList,
+      selectedItems: selected ?? selectedItems,
+    );
   }
 }

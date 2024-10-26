@@ -33,11 +33,9 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
   XFile? file;
 
   @override
-  Widget build(BuildContext context) {
-    final user = ref.watch(userDetailProvider);
-    final authState = ref.watch(authNotifierProvider);
-    final validation = ref.watch(validatorsProvider);
-    ref.listen(authNotifierProvider, (previous, next) {
+  void initState() {
+    super.initState();
+    ref.listenManual(authNotifierProvider, (previous, next) async {
       switch (next) {
         case Verified(:final user) when previous is Loading:
           ref.read(userDetailProvider.notifier).update((state) => user);
@@ -45,9 +43,8 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
           ref.read(userDetailProvider.notifier).update((state) => user);
           Common.showSnackBar(context, "Profile updated successfully");
         case Logout(:final message) when previous is LogoutLoading:
-          ref.read(localStorageServiceProvider).clearSession();
+          await ref.read(localStorageServiceProvider).clearSession();
           ref.invalidate(filtersProvider);
-          ref.invalidate(localStorageServiceProvider);
           ref.invalidate(mapViewStateProvider);
           Common.showSnackBar(context, message);
           Navigator.pushAndRemoveUntil(
@@ -55,11 +52,19 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
             MaterialPageRoute(builder: (context) => const LoginScreen()),
             (Route<dynamic> route) => false,
           );
+          ref.invalidate(localStorageServiceProvider);
         case Error(:final error):
           Common.showSnackBar(context, error.toString());
         default:
       }
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = ref.watch(userDetailProvider);
+    final authState = ref.watch(authNotifierProvider);
+    final validation = ref.watch(validatorsProvider);
 
     return Stack(
       children: [
@@ -123,9 +128,13 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                     ),
                     child: ClipOval(
                       child: file == null
-                          ? ImageWidget(
-                              url: user!.imageUrl,
-                            )
+                          ? user!.imageUrl == null
+                              ? UserInitials(
+                                  name: user.name,
+                                )
+                              : ImageWidget(
+                                  url: user.imageUrl.toString(),
+                                )
                           : Image.file(
                               File(
                                 file!.path,
@@ -328,15 +337,49 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
 
     final DateFormat outputFormat = DateFormat('MM/dd/yy');
     String formattedDate = outputFormat.format(parsedDate);
-final formattedData=convertStringToDate(formattedDate);
+    final formattedData = convertStringToDate(formattedDate);
 
     return formattedData;
   }
+
   DateTime? convertStringToDate(String? formattedDateString) {
     if (formattedDateString == null) return null;
     final DateFormat inputFormat = DateFormat('MM/dd/yy');
     final DateTime parsedDate = inputFormat.parse(formattedDateString);
 
     return parsedDate;
+  }
+}
+
+class UserInitials extends StatelessWidget {
+  final String name;
+
+  const UserInitials({super.key, required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    List<String> nameParts = name.split(' ');
+    String firstInitial = nameParts.isNotEmpty ? nameParts[0][0] : '';
+    String lastInitial = nameParts.length > 1 ? nameParts[1][0] : '';
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Common.getRandomColor(),
+        shape: BoxShape.circle,
+      ),
+      alignment: Alignment.center,
+      width: 50,
+      // Set width
+      height: 50,
+      // Set height
+      child: Text(
+        '$firstInitial$lastInitial',
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
   }
 }

@@ -54,11 +54,11 @@ class User {
 
   Map<String, dynamic> toJson() => _$UserToJson(this);
 
-  String get imageUrl {
-    if (image == null) {
-      return 'https://t4.ftcdn.net/jpg/02/17/34/67/360_F_217346796_TSg5VcYjsFxZtIDK6Qdctg3yqAapG7Xa.jpg';
-    } else {
+  String? get imageUrl {
+    if (image != null) {
+
       return "http://fernweh.acublock.in/public/$image";
     }
+    return null;
   }
 }

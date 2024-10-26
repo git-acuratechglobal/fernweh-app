@@ -23,7 +23,7 @@ final exploreNotifierProvider =
 
 typedef _$ExploreNotifier = AsyncNotifier<List<Category>>;
 String _$friendsItineraryNotifierHash() =>
-    r'80f192b13a61b51d12764b9e91dfbaf2cb487bd1';
+    r'c1a43fdb630ae62d3adbc65cc234885fc6f1783a';
 
 /// See also [FriendsItineraryNotifier].
 @ProviderFor(FriendsItineraryNotifier)
@@ -40,4 +40,4 @@ final friendsItineraryNotifierProvider = AsyncNotifierProvider<
 
 typedef _$FriendsItineraryNotifier = AsyncNotifier<FriendsPlacesState>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

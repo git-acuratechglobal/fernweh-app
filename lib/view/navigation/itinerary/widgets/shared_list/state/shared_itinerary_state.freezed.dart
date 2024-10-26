@@ -19,7 +19,9 @@ mixin _$SharedItineraryState {
   SharedItineraryEvent get authEvent => throw _privateConstructorUsedError;
   String? get message => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of SharedItineraryState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $SharedItineraryStateCopyWith<SharedItineraryState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -44,6 +46,8 @@ class _$SharedItineraryStateCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of SharedItineraryState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -82,6 +86,8 @@ class __$$SharedItineraryStateImplCopyWithImpl<$Res>
       $Res Function(_$SharedItineraryStateImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of SharedItineraryState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -129,7 +135,9 @@ class _$SharedItineraryStateImpl implements _SharedItineraryState {
   @override
   int get hashCode => Object.hash(runtimeType, authEvent, message);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of SharedItineraryState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$SharedItineraryStateImplCopyWith<_$SharedItineraryStateImpl>
@@ -147,8 +155,11 @@ abstract class _SharedItineraryState implements SharedItineraryState {
   SharedItineraryEvent get authEvent;
   @override
   String? get message;
+
+  /// Create a copy of SharedItineraryState
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$SharedItineraryStateImplCopyWith<_$SharedItineraryStateImpl>
       get copyWith => throw _privateConstructorUsedError;
 }

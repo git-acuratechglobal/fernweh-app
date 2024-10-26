@@ -3,6 +3,7 @@ import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/view/navigation/friends_list/controller/friends_notifier.dart';
+import 'package:fernweh/view/navigation/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -205,7 +206,10 @@ class _FriendsListState extends ConsumerState<FriendsList> {
               children: [
                 ClipOval(
                   child: SizedBox.square(
-                      dimension: 50, child: ImageWidget(url: user.imageUrl)),
+                      dimension: 50,
+                      child: user.imageUrl == null
+                          ? UserInitials(name: user.fullName)
+                          : ImageWidget(url: user.imageUrl.toString())),
                 ),
                 const SizedBox(width: 16),
                 Column(
@@ -431,9 +435,9 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                             ClipOval(
                               child: SizedBox.square(
                                   dimension: 50,
-                                  child: ImageWidget(
-                                    url: user.imageUrl,
-                                  )),
+                                  child: user.imageUrl == null
+                                      ? UserInitials(name: user.fullName)
+                                      : ImageWidget(url: user.imageUrl.toString())),
                             ),
                             const SizedBox(width: 16),
                             SizedBox(

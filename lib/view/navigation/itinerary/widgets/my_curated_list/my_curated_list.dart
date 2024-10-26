@@ -1,5 +1,6 @@
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/view/navigation/itinerary/models/itinerary_model.dart';
+import 'package:fernweh/view/navigation/itinerary/widgets/my_curated_list/share_your_itinerary/share_itenary_sheet.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../utils/common/extensions.dart';
@@ -148,7 +149,23 @@ class MyCreatedItinerary extends StatelessWidget {
                     ),
                     Flexible(
                       flex: 1,
-                      child: AvatarList(images: editList),
+                      child: GestureDetector(onTap: (){
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.white,
+                          isScrollControlled: true,
+                          constraints: BoxConstraints.tightFor(
+                            height: MediaQuery.sizeOf(context).height * 0.85,
+                          ),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                          ),
+                          builder: (context) {
+                            return  UnShareItenarySheet();
+                          },
+                        );
+
+                      },child: AvatarList(images: editList)),
                     )
                     // const Text(
                     //   'Shared with',

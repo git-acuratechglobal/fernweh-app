@@ -22,7 +22,7 @@ class _AddToWishlistSheetState extends ConsumerState<AddToWishlistSheet> {
   WidgetsBinding.instance.addPostFrameCallback((_){
     final wishListItem = ref.watch(wishListProvider);
     setState(() {
-      selectedItems.add(wishListItem.last.placeId);
+      selectedItems.add(wishListItem.wishList.last.placeId);
     });
   });
 
@@ -60,7 +60,7 @@ class _AddToWishlistSheetState extends ConsumerState<AddToWishlistSheet> {
         Expanded(
           child: GridView.builder(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 25),
-            itemCount: wishListItem.length,
+            itemCount: wishListItem.wishList.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 15,
@@ -68,7 +68,7 @@ class _AddToWishlistSheetState extends ConsumerState<AddToWishlistSheet> {
               childAspectRatio: 1,
             ),
             itemBuilder: (context, index) {
-              final item = wishListItem[index];
+              final item = wishListItem.wishList[index];
               bool isSelected = selectedItems.contains(item.placeId);
               return InkWell(
                 onTap: () {

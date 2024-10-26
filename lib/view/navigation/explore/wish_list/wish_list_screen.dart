@@ -31,6 +31,7 @@ class _WishListScreenState extends ConsumerState<WishListScreen> {
                 icon: const Icon(Icons.arrow_back_rounded),
                 onPressed: () {
                   Navigator.of(context).pop();
+                  ref.read(wishListProvider.notifier).clearSelection();
                 },
               ),
               title: Text(
@@ -41,27 +42,106 @@ class _WishListScreenState extends ConsumerState<WishListScreen> {
                   fontSize: 20,
                 ),
               ),
+              actions: [
+                if (wishListData.selectedItems.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            ref
+                                .read(wishListProvider.notifier)
+                                .clearSelection();
+                          },
+                          child: Text(
+                            "Cancel",
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 15),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () {
+                            showDialog<void>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Are you sure?'),
+                                content: const Text(
+                                    'Do you want to remove  from Wish List?'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () {
+                                      ref
+                                          .read(wishListProvider.notifier)
+                                          .removeSelectedItems();
+                                      Navigator.of(context).pop(true);
+                                    },
+                                    child: const Text('Yes'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child: const Text('No'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          child: Text(
+                            "Delete",
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.secondary,
+                                fontSize: 15),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+              ],
             ),
-            wishListData.isEmpty
+            wishListData.wishList.isEmpty
                 ? const Center(child: Text("No wish list"))
                 : Expanded(
                     child: ListView.separated(
-                      itemCount: wishListData.length,
+                      itemCount: wishListData.wishList.length,
                       padding: const EdgeInsets.all(24),
                       separatorBuilder: (context, index) =>
                           const SizedBox(height: 12.0),
                       itemBuilder: (context, index) {
-                        final wishList = wishListData[index];
-                        return ListViewItems(
-                          placeType: wishList.type,
-                          name: wishList.name,
-                          placeId: wishList.placeId,
-                          address: wishList.address,
-                          rating: wishList.rating,
-                          distance: wishList.distance,
-                          url: wishList.image,
-                          selection: null,
-                          walkTime: wishList.walkingTime,
+                        final wishList = wishListData.wishList[index];
+                        bool isSelected = wishListData.selectedItems
+                            .contains(wishList.placeId);
+                        return GestureDetector(
+                          onLongPress: () {
+                            ref
+                                .read(wishListProvider.notifier)
+                                .toggleSelection(wishList.placeId);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: isSelected
+                                    ? Colors.blue
+                                    : Colors.transparent,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: ListViewItems(
+                              isSelected: wishListData.selectedItems.isNotEmpty,
+                              placeType: wishList.type,
+                              name: wishList.name,
+                              placeId: wishList.placeId,
+                              address: wishList.address,
+                              rating: wishList.rating,
+                              distance: wishList.distance,
+                              url: wishList.image,
+                              selection: null,
+                              walkTime: wishList.walkingTime,
+                            ),
+                          ),
                         );
                       },
                     ),

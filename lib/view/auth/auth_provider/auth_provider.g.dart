@@ -19,6 +19,8 @@ final categoriesProvider = FutureProvider<List<IntrestedInCategory>>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CategoriesRef = FutureProviderRef<List<IntrestedInCategory>>;
 String _$userDetailHash() => r'2696d190229f3acb6dc5ec6124b4d557524c91c7';
 
@@ -34,7 +36,7 @@ final userDetailProvider = NotifierProvider<UserDetail, User?>.internal(
 );
 
 typedef _$UserDetail = Notifier<User?>;
-String _$authNotifierHash() => r'0b6f793ee9b2a7f82d89f8359feec615cb78b841';
+String _$authNotifierHash() => r'c968146b28ffc520acb83596292113d0d6d55761';
 
 /// See also [AuthNotifier].
 @ProviderFor(AuthNotifier)
@@ -50,4 +52,4 @@ final authNotifierProvider =
 
 typedef _$AuthNotifier = AutoDisposeNotifier<AuthState>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

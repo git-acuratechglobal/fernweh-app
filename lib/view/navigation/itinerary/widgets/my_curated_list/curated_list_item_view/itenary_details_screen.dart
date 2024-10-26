@@ -6,6 +6,7 @@ import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/utils/widgets/loading_widget.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
+import 'package:fernweh/view/navigation/map/notifier/wish_list_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -124,9 +125,31 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
                               const SizedBox(width: 10),
                               GestureDetector(
                                 onTap: () {
-                                  ref
-                                      .read(itineraryLocalListProvider.notifier)
-                                      .removeSelectedItems();
+                                  showDialog<void>(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Are you sure?'),
+                                      content: const Text(
+                                          'Do you want to delete place  from Itinerary?'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          onPressed: () {
+                                            ref
+                                                .read(itineraryLocalListProvider
+                                                    .notifier)
+                                                .removeSelectedItems();
+                                            Navigator.of(context).pop(true);
+                                          },
+                                          child: const Text('Yes'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(false),
+                                          child: const Text('No'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 },
                                 child: Text(
                                   "Delete",
@@ -426,6 +449,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: ListViewItems(
+                        isWishlist: false,
                         isSelected: itineraryState.selectedItems.isNotEmpty,
                         id: data.id,
                         itineraryId: data.intineraryListId,
@@ -746,6 +770,7 @@ class ListViewItems extends ConsumerStatefulWidget {
   final int? id;
   final int? type;
   final bool isSelected;
+  final bool isWishlist;
 
   const ListViewItems(
       {super.key,
@@ -766,7 +791,9 @@ class ListViewItems extends ConsumerStatefulWidget {
       this.userId,
       this.itineraryId,
       this.isSelected = false,
-      this.type});
+      this.type, this.isWishlist = true,
+      });
+
 
   @override
   ConsumerState<ListViewItems> createState() => _ListViewItemsState();
@@ -845,26 +872,31 @@ class _ListViewItemsState extends ConsumerState<ListViewItems> {
         ),
         InkWell(
           onTap: () {
-            widget.isSelected
-                ? ref
-                    .read(itineraryLocalListProvider.notifier)
-                    .toggleSelection(widget.id ?? 0)
-                : Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => RestaurantDetailScreen(
-                        locationId: widget.placeId,
-                        latitude: widget.latitude,
-                        longitude: widget.longitude,
-                        types: const [],
-                        image: widget.url ?? "",
-                        name: widget.name,
-                        rating: widget.rating,
-                        walkingTime: widget.walkTime,
-                        distance: widget.distance,
-                        address: widget.address,
-                      ),
-                    ),
-                  );
+            if (widget.isSelected) {
+              // Choose the correct provider based on `isWishlist`
+              if (widget.isWishlist) {
+                ref.read(wishListProvider.notifier).toggleSelection(widget.placeId!);
+              } else {
+                ref.read(itineraryLocalListProvider.notifier).toggleSelection(widget.id ?? 0);
+              }
+            } else {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => RestaurantDetailScreen(
+                    locationId: widget.placeId,
+                    latitude: widget.latitude,
+                    longitude: widget.longitude,
+                    types: const [],
+                    image: widget.url ?? "",
+                    name: widget.name,
+                    rating: widget.rating,
+                    walkingTime: widget.walkTime,
+                    distance: widget.distance,
+                    address: widget.address,
+                  ),
+                ),
+              );
+            }
           },
           child: Container(
             width: widget.width ?? MediaQuery.sizeOf(context).width,
@@ -913,7 +945,19 @@ class _ListViewItemsState extends ConsumerState<ListViewItems> {
                         ),
                       ),
                     ),
-                    const Positioned(top: 12, right: 10, child: FavButton()),
+                    Positioned(
+                        top: 12,
+                        right: 10,
+                        child: FavButton(
+                          placeId: widget.placeId,
+                          name: widget.name,
+                          image: widget.url,
+                          type: widget.placeType,
+                          distance: widget.distance,
+                          rating: widget.rating,
+                          address: widget.address,
+                          walkingTime: widget.walkTime,
+                        )),
                   ],
                 ),
                 const SizedBox(height: 8.0),

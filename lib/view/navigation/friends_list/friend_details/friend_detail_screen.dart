@@ -8,6 +8,7 @@ import '../../../../utils/widgets/async_widget.dart';
 import '../../../../utils/widgets/image_widget.dart';
 import '../../itinerary/notifier/itinerary_notifier.dart';
 import '../../itinerary/widgets/my_curated_list/curated_list_item_view/itenary_details_screen.dart';
+import '../../profile/profile.dart';
 import '../model/friends.dart';
 import '../model/friends_itinerary.dart';
 
@@ -60,7 +61,10 @@ class _FriendDetailScreenState extends ConsumerState<FriendDetailScreen> {
                   color: Theme.of(context).colorScheme.secondary,
                 ),
               ),
-              child: ClipOval(child: ImageWidget(url: widget.friends.imageUrl)),
+              child: ClipOval(
+                  child: widget.friends.imageUrl == null
+                      ? UserInitials(name: widget.friends.fullName)
+                      : ImageWidget(url: widget.friends.imageUrl.toString())),
             ),
             const SizedBox(height: 16.0),
             Text(
