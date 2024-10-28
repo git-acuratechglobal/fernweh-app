@@ -90,7 +90,15 @@ class PositionNotifier extends StateNotifier<Position?> {
   PositionNotifier() : super(null);
 
   void updatePosition(Position? position) {
-    state = position;
+    if (position != null && (state == null || _isPositionChanged(position))) {
+      state = position;
+    }
+  }
+
+  /// Checks if the new [Position] differs significantly from the current one
+  bool _isPositionChanged(Position newPosition) {
+    return state?.latitude != newPosition.latitude ||
+        state?.longitude != newPosition.longitude;
   }
 }
 

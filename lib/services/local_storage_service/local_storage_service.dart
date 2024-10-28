@@ -27,6 +27,7 @@ class LocalStorageService {
   static const String _selectedItineraryId = "itinerary_id";
   static const String _userItinerary = "userItinerary";
   static const String _sharedItinerary = "sharedItinerary";
+  static const String _collaborateList = "collaborateList";
 
   LocalStorageService(this._preferences);
 
@@ -116,6 +117,39 @@ class LocalStorageService {
       return apiList;
     }
     List<dynamic> jsonList = jsonDecode(sharedItinerary);
+    List<Itenery> localList = jsonList.map((e) => Itenery.fromJson(e)).toList();
+    localList.removeWhere((localItem) => !apiList
+        .any((apiItem) => apiItem.itinerary?.id == localItem.itinerary?.id));
+    for (var apiItem in apiList) {
+      var localItemIndex = localList.indexWhere(
+          (localItem) => localItem.itinerary?.id == apiItem.itinerary?.id);
+      if (localItemIndex != -1) {
+        var localItem = localList[localItemIndex];
+        if (localItem.itinerary?.name != apiItem.itinerary?.name ||
+            localItem.itinerary?.image != apiItem.itinerary?.image ||
+            localItem.canEdit != apiItem.canEdit ||
+            localItem.canView != apiItem.canView ||
+            localItem.placesCount != apiItem.placesCount) {
+          localList[localItemIndex] = apiItem;
+        }
+      } else {
+        localList.add(apiItem);
+      }
+    }
+    return localList;
+  }
+
+  Future<void> setCollaborateList(List<Itenery> collaborateList) async {
+    await _preferences.setString(_collaborateList,
+        jsonEncode(collaborateList.map((e) => e.toJson()).toList()));
+  }
+
+  List<Itenery>? getCollaborateList(List<Itenery> apiList) {
+    final collaborateList = _preferences.getString(_collaborateList);
+    if (collaborateList == null) {
+      return apiList;
+    }
+    List<dynamic> jsonList = jsonDecode(collaborateList);
     List<Itenery> localList = jsonList.map((e) => Itenery.fromJson(e)).toList();
     localList.removeWhere((localItem) => !apiList
         .any((apiItem) => apiItem.itinerary?.id == localItem.itinerary?.id));

@@ -5,6 +5,7 @@ import 'package:fernweh/utils/common/app_validation.dart';
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
+import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/shared_list.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +48,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userDetailProvider);
     return Scaffold(
       body: Container(
         constraints: const BoxConstraints.expand(),
@@ -153,6 +155,16 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                             localStorageItinerary!
                                 .where((e) => e.placesCount != 0)
                                 .toList();
+                        List<Itenery>? sharedIteneries = userItinerary
+                            .sharedIteneries
+                            ?.where((e) =>
+                                e.canEdit?.any((i) => i.id == user?.id) ??
+                                false)
+                            .toList();
+                        final localCollaborateList = ref
+                            .watch(localStorageServiceProvider)
+                            .getCollaborateList(
+                            sharedIteneries ?? []);
                         return filteredList.isEmpty
                             ? Center(
                                 child: Column(
@@ -180,90 +192,237 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                   ],
                                 ),
                               )
-                            : ReorderableListView.builder(
-                                padding: const EdgeInsets.all(24),
-                                itemCount: filteredList.length,
-                                itemBuilder: (context, index) {
-                                  final itinary = filteredList[index].itinerary;
-                                  return Column(
-                                    key: ValueKey(
-                                        '${itinary?.id ?? 'no-id'}-$index'),
-                                    children: [
-                                      InkWell(
-                                        onTap: () {
-                                          switch (isEditing) {
-                                            case true:
-                                              null;
+                            : ListView(
+                                padding: EdgeInsets.zero,
+                                children: [
+                                  Theme(
+                                      data: ThemeData().copyWith(
+                                          dividerColor: Colors.transparent),
+                                      child: ExpansionTile(
+                                          initiallyExpanded: true,
+                                          tilePadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 20, vertical: 0),
+                                          title: const Text(
+                                            "My List",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                          children: [
+                                            ReorderableListView.builder(
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
+                                              padding: const EdgeInsets.all(24),
+                                              shrinkWrap: true,
+                                              itemCount: filteredList.length,
+                                              itemBuilder: (context, index) {
+                                                final itinary =
+                                                    filteredList[index]
+                                                        .itinerary;
+                                                return Column(
+                                                  key: ValueKey(
+                                                      '${itinary?.id ?? 'no-id'}-$index'),
+                                                  children: [
+                                                    InkWell(
+                                                      onTap: () {
+                                                        switch (isEditing) {
+                                                          case true:
+                                                            null;
 
-                                            case false:
-                                              Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ItenaryDetailsScreen(
-                                                    title: itinary.name ?? "",
-                                                    itineraryId:
-                                                        itinary.id ?? 0,
-                                                  ),
-                                                ),
-                                              );
-                                            default:
-                                          }
-                                        },
-                                        child: MyCreatedItinerary(
-                                            placeCount: filteredList[index]
-                                                    .placesCount ??
-                                                0,
-                                            itinary: itinary!,
-                                            editList: [
-                                              ...?filteredList[index].canEdit,
-                                              ...?filteredList[index].canView
-                                            ]),
-                                      ),
-                                      const SizedBox(height: 10),
-                                    ],
-                                  );
-                                },
-                                // separatorBuilder:
-                                //     (BuildContext context, int index) {
-                                //   return const SizedBox(
-                                //     height: 10,
-                                //   );
-                                // },
-                                onReorder: (int oldIndex, int newIndex) {
-                                  setState(() {
-                                    if (newIndex > oldIndex) {
-                                      newIndex -= 1;
-                                    }
+                                                          case false:
+                                                            Navigator.of(
+                                                                    context)
+                                                                .push(
+                                                              MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        ItenaryDetailsScreen(
+                                                                  title: itinary
+                                                                          .name ??
+                                                                      "",
+                                                                  itineraryId:
+                                                                      itinary.id ??
+                                                                          0,
+                                                                ),
+                                                              ),
+                                                            );
+                                                          default:
+                                                        }
+                                                      },
+                                                      child: MyCreatedItinerary(
+                                                          placeCount: filteredList[
+                                                                      index]
+                                                                  .placesCount ??
+                                                              0,
+                                                          itinary: itinary!,
+                                                          editList: [
+                                                            ...?filteredList[
+                                                                    index]
+                                                                .canEdit,
+                                                            ...?filteredList[
+                                                                    index]
+                                                                .canView
+                                                          ]),
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                  ],
+                                                );
+                                              },
+                                              // separatorBuilder:
+                                              //     (BuildContext context, int index) {
+                                              //   return const SizedBox(
+                                              //     height: 10,
+                                              //   );
+                                              // },
+                                              onReorder:
+                                                  (int oldIndex, int newIndex) {
+                                                setState(() {
+                                                  if (newIndex > oldIndex) {
+                                                    newIndex -= 1;
+                                                  }
 
-                                    // Reorder the itinerary items
-                                    final item = localStorageItinerary
-                                        .removeAt(oldIndex);
-                                    localStorageItinerary.insert(
-                                        newIndex, item);
-                                  });
-                                  ref
-                                      .read(localStorageServiceProvider)
-                                      .setUserItinerary(localStorageItinerary);
-                                },
+                                                  // Reorder the itinerary items
+                                                  final item =
+                                                      localStorageItinerary
+                                                          .removeAt(oldIndex);
+                                                  localStorageItinerary.insert(
+                                                      newIndex, item);
+                                                });
+                                                ref
+                                                    .read(
+                                                        localStorageServiceProvider)
+                                                    .setUserItinerary(
+                                                        localStorageItinerary);
+                                              },
+                                            ),
+                                          ])),
+                                  if (localCollaborateList!.isNotEmpty)
+                                    Theme(
+                                        data: ThemeData().copyWith(
+                                            dividerColor: Colors.transparent),
+                                        child: ExpansionTile(
+                                            initiallyExpanded: true,
+                                            tilePadding:
+                                                const EdgeInsets.symmetric(
+                                                    horizontal: 20,
+                                                    vertical: 0),
+                                            title: const Text(
+                                              "Collaborate Lists",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                            children: [
+                                              ReorderableListView.builder(
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                padding:
+                                                    const EdgeInsets.all(24),
+                                                itemCount:
+                                                localCollaborateList.length,
+                                                itemBuilder: (context, index) {
+                                                  final itinary =
+                                                      localCollaborateList[index]
+                                                          .itinerary;
+                                                  return Column(
+                                                    key: ValueKey(
+                                                        '${itinary?.id ?? 'no-id'}-$index'),
+                                                    children: [
+                                                      InkWell(
+                                                        onTap: () {
+                                                          switch (isEditing) {
+                                                            case true:
+                                                              null;
+
+                                                            case false:
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .push(
+                                                                MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          ItenaryDetailsScreen(
+                                                                    title: itinary
+                                                                            .name ??
+                                                                        "",
+                                                                    itineraryId:
+                                                                        itinary.id ??
+                                                                            0,
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            default:
+                                                          }
+                                                        },
+                                                        child: MyCreatedItinerary(
+                                                            placeCount:
+                                                            localCollaborateList[
+                                                                            index]
+                                                                        .placesCount ??
+                                                                    0,
+                                                            itinary: itinary!,
+                                                            editList: [
+                                                              ...?localCollaborateList[
+                                                                      index]
+                                                                  .canEdit,
+                                                              ...?localCollaborateList[
+                                                                      index]
+                                                                  .canView
+                                                            ]),
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 10),
+                                                    ],
+                                                  );
+                                                },
+                                                // separatorBuilder:
+                                                //     (BuildContext context, int index) {
+                                                //   return const SizedBox(
+                                                //     height: 10,
+                                                //   );
+                                                // },
+                                                onReorder: (int oldIndex,
+                                                    int newIndex) {
+                                                  setState(() {
+                                                    if (newIndex > oldIndex) {
+                                                      newIndex -= 1;
+                                                    }
+
+                                                    // Reorder the itinerary items
+                                                    final item = localCollaborateList
+                                                        .removeAt(oldIndex);
+                                                    localCollaborateList.insert(
+                                                        newIndex, item);
+                                                  });
+                                                  ref
+                                                      .read(
+                                                      localStorageServiceProvider)
+                                                      .setCollaborateList(
+                                                      localCollaborateList);
+                                                },
+                                              ),
+                                            ])),
+                                ],
                               );
                       },
                       errorBuilder: (error, stack) => Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                             Text(error.toString()),
+                            Text(error.toString()),
                             const SizedBox(
                               height: 10,
                             ),
                             OutlinedButton(
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
                                 minimumSize: const Size(60, 40),
                               ),
                               onPressed: () {
-                                ref.invalidate(
-                                    getUserItineraryProvider);
+                                ref.invalidate(getUserItineraryProvider);
                               },
                               child: const Text(
                                 "Refresh",
@@ -334,8 +493,7 @@ class AvatarList extends StatelessWidget {
             ),
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: ImageWidget(
-                    url: avtar.imageUrl)),
+                child: ImageWidget(url: avtar.imageUrl)),
           ),
         );
       },

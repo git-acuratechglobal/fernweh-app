@@ -160,7 +160,8 @@ class ApiService {
     });
   }
 
-  Future<String> updateMyItinerary(Map<String, dynamic> formData,int id) async {
+  Future<String> updateMyItinerary(
+      Map<String, dynamic> formData, int id) async {
     print(formData.toString());
     return asyncGuard(() async {
       final response = await _dio.post('itinerary/user-itinerary-update/$id',
@@ -172,11 +173,9 @@ class ApiService {
           }));
       final myItineraryJson = response.data["message"];
 
-      return myItineraryJson ;
+      return myItineraryJson;
     });
   }
-
-
 
   Future<List<SearchResult>> getPlaceSearch(String search) async {
     return asyncGuard(() async {
@@ -236,9 +235,7 @@ class ApiService {
       {String? search}) async {
     return asyncGuard(() async {
       final response = await _dio.post('user-management/friend-list?page=$page',
-          data: search != null ? FormData.fromMap({
-            "search":search
-          }) : null,
+          data: search != null ? FormData.fromMap({"search": search}) : null,
           options: Options(headers: {
             'Authorization': "Bearer $_token",
             'Accept': 'application/json',

@@ -40,7 +40,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Map<String, dynamic> filterData = {};
   bool showSearchMessage = false;
   LatLng? _latLng;
-
   void searchMessage() {
     Position position = Position(
         latitude: _latLng!.latitude,
@@ -58,11 +57,41 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       floatingButtonsHide = false;
     });
   }
+  LatLngBounds calculateBounds(List<Marker> markers) {
+    assert(markers.isNotEmpty);
+    double minLat = markers.first.position.latitude;
+    double maxLat = markers.first.position.latitude;
+    double minLng = markers.first.position.longitude;
+    double maxLng = markers.first.position.longitude;
 
+    for (var marker in markers) {
+      if (marker.position.latitude < minLat) minLat = marker.position.latitude;
+      if (marker.position.latitude > maxLat) maxLat = marker.position.latitude;
+      if (marker.position.longitude < minLng) minLng = marker.position.longitude;
+      if (marker.position.longitude > maxLng) maxLng = marker.position.longitude;
+    }
+
+    return LatLngBounds(
+      southwest: LatLng(minLat, minLng),
+      northeast: LatLng(maxLat, maxLng),
+    );
+  }
   @override
   void initState() {
-    _scrollController = ScrollController();
     super.initState();
+    _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      ref.listenManual<Position?>(positionProvider, (previous, current) {
+        if (current != null) {
+          mapController.animateCamera(
+            CameraUpdate.newLatLng(
+              LatLng(current.latitude, current.longitude),
+            ),
+          );
+        }
+      });
+    });
+
   }
 
   @override
@@ -249,14 +278,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     onMapCreated: (controller) async {
                                       mapController = controller;
                                       if (category.isNotEmpty) {
-                                        final latlng = LatLng(
-                                          double.parse(
-                                              category[0].latitude.toString()),
-                                          double.parse(
-                                              category[0].longitude.toString()),
-                                        );
-                                        await mapController.animateCamera(
-                                            CameraUpdate.newLatLng(latlng));
+                                        final bounds = calculateBounds(markers);
+                                        Future.delayed(const Duration(milliseconds: 500), () async {
+                                          await mapController.animateCamera(
+                                            CameraUpdate.newLatLngBounds(bounds, 50), // Adjust padding as needed
+                                          );
+                                        });
                                       } else {
                                         await mapController.animateCamera(
                                             CameraUpdate.newLatLng(
@@ -318,6 +345,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             dataBuilder:
                                 (BuildContext context, itineraryPlace) {
                               markers.clear();
+                              if (itineraryPlace.isNotEmpty) {
                               for (var data in itineraryPlace) {
                                 markers.add(Marker(
                                     icon: icon.value ??
@@ -346,13 +374,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                         selectedPlaceId = data.id.toString();
                                       });
                                     }));
-                              }
+                              }}
 
                               return GoogleMap(
                                 zoomControlsEnabled: false,
                                 myLocationButtonEnabled: false,
                                 initialCameraPosition: CameraPosition(
-                                  zoom: 14.4746,
+                                  zoom: 10.0,
                                   target: latLag == null
                                       ? LatLng(currentPosition!.latitude,
                                           currentPosition.longitude)
@@ -361,14 +389,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 ),
                                 onMapCreated: (controller) async {
                                   mapController = controller;
-                                  final latlng = LatLng(
-                                    double.parse(
-                                        itineraryPlace[0].latitude.toString()),
-                                    double.parse(
-                                        itineraryPlace[0].longitude.toString()),
-                                  );
-                                  await mapController.animateCamera(
-                                      CameraUpdate.newLatLng(latlng));
+                                  final bounds = calculateBounds(markers);
+                                  Future.delayed(const Duration(milliseconds: 500), () async {
+                                    await mapController.animateCamera(
+                                      CameraUpdate.newLatLngBounds(bounds, 50), // Adjust padding as needed
+                                    );
+                                  });
                                 },
                                 onCameraMove: (position) async {},
                                 onTap: (latLng) {
