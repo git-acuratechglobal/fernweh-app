@@ -15,7 +15,6 @@ import '../../view/navigation/map/model/category.dart';
 import '../auth_service/auth_service.dart';
 import '../dio_service/dio_service.dart';
 import '../local_storage_service/local_storage_service.dart';
-
 part 'api_service.g.dart';
 
 @Riverpod(keepAlive: true)
@@ -32,7 +31,6 @@ class ApiService {
 
   Future<List<Category>> getCategory(String? latitude, String? longitude,
       {required Map<String, dynamic> filter}) async {
-    print(filter);
     return asyncGuard(() async {
       final response = await _dio.post(
         'attractions',
@@ -114,7 +112,6 @@ class ApiService {
       final id = formData['id'];
       formData.remove('id');
       final XFile? imagePath = formData['image'];
-      print(formData);
       if (imagePath != null) {
         formData['image'] = await MultipartFile.fromFile(imagePath.path);
       }
@@ -145,7 +142,6 @@ class ApiService {
   }
 
   Future<MyItinerary> createMyItinerary(Map<String, dynamic> formData) async {
-    print(formData.toString());
     return asyncGuard(() async {
       final response = await _dio.post('itinerary/user-itinerary-create',
           data: FormData.fromMap(formData),
@@ -162,7 +158,6 @@ class ApiService {
 
   Future<String> updateMyItinerary(
       Map<String, dynamic> formData, int id) async {
-    print(formData.toString());
     return asyncGuard(() async {
       final response = await _dio.post('itinerary/user-itinerary-update/$id',
           data: FormData.fromMap(formData),
@@ -266,7 +261,6 @@ class ApiService {
 
   Future<String> acceptRequest(int userId, int status) async {
     return asyncGuard(() async {
-      print("api request send ============>$userId");
       final response = await _dio.post('user-management/accept-request',
           data: FormData.fromMap({"status": status, "userId": userId}),
           options: Options(headers: {

@@ -1,4 +1,3 @@
-import 'package:fernweh/utils/common/common.dart';
 import 'package:fernweh/utils/common/config.dart';
 import 'package:fernweh/utils/common/privacy_policy.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
@@ -6,11 +5,10 @@ import 'package:fernweh/view/auth/auth_state/auth_state.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../../utils/common/app_button.dart';
 import '../../../utils/common/app_mixin.dart';
 import '../../../utils/common/app_validation.dart';
-import 'otp_verification/verification_screen.dart';
+import '../login/login_screen.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -65,6 +63,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen>
                   const SizedBox(height: 28),
                   const SizedBox(height: 16),
                   TextFormField(
+                    inputFormatters: [
+                      LowerCaseTextFormatter(),
+                    ],
                     controller: emailController,
                     validator: (val) => validation.validateEmail(val),
                     decoration:
