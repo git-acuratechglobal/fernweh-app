@@ -62,11 +62,11 @@ class Can {
 
   factory Can.fromJson(Map<String, dynamic> json) => _$CanFromJson(json);
   Map<String, dynamic> toJson() => _$CanToJson(this);
-  String get imageUrl {
-    if (image == null) {
-      return 'https://t4.ftcdn.net/jpg/02/17/34/67/360_F_217346796_TSg5VcYjsFxZtIDK6Qdctg3yqAapG7Xa.jpg';
+  String? get imageUrl {
+    if (image != null) {
+      return "http://fernweh.acublock.in/public/$image";;
     } else {
-      return "http://fernweh.acublock.in/public/$image";
+      return null;
     }
   }
 }

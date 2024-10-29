@@ -53,7 +53,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         speedAccuracy: 0.0,
         altitudeAccuracy: 0.0,
         headingAccuracy: 0.0);
-    ref.read(currentPositionProvider.notifier).updatePosition(position);
+    ref
+        .read(currentPositionProvider.notifier)
+        .updatePositionForSearchArea(position);
     setState(() {
       floatingButtonsHide = false;
     });

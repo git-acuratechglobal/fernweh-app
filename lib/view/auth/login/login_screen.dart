@@ -6,6 +6,7 @@ import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../utils/common/common.dart';
 import '../../../utils/common/privacy_policy.dart';
@@ -105,6 +106,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 28),
                   TextFormField(
+                    inputFormatters: [
+                      LowerCaseTextFormatter(),
+                    ],
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
                     validator: (val) => validation.validateEmail(val),
@@ -290,6 +294,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+class LowerCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+      text: newValue.text.toLowerCase(),
+      selection: newValue.selection,
     );
   }
 }

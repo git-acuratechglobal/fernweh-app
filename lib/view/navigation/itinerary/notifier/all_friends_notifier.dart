@@ -4,7 +4,7 @@ import '../../friends_list/model/friends_itinerary.dart';
 
 part 'all_friends_notifier.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: false)
 class AllFriendsNotifier extends _$AllFriendsNotifier {
   @override
   FutureOr<List<FriendsItinerary>?> build() async {
@@ -20,4 +20,5 @@ class AllFriendsNotifier extends _$AllFriendsNotifier {
     state = result;
     return state.valueOrNull;
   }
+
 }

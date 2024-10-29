@@ -81,6 +81,12 @@ class CurrentPosition extends _$CurrentPosition {
     ref.read(positionProvider.notifier).updatePosition(position);
     ref.invalidate(addressProvider);
   }
+  Future<void> updatePositionForSearchArea(Position position) async {
+    state = AsyncData(position);
+    ref.read(positionProvider.notifier).updatePosition(position);
+    ref.read(itineraryNotifierProvider.notifier).filteredItinerary();
+    ref.invalidate(addressProvider);
+  }
 }
 
 final positionProvider = StateNotifierProvider<PositionNotifier, Position?>(

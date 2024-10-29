@@ -7,11 +7,11 @@ part of 'explore_notifier.dart';
 // **************************************************************************
 
 String _$friendsItineraryNotifierHash() =>
-    r'7f061b483ce2fa5ee275773427da7221193e887d';
+    r'792b2f0ac248aa4e33dffa318740117848959432';
 
 /// See also [FriendsItineraryNotifier].
 @ProviderFor(FriendsItineraryNotifier)
-final friendsItineraryNotifierProvider = AsyncNotifierProvider<
+final friendsItineraryNotifierProvider = AutoDisposeAsyncNotifierProvider<
     FriendsItineraryNotifier, FriendsPlacesState>.internal(
   FriendsItineraryNotifier.new,
   name: r'friendsItineraryNotifierProvider',
@@ -22,6 +22,7 @@ final friendsItineraryNotifierProvider = AsyncNotifierProvider<
   allTransitiveDependencies: null,
 );
 
-typedef _$FriendsItineraryNotifier = AsyncNotifier<FriendsPlacesState>;
+typedef _$FriendsItineraryNotifier
+    = AutoDisposeAsyncNotifier<FriendsPlacesState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

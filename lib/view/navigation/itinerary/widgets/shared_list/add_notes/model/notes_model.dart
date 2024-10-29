@@ -25,11 +25,11 @@ class Notes {
 
   factory Notes.fromJson(Map<String, dynamic> json) => _$NotesFromJson(json);
 
-  String get imageUrl {
-    if (userImage == null) {
-      return 'https://t4.ftcdn.net/jpg/02/17/34/67/360_F_217346796_TSg5VcYjsFxZtIDK6Qdctg3yqAapG7Xa.jpg';
-    } else {
+  String? get imageUrl {
+    if (userImage != null) {
       return "http://fernweh.acublock.in/public/$userImage";
+    } else {
+      return null;
     }
   }
 }

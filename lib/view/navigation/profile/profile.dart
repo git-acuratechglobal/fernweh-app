@@ -7,6 +7,7 @@ import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/auth/auth_state/auth_state.dart';
 import 'package:fernweh/view/auth/login/login_screen.dart';
+import 'package:fernweh/view/navigation/itinerary/notifier/all_friends_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +20,7 @@ import '../../../utils/widgets/gender_form_field.dart';
 import '../../../utils/widgets/loading_widget.dart';
 import '../../../utils/widgets/picker_form_field.dart';
 import '../../auth/signup/profile_setup/create_profile_screen.dart';
+import '../explore/notifier/explore_notifier.dart';
 import '../map/notifier/category_notifier.dart';
 
 class Profile extends ConsumerStatefulWidget {

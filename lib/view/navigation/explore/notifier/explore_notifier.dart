@@ -11,7 +11,7 @@ import '../../map/model/category.dart';
 
 part 'explore_notifier.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: false)
 class FriendsItineraryNotifier extends _$FriendsItineraryNotifier {
   @override
   FutureOr<FriendsPlacesState> build() async {
@@ -33,8 +33,9 @@ class FriendsItineraryNotifier extends _$FriendsItineraryNotifier {
             'Failed to fetch itinerary for friend ID $friendId: ${e.toString()}');
       }
     }
+
     await ref
-        .read(allFriendsNotifierProvider.notifier)
+        .watch(allFriendsNotifierProvider.notifier)
         .getFriendsItineraries(friendsItineraryList: friendItineray);
     final List<int> itineraryIds =
         friendItineray.map((e) => e.id ?? 0).toList();

@@ -35,133 +35,134 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
           height: double.infinity,
           width: double.infinity,
           decoration: BoxDecoration(gradient: Config.backgroundGradient),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                PreferredSize(
-                  preferredSize:
-                      Size.fromHeight(MediaQuery.paddingOf(context).top + 8),
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        top: MediaQuery.paddingOf(context).top + 8,
-                        left: 24,
-                        right: 24),
-                    child: Row(children: [
-                      Image.asset('assets/images/location.png'),
-                      const SizedBox(width: 8.0),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CurrentLocation()));
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Current Location',
-                                style: TextStyle(
-                                  color: Color(0xFF494D60),
-                                  fontSize: 12,
-                                ),
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              PreferredSize(
+                preferredSize:
+                    Size.fromHeight(MediaQuery.paddingOf(context).top + 8),
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      top: MediaQuery.paddingOf(context).top + 8,
+                      left: 24,
+                      right: 24),
+                  child: Row(children: [
+                    Image.asset('assets/images/location.png'),
+                    const SizedBox(width: 8.0),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CurrentLocation()));
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Current Location',
+                              style: TextStyle(
+                                color: Color(0xFF494D60),
+                                fontSize: 12,
                               ),
-                              AsyncDataWidgetB(
-                                dataProvider: addressProvider,
-                                dataBuilder: (BuildContext context, data) {
-                                  return Row(
-                                    children: [
-                                      ConstrainedBox(
-                                        constraints:
-                                            const BoxConstraints(maxWidth: 230),
-                                        child: Text(
-                                          overflow: TextOverflow.ellipsis,
-                                          data,
-                                          style: TextStyle(
-                                            color: const Color(0xFF1A1B28),
-                                            fontVariations: FVariations.w700,
-                                          ),
+                            ),
+                            AsyncDataWidgetB(
+                              dataProvider: addressProvider,
+                              dataBuilder: (BuildContext context, data) {
+                                return Row(
+                                  children: [
+                                    ConstrainedBox(
+                                      constraints:
+                                          const BoxConstraints(maxWidth: 230),
+                                      child: Text(
+                                        overflow: TextOverflow.ellipsis,
+                                        data,
+                                        style: TextStyle(
+                                          color: const Color(0xFF1A1B28),
+                                          fontVariations: FVariations.w700,
                                         ),
                                       ),
-                                      const Icon(
-                                          Icons.keyboard_arrow_down_outlined)
-                                    ],
-                                  );
-                                },
-                                errorBuilder: (error, stack) => const Center(
-                                  child:
-                                      Text("Unable to load current location"),
-                                ),
-                                loadingBuilder: const Skeletonizer(
-                                  child: Text("this is dummy location"),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      // IconButton(
-                      //   onPressed: () {
-                      //     Navigator.of(context).push(
-                      //       MaterialPageRoute(
-                      //           builder: (context) => const WishListScreen()),
-                      //     );
-                      //   },
-                      //   icon: Image.asset(
-                      //     'assets/images/heart.png',
-                      //     color: const Color(0xffCF5253),
-                      //   ),
-                      // ),
-                      Image.asset('assets/images/notification.png'),
-                      // Container(
-                      //   width: 70,
-                      //   decoration: BoxDecoration(boxShadow: [
-                      //     BoxShadow(
-                      //       color: Colors.black.withOpacity(0.1),
-                      //       spreadRadius: 5,
-                      //       blurRadius: 20,
-                      //       offset: const Offset(0, 2),
-                      //     ),
-                      //   ]),
-                      //   child:
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      GestureDetector(
-                          onTap: () {
-                            showModalBottomSheet(
-                              context: context,
-                              backgroundColor: Colors.white,
-                              isScrollControlled: true,
-                              constraints: BoxConstraints.tightFor(
-                                height:
-                                    MediaQuery.sizeOf(context).height * 0.88,
-                              ),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(20)),
-                              ),
-                              builder: (context) {
-                                return FilterSheet(
-                                  refresh: (String val) {
-                                    setState(() {});
-                                  },
+                                    ),
+                                    const Icon(
+                                        Icons.keyboard_arrow_down_outlined)
+                                  ],
                                 );
                               },
-                            );
-                          },
-                          child: Image.asset('assets/images/filter.png')),
+                              errorBuilder: (error, stack) => const Center(
+                                child:
+                                    Text("Unable to load current location"),
+                              ),
+                              loadingBuilder: const Skeletonizer(
+                                child: Text("this is dummy location"),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    // IconButton(
+                    //   onPressed: () {
+                    //     Navigator.of(context).push(
+                    //       MaterialPageRoute(
+                    //           builder: (context) => const WishListScreen()),
+                    //     );
+                    //   },
+                    //   icon: Image.asset(
+                    //     'assets/images/heart.png',
+                    //     color: const Color(0xffCF5253),
+                    //   ),
+                    // ),
+                    Image.asset('assets/images/notification.png'),
+                    // Container(
+                    //   width: 70,
+                    //   decoration: BoxDecoration(boxShadow: [
+                    //     BoxShadow(
+                    //       color: Colors.black.withOpacity(0.1),
+                    //       spreadRadius: 5,
+                    //       blurRadius: 20,
+                    //       offset: const Offset(0, 2),
+                    //     ),
+                    //   ]),
+                    //   child:
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            backgroundColor: Colors.white,
+                            isScrollControlled: true,
+                            constraints: BoxConstraints.tightFor(
+                              height:
+                                  MediaQuery.sizeOf(context).height * 0.88,
+                            ),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(20)),
+                            ),
+                            builder: (context) {
+                              return FilterSheet(
+                                refresh: (String val) {
+                                  setState(() {});
+                                },
+                              );
+                            },
+                          );
+                        },
+                        child: Image.asset('assets/images/filter.png')),
 
-                      // ),
-                    ]),
-                  ),
+                    // ),
+                  ]),
                 ),
-                const SizedBox(height: 26),
-                Padding(
+              ),
+              const SizedBox(height: 26),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
                     'Categories',
@@ -173,97 +174,100 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                SizedBox.fromSize(
-                  size: const Size.fromHeight(90),
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    separatorBuilder: (context, index) {
-                      return const SizedBox(width: 16.0);
-                    },
-                    scrollDirection: Axis.horizontal,
-                    itemCount: Config.dashboardCategories.length,
-                    itemBuilder: (context, index) {
-                      final category = Config.dashboardCategories[index];
-                      return InkWell(
-                        onTap: () {
-                          setState(() {
-                            if (selectedCategory == index) {
-                              selectedCategory = null;
-                              ref
-                                  .read(
-                                      friendsItineraryNotifierProvider.notifier)
-                                  .resetFilter();
-                            } else {
-                              selectedCategory = index;
-                              ref
-                                  .read(
-                                      friendsItineraryNotifierProvider.notifier)
-                                  .filterList(category.title.toLowerCase());
-                            }
-                          });
+              ),
+              const SizedBox(height: 16),
+              SizedBox.fromSize(
+                size: const Size.fromHeight(90),
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  separatorBuilder: (context, index) {
+                    return const SizedBox(width: 16.0);
+                  },
+                  scrollDirection: Axis.horizontal,
+                  itemCount: Config.dashboardCategories.length,
+                  itemBuilder: (context, index) {
+                    final category = Config.dashboardCategories[index];
+                    return InkWell(
+                      onTap: () {
+                        setState(() {
+                          if (selectedCategory == index) {
+                            selectedCategory = null;
+                            ref
+                                .read(
+                                    friendsItineraryNotifierProvider.notifier)
+                                .resetFilter();
+                          } else {
+                            selectedCategory = index;
+                            ref
+                                .read(
+                                    friendsItineraryNotifierProvider.notifier)
+                                .filterList(category.title.toLowerCase());
+                          }
+                        });
 
-                          // if (category.title == mapViewState.selectedCategory) {
-                          //   mapState.update(
-                          //         categoryView: true,
-                          //         itineraryView: false,
-                          //         selectedCategory: "",
-                          //       );
-                          //   filterData = {
-                          //     'type': null,
-                          //     'rating': filters['rating'],
-                          //     'radius': filters['radius'],
-                          //     'sort_by': filters['sort_by'],
-                          //     'selected_category': "All",
-                          //     'selected_rating': filters['selected_rating'],
-                          //     'selected_distance': filters['selected_distance'],
-                          //     'selected_radius': filters['selected_radius'],
-                          //     'input': filters['input'],
-                          //     'search_term': filters['search_term'],
-                          //   };
-                          //   ref
-                          //       .read(filtersProvider.notifier)
-                          //       .updateFilter(filterData);
-                          //   ref.invalidate(itineraryNotifierProvider);
-                          //   return;
-                          // } else {
-                          //   mapState.update(
-                          //         categoryView: true,
-                          //         itineraryView: false,
-                          //         selectedCategory: category.title,
-                          //       );
-                          //   filterData = {
-                          //     'type': category.type,
-                          //     'rating': filters['rating'],
-                          //     'radius': filters['radius'],
-                          //     'sort_by': filters['sort_by'],
-                          //     'selected_category': category.title,
-                          //     'selected_rating': filters['selected_rating'],
-                          //     'selected_distance': filters['selected_distance'],
-                          //     'selected_radius': filters['selected_radius'],
-                          //     'input': filters['input'],
-                          //     'search_term': filters['search_term'],
-                          //   };
-                          //   ref
-                          //       .read(filtersProvider.notifier)
-                          //       .updateFilter(filterData);
-                          //   ref
-                          //       .read(itineraryNotifierProvider
-                          //       .notifier)
-                          //       .filteredItinerary();
-                          // }
-                        },
-                        child: CategoryItem(
-                          category: category,
-                          isSelected: selectedCategory == index,
-                          // category.title == mapViewState.selectedCategory,
-                        ),
-                      );
-                    },
-                  ),
+                        // if (category.title == mapViewState.selectedCategory) {
+                        //   mapState.update(
+                        //         categoryView: true,
+                        //         itineraryView: false,
+                        //         selectedCategory: "",
+                        //       );
+                        //   filterData = {
+                        //     'type': null,
+                        //     'rating': filters['rating'],
+                        //     'radius': filters['radius'],
+                        //     'sort_by': filters['sort_by'],
+                        //     'selected_category': "All",
+                        //     'selected_rating': filters['selected_rating'],
+                        //     'selected_distance': filters['selected_distance'],
+                        //     'selected_radius': filters['selected_radius'],
+                        //     'input': filters['input'],
+                        //     'search_term': filters['search_term'],
+                        //   };
+                        //   ref
+                        //       .read(filtersProvider.notifier)
+                        //       .updateFilter(filterData);
+                        //   ref.invalidate(itineraryNotifierProvider);
+                        //   return;
+                        // } else {
+                        //   mapState.update(
+                        //         categoryView: true,
+                        //         itineraryView: false,
+                        //         selectedCategory: category.title,
+                        //       );
+                        //   filterData = {
+                        //     'type': category.type,
+                        //     'rating': filters['rating'],
+                        //     'radius': filters['radius'],
+                        //     'sort_by': filters['sort_by'],
+                        //     'selected_category': category.title,
+                        //     'selected_rating': filters['selected_rating'],
+                        //     'selected_distance': filters['selected_distance'],
+                        //     'selected_radius': filters['selected_radius'],
+                        //     'input': filters['input'],
+                        //     'search_term': filters['search_term'],
+                        //   };
+                        //   ref
+                        //       .read(filtersProvider.notifier)
+                        //       .updateFilter(filterData);
+                        //   ref
+                        //       .read(itineraryNotifierProvider
+                        //       .notifier)
+                        //       .filteredItinerary();
+                        // }
+                      },
+                      child: CategoryItem(
+                        category: category,
+                        isSelected: selectedCategory == index,
+                        // category.title == mapViewState.selectedCategory,
+                      ),
+                    );
+                  },
                 ),
-                const SizedBox(height: 34),
-                Padding(
+              ),
+              const SizedBox(height: 34),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
                     'Friend list',
@@ -275,13 +279,16 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+              ),
+              const SizedBox(height: 16),
 
-                //****FriendList Widget ****
-                const FriendList(),
+              //****FriendList Widget ****
+              const FriendList(),
 
-                const SizedBox(height: 34),
-                Padding(
+              const SizedBox(height: 34),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
                     'Recommended for you',
@@ -293,96 +300,96 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                AsyncDataWidgetB(
-                    dataProvider: friendsItineraryNotifierProvider,
-                    dataBuilder: (context, category) {
-                      return category.isFilterApplied &&
-                              category.filterCategories.isEmpty
-                          ? const Center(child: Text("No Itinerary Found"))
-                          : category.categories.isEmpty
-                              ? const Center(child: Text("No Itinerary Found"))
-                              : ListView.separated(
-                                  shrinkWrap: true,
-                                  itemCount: category.isFilterApplied
-                                      ? category.filterCategories.length
-                                      : category.categories.length,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16),
-                                  separatorBuilder: (context, index) =>
-                                      const SizedBox(height: 12.0),
-                                  itemBuilder: (context, index) {
-                                    final data = category.isFilterApplied
-                                        ? category.filterCategories[index]
-                                        : category.categories[index];
-                                    return InkWell(
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                RestaurantDetailScreen(
-                                              types: data.type,
-                                              address: data.vicinity,
-                                              distance:
-                                                  data.distance.toString(),
-                                              walkingTime: convertMinutes(
-                                                  int.parse(data.walkingTime
-                                                      .toString())),
-                                              images: data.photoUrls,
-                                              name: data.name,
-                                              rating: data.rating.toString(),
-                                              locationId: data.placeId ?? "",
-                                            ),
+              ),
+              const SizedBox(height: 16),
+              AsyncDataWidgetB(
+                  dataProvider: friendsItineraryNotifierProvider,
+                  dataBuilder: (context, category) {
+                    return category.isFilterApplied &&
+                            category.filterCategories.isEmpty
+                        ? const Center(child: Text("No Itinerary Found"))
+                        : category.categories.isEmpty
+                            ? const Center(child: Text("No Itinerary Found"))
+                            : ListView.separated(
+                                shrinkWrap: true,
+                                itemCount: category.isFilterApplied
+                                    ? category.filterCategories.length
+                                    : category.categories.length,
+                                physics: const NeverScrollableScrollPhysics(),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16),
+                                separatorBuilder: (context, index) =>
+                                    const SizedBox(height: 12.0),
+                                itemBuilder: (context, index) {
+                                  final data = category.isFilterApplied
+                                      ? category.filterCategories[index]
+                                      : category.categories[index];
+                                  return InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              RestaurantDetailScreen(
+                                            types: data.type,
+                                            address: data.vicinity,
+                                            distance:
+                                                data.distance.toString(),
+                                            walkingTime: convertMinutes(
+                                                int.parse(data.walkingTime
+                                                    .toString())),
+                                            images: data.photoUrls,
+                                            name: data.name,
+                                            rating: data.rating.toString(),
+                                            locationId: data.placeId ?? "",
                                           ),
-                                        );
-                                      },
-                                      child: RecommendedItem(
-                                        address: data.vicinity.toString(),
-                                        type: formatCategory(
-                                            data.type ?? ["All"]),
-                                        image: data.photoUrls!.isEmpty
-                                            ? ""
-                                            : data.photoUrls?[0],
-                                        name: data.name,
-                                        rating: data.rating.toString(),
-                                        walkingTime: convertMinutes(int.parse(
-                                            data.walkingTime.toString())),
-                                        distance: data.distance.toString(),
-                                      ),
-                                    );
-                                  },
-                                );
-                    },
-                    loadingBuilder: Skeletonizer(
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        itemCount: 3,
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 12.0),
-                        itemBuilder: (context, index) {
-                          return const RecommendedItem(
-                            address: "jkjljkljkl",
-                            type: "cbcbcb",
-                            image: "data.photo",
-                            name: "data.name",
-                            rating: " data.rating.toString()",
-                            walkingTime: "data.walkingTime.toString()",
-                            distance: "data.distance.toString()",
-                          );
-                        },
-                      ),
+                                        ),
+                                      );
+                                    },
+                                    child: RecommendedItem(
+                                      address: data.vicinity.toString(),
+                                      type: formatCategory(
+                                          data.type ?? ["All"]),
+                                      image: data.photoUrls!.isEmpty
+                                          ? ""
+                                          : data.photoUrls?[0],
+                                      name: data.name,
+                                      rating: data.rating.toString(),
+                                      walkingTime: convertMinutes(int.parse(
+                                          data.walkingTime.toString())),
+                                      distance: data.distance.toString(),
+                                    ),
+                                  );
+                                },
+                              );
+                  },
+                  loadingBuilder: Skeletonizer(
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: 3,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 12.0),
+                      itemBuilder: (context, index) {
+                        return const RecommendedItem(
+                          address: "jkjljkljkl",
+                          type: "cbcbcb",
+                          image: "data.photo",
+                          name: "data.name",
+                          rating: " data.rating.toString()",
+                          walkingTime: "data.walkingTime.toString()",
+                          distance: "data.distance.toString()",
+                        );
+                      },
                     ),
-                    errorBuilder: (error, stack) =>
-                        const Center(child: Text("No Itinerary Found"))),
+                  ),
+                  errorBuilder: (error, stack) =>
+                      const Center(child: Text("No Itinerary Found"))),
 
-                const SizedBox(
-                  height: 20,
-                )
-              ],
-            ),
+              const SizedBox(
+                height: 20,
+              )
+            ],
           ),
         ),
       ),

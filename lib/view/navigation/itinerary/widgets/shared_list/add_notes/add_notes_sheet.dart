@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../../../utils/common/common.dart';
 import '../../../../../../utils/common/extensions.dart';
+import '../../../../profile/profile.dart';
 import 'model/notes_model.dart';
 
 class AddNotesSheet extends ConsumerStatefulWidget {
@@ -141,8 +142,11 @@ class _AddNotesSheetState extends ConsumerState<AddNotesSheet> {
                                   ClipOval(
                                     child: SizedBox.square(
                                       dimension: 30,
-                                      child: ImageWidget(
-                                          url:user.imageUrl),
+                                      child: user.imageUrl == null
+                                          ? UserInitials(
+                                              name: user.userName!,
+                                            )
+                                          : ImageWidget(url: user.imageUrl!),
                                     ),
                                   ),
                                   const SizedBox(width: 16.0),
