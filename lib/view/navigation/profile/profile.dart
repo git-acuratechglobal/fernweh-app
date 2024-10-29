@@ -375,7 +375,7 @@ class UserInitials extends StatelessWidget {
       height: 50,
       // Set height
       child: Text(
-        '$firstInitial$lastInitial',
+        '${firstInitial.toUpperCase()}${lastInitial.toUpperCase()}',
         style: const TextStyle(
           color: Colors.white,
           fontSize: 18,
