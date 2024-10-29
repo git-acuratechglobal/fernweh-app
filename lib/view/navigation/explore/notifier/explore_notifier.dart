@@ -1,4 +1,5 @@
 import 'package:fernweh/view/navigation/friends_list/controller/friends_notifier.dart';
+import 'package:fernweh/view/navigation/itinerary/notifier/all_friends_notifier.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../services/api_service/api_service.dart';
@@ -9,18 +10,6 @@ import '../../itinerary/models/itinerary_places.dart';
 import '../../map/model/category.dart';
 
 part 'explore_notifier.g.dart';
-
-@Riverpod(keepAlive: true)
-class ExploreNotifier extends _$ExploreNotifier {
-  @override
-  FutureOr<List<Category>> build() async {
-    final position = await ref.read(currentPositionProvider.future);
-    final data = await ref.watch(apiServiceProvider).getCategory(
-        position.latitude.toString(), position.longitude.toString(),
-        filter: {});
-    return data;
-  }
-}
 
 @Riverpod(keepAlive: true)
 class FriendsItineraryNotifier extends _$FriendsItineraryNotifier {
@@ -44,6 +33,9 @@ class FriendsItineraryNotifier extends _$FriendsItineraryNotifier {
             'Failed to fetch itinerary for friend ID $friendId: ${e.toString()}');
       }
     }
+    await ref
+        .read(allFriendsNotifierProvider.notifier)
+        .getFriendsItineraries(friendsItineraryList: friendItineray);
     final List<int> itineraryIds =
         friendItineray.map((e) => e.id ?? 0).toList();
     final List<ItineraryPlaces> category = [];

@@ -7,7 +7,7 @@ part of 'category_notifier.dart';
 // **************************************************************************
 
 String _$itineraryNotifierHash() =>
-    r'5365378e9b04570d91e9c782c69b9b938e97920a'; /////*************THIS IS USED FOR MAP SCREEN DATA PROVIDER *****************////////////
+    r'9c515016addf651d5500c21380f015c1a66cf9b9'; /////*************THIS IS USED FOR MAP SCREEN DATA PROVIDER *****************////////////
 ///
 /// Copied from [ItineraryNotifier].
 @ProviderFor(ItineraryNotifier)

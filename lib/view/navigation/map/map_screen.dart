@@ -40,6 +40,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Map<String, dynamic> filterData = {};
   bool showSearchMessage = false;
   LatLng? _latLng;
+
   void searchMessage() {
     Position position = Position(
         latitude: _latLng!.latitude,
@@ -57,6 +58,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       floatingButtonsHide = false;
     });
   }
+
   LatLngBounds calculateBounds(List<Marker> markers) {
     assert(markers.isNotEmpty);
     double minLat = markers.first.position.latitude;
@@ -67,8 +69,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     for (var marker in markers) {
       if (marker.position.latitude < minLat) minLat = marker.position.latitude;
       if (marker.position.latitude > maxLat) maxLat = marker.position.latitude;
-      if (marker.position.longitude < minLng) minLng = marker.position.longitude;
-      if (marker.position.longitude > maxLng) maxLng = marker.position.longitude;
+      if (marker.position.longitude < minLng)
+        minLng = marker.position.longitude;
+      if (marker.position.longitude > maxLng)
+        maxLng = marker.position.longitude;
     }
 
     return LatLngBounds(
@@ -76,11 +80,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       northeast: LatLng(maxLat, maxLng),
     );
   }
+
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_){
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.listenManual<Position?>(positionProvider, (previous, current) {
         if (current != null) {
           mapController.animateCamera(
@@ -91,7 +96,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         }
       });
     });
-
   }
 
   @override
@@ -279,9 +283,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       mapController = controller;
                                       if (category.isNotEmpty) {
                                         final bounds = calculateBounds(markers);
-                                        Future.delayed(const Duration(milliseconds: 500), () async {
+                                        Future.delayed(
+                                            const Duration(milliseconds: 500),
+                                            () async {
                                           await mapController.animateCamera(
-                                            CameraUpdate.newLatLngBounds(bounds, 50), // Adjust padding as needed
+                                            CameraUpdate.newLatLngBounds(bounds,
+                                                50), // Adjust padding as needed
                                           );
                                         });
                                       } else {
@@ -346,35 +353,39 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 (BuildContext context, itineraryPlace) {
                               markers.clear();
                               if (itineraryPlace.isNotEmpty) {
-                              for (var data in itineraryPlace) {
-                                markers.add(Marker(
-                                    icon: icon.value ??
-                                        BitmapDescriptor.defaultMarker,
-                                    consumeTapEvents: true,
-                                    markerId:
-                                        MarkerId(data.locationId.toString()),
-                                    position: LatLng(
-                                      double.parse(data.latitude.toString()),
-                                      double.parse(data.longitude.toString()),
-                                    ),
-                                    onTap: () async {
-                                      final latlng = LatLng(
+                                for (var data in itineraryPlace) {
+                                  markers.add(Marker(
+                                      icon: icon.value ??
+                                          BitmapDescriptor.defaultMarker,
+                                      consumeTapEvents: true,
+                                      markerId:
+                                          MarkerId(data.locationId.toString()),
+                                      position: LatLng(
                                         double.parse(data.latitude.toString()),
                                         double.parse(data.longitude.toString()),
-                                      );
-                                      await mapController
-                                          .animateCamera(
-                                              CameraUpdate.newLatLng(latlng))
-                                          .then((val) {
-                                        // itineraryMarkerInfo(data);
-                                      });
-                                      setState(() {
-                                        _scrollToSelectedItineraryPlace(
-                                            itineraryPlace, data.id.toString());
-                                        selectedPlaceId = data.id.toString();
-                                      });
-                                    }));
-                              }}
+                                      ),
+                                      onTap: () async {
+                                        final latlng = LatLng(
+                                          double.parse(
+                                              data.latitude.toString()),
+                                          double.parse(
+                                              data.longitude.toString()),
+                                        );
+                                        await mapController
+                                            .animateCamera(
+                                                CameraUpdate.newLatLng(latlng))
+                                            .then((val) {
+                                          // itineraryMarkerInfo(data);
+                                        });
+                                        setState(() {
+                                          _scrollToSelectedItineraryPlace(
+                                              itineraryPlace,
+                                              data.id.toString());
+                                          selectedPlaceId = data.id.toString();
+                                        });
+                                      }));
+                                }
+                              }
 
                               return GoogleMap(
                                 zoomControlsEnabled: false,
@@ -390,9 +401,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 onMapCreated: (controller) async {
                                   mapController = controller;
                                   final bounds = calculateBounds(markers);
-                                  Future.delayed(const Duration(milliseconds: 500), () async {
+                                  Future.delayed(
+                                      const Duration(milliseconds: 500),
+                                      () async {
                                     await mapController.animateCamera(
-                                      CameraUpdate.newLatLngBounds(bounds, 50), // Adjust padding as needed
+                                      CameraUpdate.newLatLngBounds(bounds,
+                                          50), // Adjust padding as needed
                                     );
                                   });
                                 },
@@ -622,7 +636,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                         userItinerary?.id ?? 0);
                                                 // _itineraryView = true;
                                                 // _categoryView = false;
-                                                ref.invalidate(itineraryNotifierProvider);
+                                                ref.invalidate(
+                                                    itineraryNotifierProvider);
                                               }
                                               // });
                                             },

@@ -22,7 +22,7 @@ final addressProvider = FutureProvider<String>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AddressRef = FutureProviderRef<String>;
-String _$currentPositionHash() => r'9844c279ec434921e24c9cfe3aafcf297f953666';
+String _$currentPositionHash() => r'b3a936afe3cfec992556569a12599201f395acaf';
 
 /// See also [CurrentPosition].
 @ProviderFor(CurrentPosition)

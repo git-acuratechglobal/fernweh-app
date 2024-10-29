@@ -6,6 +6,7 @@ import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
+import 'package:fernweh/view/navigation/itinerary/notifier/all_friends_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/shared_list.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,8 @@ import '../../../../utils/common/app_button.dart';
 import '../../../../utils/common/common.dart';
 import '../../../../utils/common/config.dart';
 import '../../../auth/signup/profile_setup/create_profile_screen.dart';
+import '../../friends_list/friend_details/friend_detail_screen.dart';
+import '../../friends_list/model/friends_itinerary.dart';
 import '../models/itinerary_model.dart';
 import '../models/states/itinerary_state.dart';
 import 'my_curated_list/curated_list_item_view/itenary_details_screen.dart';
@@ -38,7 +41,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 2, vsync: this);
+    tabController = TabController(length: 3, vsync: this);
     tabController.addListener(() {
       setState(() {
         tabIndex = tabController.index;
@@ -113,6 +116,8 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
               ],
             ),
             TabBar(
+              tabAlignment: TabAlignment.start,
+              isScrollable: true,
               controller: tabController,
               labelColor: Theme.of(context).colorScheme.secondary,
               indicatorColor: Theme.of(context).colorScheme.secondary,
@@ -132,6 +137,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
               tabs: const [
                 Tab(child: Text("My Curated List")),
                 Tab(child: Text("Shared List")),
+                Tab(child: Text("Friends List")),
               ],
             ),
             Expanded(
@@ -163,8 +169,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                             .toList();
                         final localCollaborateList = ref
                             .watch(localStorageServiceProvider)
-                            .getCollaborateList(
-                            sharedIteneries ?? []);
+                            .getCollaborateList(sharedIteneries ?? []);
                         return filteredList.isEmpty
                             ? Center(
                                 child: Column(
@@ -321,10 +326,11 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                 padding:
                                                     const EdgeInsets.all(24),
                                                 itemCount:
-                                                localCollaborateList.length,
+                                                    localCollaborateList.length,
                                                 itemBuilder: (context, index) {
                                                   final itinary =
-                                                      localCollaborateList[index]
+                                                      localCollaborateList[
+                                                              index]
                                                           .itinerary;
                                                   return Column(
                                                     key: ValueKey(
@@ -358,7 +364,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                         },
                                                         child: MyCreatedItinerary(
                                                             placeCount:
-                                                            localCollaborateList[
+                                                                localCollaborateList[
                                                                             index]
                                                                         .placesCount ??
                                                                     0,
@@ -391,16 +397,17 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                     }
 
                                                     // Reorder the itinerary items
-                                                    final item = localCollaborateList
-                                                        .removeAt(oldIndex);
+                                                    final item =
+                                                        localCollaborateList
+                                                            .removeAt(oldIndex);
                                                     localCollaborateList.insert(
                                                         newIndex, item);
                                                   });
                                                   ref
                                                       .read(
-                                                      localStorageServiceProvider)
+                                                          localStorageServiceProvider)
                                                       .setCollaborateList(
-                                                      localCollaborateList);
+                                                          localCollaborateList);
                                                 },
                                               ),
                                             ])),
@@ -453,7 +460,8 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                       ),
                     ),
                   ),
-                  SharedListTab(isMapView: mapView)
+                  SharedListTab(isMapView: mapView),
+                  const AllFriends(),
                 ],
               ),
             ),
@@ -676,6 +684,315 @@ class _CreateItineraryState extends ConsumerState<CreateItinerary>
           ),
         ],
       ),
+    );
+  }
+}
+
+class AllFriends extends ConsumerStatefulWidget {
+  const AllFriends({super.key});
+
+  @override
+  ConsumerState<AllFriends> createState() => _AllFriendsState();
+}
+
+class _AllFriendsState extends ConsumerState<AllFriends> {
+  @override
+  Widget build(BuildContext context) {
+    return AsyncDataWidgetB(
+      dataProvider: allFriendsNotifierProvider,
+      dataBuilder: (BuildContext context, data) {
+        return data!.isEmpty
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("No itinerary found!"),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      minimumSize: const Size(60, 40),
+                    ),
+                    onPressed: () {
+                      ref.invalidate(allFriendsNotifierProvider);
+                    },
+                    child: const Text(
+                      "Refresh",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ),
+                ],
+              )
+            : ListView.separated(
+                padding: const EdgeInsets.all(24),
+                itemCount: data.length,
+                itemBuilder: (context, index) {
+                  return InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ItenaryDetailsScreen(
+                            title: data[index].name ?? "",
+                            itineraryId: data[index].id ?? 0,
+                          ),
+                        ),
+                      );
+                    },
+                    child: AllFriendsWidget(
+                      itinary: data[index],
+
+                    ),
+                  );
+                }, separatorBuilder: (BuildContext context, int index) {
+              return    const SizedBox(height: 10,);
+        },
+              );
+      },
+      loadingBuilder: Skeletonizer(
+          child: GridView.builder(
+        padding: const EdgeInsets.all(24),
+        itemCount: 6,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 25,
+          mainAxisSpacing: 25,
+          childAspectRatio: 0.75,
+        ),
+        itemBuilder: (context, index) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      width: 1,
+                      color: const Color(0xffE2E2E2),
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.asset(
+                        "assets/images/avatar1.png",
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  )),
+              const SizedBox(
+                height: 10,
+              ),
+              const Text(
+                "dummy name",
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          );
+        },
+      )),
+      errorBuilder: (error, stack) => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(error.toString()),
+          const SizedBox(
+            height: 10,
+          ),
+          OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              minimumSize: const Size(60, 40),
+            ),
+            onPressed: () {
+              ref.invalidate(allFriendsNotifierProvider);
+            },
+            child: const Text(
+              "Refresh",
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+class AllFriendsWidget extends StatelessWidget {
+  const AllFriendsWidget(
+      {super.key,
+        required this.itinary,
+       });
+
+  final FriendsItinerary itinary;
+  // final int placeCount;
+  // final List<Can> editList;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          height: 140,
+          width: MediaQuery.sizeOf(context).width - 50,
+          padding: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              width: 1,
+              color: const Color(0xffE2E2E2),
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              SizedBox(
+                height: 150,
+                width: 120,
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: ImageWidget(
+                        url:itinary.imageUrl)),
+              ),
+              const SizedBox(width: 12.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      itinary.name ?? "",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontVariations: FVariations.w700,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    // Text(
+                    //   "$placeCount locations",
+                    //   style: const TextStyle(
+                    //       color: Color(0xFF505050),
+                    //       fontSize: 16,
+                    //       fontWeight: FontWeight.w400),
+                    // ),
+                    // const SizedBox(
+                    //   height: 10,
+                    // ),
+                    // const Text(
+                    //   'Shared with',
+                    //   style: TextStyle(
+                    //     color: Color(0xFF505050),
+                    //     fontSize: 12,
+                    //   ),
+                    // ),
+                    // Flexible(
+                    //   flex: 1,
+                    //   child: GestureDetector(onTap: (){
+                    //     showModalBottomSheet(
+                    //       context: context,
+                    //       backgroundColor: Colors.white,
+                    //       isScrollControlled: true,
+                    //       constraints: BoxConstraints.tightFor(
+                    //         height: MediaQuery.sizeOf(context).height * 0.85,
+                    //       ),
+                    //       shape: const RoundedRectangleBorder(
+                    //         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    //       ),
+                    //       builder: (context) {
+                    //         return  UnShareItenarySheet();
+                    //       },
+                    //     );
+                    //
+                    //   },child: AvatarList(images: editList)),
+                    // )
+                    // const Text(
+                    //   'Shared with',
+                    //   style: TextStyle(
+                    //     color: Color(0xFF505050),
+                    //     fontSize: 12,
+                    //   ),
+                    // ),
+                    // Flexible(
+                    //   flex: 1,
+                    //   child: AvatarList(
+                    //       images: widget.itinerary.canView!.isEmpty
+                    //           ? widget.itinerary.canEdit
+                    //           : widget.itinerary.canView),
+                    // )
+                  ],
+                ),
+              ),
+              // Column(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     GestureDetector(
+              //         onTap: () {
+              //           showModalBottomSheet(
+              //             context: context,
+              //             backgroundColor: Colors.white,
+              //             isScrollControlled: true,
+              //             constraints: BoxConstraints.tightFor(
+              //               height: MediaQuery.sizeOf(context).height * 0.80,
+              //             ),
+              //             shape: const RoundedRectangleBorder(
+              //               borderRadius:
+              //               BorderRadius.vertical(top: Radius.circular(20)),
+              //             ),
+              //             builder: (context) {
+              //               return EditItenerary(
+              //                 iteneraryPhoto: itinary.imageUrl,
+              //                 iteneraryName: itinary.name ?? "",
+              //                 id: itinary.id,
+              //                 type: int.parse(itinary.type ?? ""),
+              //               );
+              //             },
+              //           );
+              //         },
+              //         child: Image.asset('assets/images/edit.png')),
+              //     const SizedBox(
+              //       height: 10,
+              //     ),
+              //     GestureDetector(
+              //       onTap: () {
+              //         showModalBottomSheet(
+              //           context: context,
+              //           backgroundColor: Colors.white,
+              //           isScrollControlled: true,
+              //           constraints: BoxConstraints.tightFor(
+              //             height: MediaQuery.sizeOf(context).height * 0.85,
+              //           ),
+              //           shape: const RoundedRectangleBorder(
+              //             borderRadius:
+              //             BorderRadius.vertical(top: Radius.circular(20)),
+              //           ),
+              //           builder: (context) {
+              //             return AddNotesSheet(
+              //               itineraryId: itinary.id ?? 0,
+              //             );
+              //           },
+              //         );
+              //       },
+              //       child: Image.asset(
+              //         'assets/images/note.png',
+              //       ),
+              //     ),
+              //     ShareIcon(itinary.id.toString())
+              //   ],
+              // )
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
