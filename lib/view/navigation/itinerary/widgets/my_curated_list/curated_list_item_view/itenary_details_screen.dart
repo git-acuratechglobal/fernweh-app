@@ -34,6 +34,7 @@ class ItenaryDetailsScreen extends ConsumerStatefulWidget {
 }
 
 class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
+
   @override
   void initState() {
     super.initState();
@@ -252,7 +253,29 @@ class _DetailPageState extends ConsumerState<DetailPage> {
   final CustomInfoWindowController _customInfoWindowController =
       CustomInfoWindowController();
   late GoogleMapController mapController;
+  LatLngBounds calculateBounds(List<Marker> markers) {
+    assert(markers.isNotEmpty);
+    double minLat = markers.first.position.latitude;
+    double maxLat = markers.first.position.latitude;
+    double minLng = markers.first.position.longitude;
+    double maxLng = markers.first.position.longitude;
 
+    for (var marker in markers) {
+      if (marker.position.latitude < minLat) minLat = marker.position.latitude;
+      if (marker.position.latitude > maxLat) maxLat = marker.position.latitude;
+      if (marker.position.longitude < minLng) {
+        minLng = marker.position.longitude;
+      }
+      if (marker.position.longitude > maxLng) {
+        maxLng = marker.position.longitude;
+      }
+    }
+
+    return LatLngBounds(
+      southwest: LatLng(minLat, minLng),
+      northeast: LatLng(maxLat, maxLng),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     final icon = ref.watch(bitmapIconProvider);
@@ -302,12 +325,17 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                     mapController = controller;
                     _customInfoWindowController.googleMapController =
                         controller;
-                    final latlng = LatLng(
-                      double.parse(itineraryPlace[0].latitude.toString()),
-                      double.parse(itineraryPlace[0].longitude.toString()),
-                    );
-                    await mapController
-                        .animateCamera(CameraUpdate.newLatLng(latlng));
+                    if (itineraryPlace.isNotEmpty) {
+                      final bounds = calculateBounds(markers);
+                      Future.delayed(
+                          const Duration(milliseconds: 500),
+                              () async {
+                            await mapController.animateCamera(
+                              CameraUpdate.newLatLngBounds(bounds,
+                                  50), // Adjust padding as needed
+                            );
+                          });
+                    }
                   },
                   onCameraMove: (position) async {
                     _customInfoWindowController.onCameraMove!();

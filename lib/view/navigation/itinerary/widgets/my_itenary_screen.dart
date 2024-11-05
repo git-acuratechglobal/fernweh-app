@@ -157,13 +157,14 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                         final localStorageItinerary = ref
                             .watch(localStorageServiceProvider)
                             .getUserItinerary(
-                                userItinerary.userIteneries ?? []);
+                                userItinerary.userItinerary.userIteneries ??
+                                    []);
                         final List<Itenery> filteredList =
                             localStorageItinerary!
                                 .where((e) => e.placesCount != 0)
                                 .toList();
                         List<Itenery>? sharedIteneries = userItinerary
-                            .sharedIteneries
+                            .userItinerary.sharedIteneries
                             ?.where((e) =>
                                 e.canEdit?.any((i) => i.id == user?.id) ??
                                 false)
@@ -251,17 +252,20 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                     }
                                                   },
                                                   child: MyCreatedItinerary(
-                                                      placeCount: filteredList[
-                                                                  index]
-                                                              .placesCount ??
-                                                          0,
-                                                      itinary: itinary!,
-                                                      editList: [
-                                                        ...?filteredList[index]
-                                                            .canEdit,
-                                                        ...?filteredList[index]
-                                                            .canView
-                                                      ]),
+                                                    placeCount:
+                                                        filteredList[index]
+                                                                .placesCount ??
+                                                            0,
+                                                    itinary: itinary!,
+                                                    editList: [
+                                                      ...?filteredList[index]
+                                                          .canEdit,
+                                                      ...?filteredList[index]
+                                                          .canView
+                                                    ],
+                                                    placeUrls: userItinerary
+                                                        .itineraryPhotos[itinary.id],
+                                                  ),
                                                 ),
                                                 const SizedBox(height: 10),
                                               ],
@@ -432,6 +436,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                               placeCount: 0,
                               itinary: userItinerarydummyList[index],
                               editList: const [],
+                              placeUrls: [],
                             );
                           },
                           separatorBuilder: (BuildContext context, int index) {

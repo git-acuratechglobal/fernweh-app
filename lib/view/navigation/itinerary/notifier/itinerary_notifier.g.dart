@@ -6,11 +6,11 @@ part of 'itinerary_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getUserItineraryHash() => r'd55908a9da2f0fd8af8c334db305870f0e3620fd';
+String _$getUserItineraryHash() => r'b8d7d6cf00c00f62e6947e3f9642b372217d8e52';
 
 /// See also [getUserItinerary].
 @ProviderFor(getUserItinerary)
-final getUserItineraryProvider = FutureProvider<UserItinerary>.internal(
+final getUserItineraryProvider = FutureProvider<ItineraryTabState>.internal(
   getUserItinerary,
   name: r'getUserItineraryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -22,7 +22,7 @@ final getUserItineraryProvider = FutureProvider<UserItinerary>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef GetUserItineraryRef = FutureProviderRef<UserItinerary>;
+typedef GetUserItineraryRef = FutureProviderRef<ItineraryTabState>;
 String _$userItineraryNotifierHash() =>
     r'205994ea6b28cfba10da18490a3fa8c12638b70c';
 

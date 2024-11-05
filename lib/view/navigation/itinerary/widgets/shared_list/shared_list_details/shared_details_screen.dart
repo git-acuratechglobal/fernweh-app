@@ -40,6 +40,30 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
   late GoogleMapController mapController;
   bool _isHide = false;
 
+  LatLngBounds calculateBounds(List<Marker> markers) {
+    assert(markers.isNotEmpty);
+    double minLat = markers.first.position.latitude;
+    double maxLat = markers.first.position.latitude;
+    double minLng = markers.first.position.longitude;
+    double maxLng = markers.first.position.longitude;
+
+    for (var marker in markers) {
+      if (marker.position.latitude < minLat) minLat = marker.position.latitude;
+      if (marker.position.latitude > maxLat) maxLat = marker.position.latitude;
+      if (marker.position.longitude < minLng) {
+        minLng = marker.position.longitude;
+      }
+      if (marker.position.longitude > maxLng) {
+        maxLng = marker.position.longitude;
+      }
+    }
+
+    return LatLngBounds(
+      southwest: LatLng(minLat, minLng),
+      northeast: LatLng(maxLat, maxLng),
+    );
+  }
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -53,8 +77,7 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final icon =
-        ref.watch(bitmapIconProvider);
+    final icon = ref.watch(bitmapIconProvider);
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: ActionButton(
@@ -98,7 +121,9 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                             BorderRadius.vertical(top: Radius.circular(20)),
                       ),
                       builder: (context) {
-                        return  AddNotesSheet(itineraryId: widget.itinerary.itinerary!.id??0,);
+                        return AddNotesSheet(
+                          itineraryId: widget.itinerary.itinerary!.id ?? 0,
+                        );
                       },
                     );
                   },
@@ -185,16 +210,20 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                                           mapController = controller;
                                           _customInfoWindowController
                                               .googleMapController = controller;
-                                          final latlng = LatLng(
-                                            double.parse(itineraryPlace[0]
-                                                .latitude
-                                                .toString()),
-                                            double.parse(itineraryPlace[0]
-                                                .longitude
-                                                .toString()),
-                                          );
-                                          await mapController.animateCamera(
-                                              CameraUpdate.newLatLng(latlng));
+                                          if (itineraryPlace.isNotEmpty) {
+                                            final bounds =
+                                                calculateBounds(markers);
+                                            Future.delayed(
+                                                const Duration(
+                                                    milliseconds: 500),
+                                                () async {
+                                              await mapController.animateCamera(
+                                                CameraUpdate.newLatLngBounds(
+                                                    bounds,
+                                                    50), // Adjust padding as needed
+                                              );
+                                            });
+                                          }
                                         },
                                         onCameraMove: (position) async {
                                           _customInfoWindowController
@@ -262,8 +291,8 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                                                       selection: data.type == 1
                                                           ? "WANT TO VISIT"
                                                           : data.type == 2
-                                                          ? "VISITED"
-                                                          : "WILL VISIT AGAIN",
+                                                              ? "VISITED"
+                                                              : "WILL VISIT AGAIN",
                                                       placeType:
                                                           data.placeTypes ?? "",
                                                       name: data.name,

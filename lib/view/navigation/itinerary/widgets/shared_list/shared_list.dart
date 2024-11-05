@@ -36,7 +36,7 @@ class _SharedListTabState extends ConsumerState<SharedListTab> {
           dataBuilder: (context, sharedItinerary) {
             final localSharedList = ref
                 .watch(localStorageServiceProvider)
-                .getSharedItinerary(sharedItinerary.sharedIteneries ?? []);
+                .getSharedItinerary(sharedItinerary.userItinerary.sharedIteneries ?? []);
             return localSharedList!.isEmpty
                 ? Center(
                     child: Column(

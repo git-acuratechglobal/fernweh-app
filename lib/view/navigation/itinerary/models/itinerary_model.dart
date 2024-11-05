@@ -14,7 +14,9 @@ class UserItinerary {
 
   factory UserItinerary.fromJson(Map<String, dynamic> json) =>
       _$UserItineraryFromJson(json);
+
   Map<String, dynamic> toJson() => _$UserItineraryToJson(this);
+
   List<Itenery> getCombinedItineraries(int currentUserId) {
     List<Itenery> combinedItineraries = [];
     if (userIteneries != null) {
@@ -45,6 +47,7 @@ class Itenery {
 
   factory Itenery.fromJson(Map<String, dynamic> json) =>
       _$IteneryFromJson(json);
+
   Map<String, dynamic> toJson() => _$IteneryToJson(this);
 }
 
@@ -61,10 +64,12 @@ class Can {
   final String? image;
 
   factory Can.fromJson(Map<String, dynamic> json) => _$CanFromJson(json);
+
   Map<String, dynamic> toJson() => _$CanToJson(this);
+
   String? get imageUrl {
     if (image != null) {
-      return "http://fernweh.acublock.in/public/$image";;
+      return "http://fernweh.acublock.in/public/$image";
     } else {
       return null;
     }
@@ -117,18 +122,16 @@ class Itinerary {
 
   factory Itinerary.fromJson(Map<String, dynamic> json) =>
       _$ItineraryFromJson(json);
+
   Map<String, dynamic> toJson() => _$ItineraryToJson(this);
 
-
-  String get imageUrl{
-    if(image==null){
+  String get imageUrl {
+    if (image == null) {
       return "https://cdn-icons-png.flaticon.com/512/2343/2343940.png";
-    }else{
+    } else {
       return "http://fernweh.acublock.in/public/$image";
     }
   }
-
-
 }
 
 List<Itinerary> get userItinerarydummyList {
@@ -147,4 +150,12 @@ List<Itinerary> get userItinerarydummyList {
         haveAccess: '',
         shareUrl: '');
   });
+}
+
+class ItineraryTabState {
+  UserItinerary userItinerary;
+  Map<int, List<String>> itineraryPhotos;
+
+  ItineraryTabState(
+      {required this.userItinerary, required this.itineraryPhotos});
 }

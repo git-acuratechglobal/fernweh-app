@@ -2,8 +2,11 @@ import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/view/navigation/itinerary/models/itinerary_model.dart';
 import 'package:fernweh/view/navigation/itinerary/widgets/my_curated_list/share_your_itinerary/share_itenary_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../utils/common/extensions.dart';
+import '../../models/itinerary_places.dart';
+import '../../notifier/itinerary_notifier.dart';
 import '../my_itenary_screen.dart';
 import '../shared_list/add_notes/add_notes_sheet.dart';
 import '../shared_list/shared_list_details/shared_details_screen.dart';
@@ -15,12 +18,13 @@ class MyCuratedListTab extends StatelessWidget {
     required this.itinary,
     required this.isEditing,
     required this.isSelected,
+    this.placeUrls
   });
 
   final Itinerary itinary;
   final bool isEditing;
   final bool isSelected;
-
+  final List<String>? placeUrls;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -43,9 +47,28 @@ class MyCuratedListTab extends StatelessWidget {
                 children: [
                   ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child:ImageWidget(
-                          url:itinary.imageUrl)
-                         ),
+                      child: placeUrls == null
+                          ? ImageWidget(url: itinary.imageUrl)
+                          : GridView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          itemCount: 4,
+                          shrinkWrap: true,
+                          gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 4.0,
+                            crossAxisSpacing: 4.0,
+                          ),
+                          itemBuilder: (context, index) {
+                            if (index < placeUrls!.length) {
+                              return ImageWidget(url: placeUrls![index]);
+                            } else {
+                              return Container(
+                                color: Colors.grey[300],
+                              );
+                            }
+                          })),
                   Positioned(
                     top: 1,
                     right: 1,
@@ -74,16 +97,24 @@ class MyCuratedListTab extends StatelessWidget {
   }
 }
 
-class MyCreatedItinerary extends StatelessWidget {
+class MyCreatedItinerary extends ConsumerStatefulWidget {
   const MyCreatedItinerary(
       {super.key,
       required this.itinary,
       required this.placeCount,
-      required this.editList});
+      required this.editList,
+      this.placeUrls});
 
   final Itinerary itinary;
   final int placeCount;
   final List<Can> editList;
+  final List<String>? placeUrls;
+
+  @override
+  ConsumerState<MyCreatedItinerary> createState() => _MyCreatedItineraryState();
+}
+
+class _MyCreatedItineraryState extends ConsumerState<MyCreatedItinerary> {
 
   @override
   Widget build(BuildContext context) {
@@ -109,8 +140,28 @@ class MyCreatedItinerary extends StatelessWidget {
                 width: 120,
                 child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: ImageWidget(
-                            url:itinary.imageUrl)),
+                    child: widget.placeUrls == null
+                        ? ImageWidget(url: widget.itinary.imageUrl)
+                        : GridView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: EdgeInsets.zero,
+                            itemCount: 4,
+                            shrinkWrap: true,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 4.0,
+                              crossAxisSpacing: 4.0,
+                            ),
+                            itemBuilder: (context, index) {
+                              if (index < widget.placeUrls!.length) {
+                                return ImageWidget(url: widget.placeUrls![index]);
+                              } else {
+                                return Container(
+                                  color: Colors.grey[300],
+                                );
+                              }
+                            })),
               ),
               const SizedBox(width: 12.0),
               Expanded(
@@ -120,7 +171,7 @@ class MyCreatedItinerary extends StatelessWidget {
                     Text(
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      itinary.name ?? "",
+                      widget.itinary.name ?? "",
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 16,
@@ -131,7 +182,7 @@ class MyCreatedItinerary extends StatelessWidget {
                       height: 10,
                     ),
                     Text(
-                      "$placeCount locations",
+                      "${widget.placeCount} locations",
                       style: const TextStyle(
                           color: Color(0xFF505050),
                           fontSize: 16,
@@ -149,23 +200,26 @@ class MyCreatedItinerary extends StatelessWidget {
                     ),
                     Flexible(
                       flex: 1,
-                      child: GestureDetector(onTap: (){
-                        showModalBottomSheet(
-                          context: context,
-                          backgroundColor: Colors.white,
-                          isScrollControlled: true,
-                          constraints: BoxConstraints.tightFor(
-                            height: MediaQuery.sizeOf(context).height * 0.85,
-                          ),
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                          ),
-                          builder: (context) {
-                            return  const UnShareItenarySheet();
+                      child: GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.white,
+                              isScrollControlled: true,
+                              constraints: BoxConstraints.tightFor(
+                                height:
+                                    MediaQuery.sizeOf(context).height * 0.85,
+                              ),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20)),
+                              ),
+                              builder: (context) {
+                                return const UnShareItenarySheet();
+                              },
+                            );
                           },
-                        );
-
-                      },child: AvatarList(images: editList)),
+                          child: AvatarList(images: widget.editList)),
                     )
                     // const Text(
                     //   'Shared with',
@@ -202,10 +256,10 @@ class MyCreatedItinerary extends StatelessWidget {
                           ),
                           builder: (context) {
                             return EditItenerary(
-                              iteneraryPhoto: itinary.imageUrl,
-                              iteneraryName: itinary.name ?? "",
-                              id: itinary.id,
-                              type: int.parse(itinary.type ?? ""),
+                              iteneraryPhoto: widget.itinary.imageUrl,
+                              iteneraryName: widget.itinary.name ?? "",
+                              id: widget.itinary.id,
+                              type: int.parse(widget.itinary.type ?? ""),
                             );
                           },
                         );
@@ -229,7 +283,7 @@ class MyCreatedItinerary extends StatelessWidget {
                         ),
                         builder: (context) {
                           return AddNotesSheet(
-                            itineraryId: itinary.id ?? 0,
+                            itineraryId: widget.itinary.id ?? 0,
                           );
                         },
                       );
@@ -238,7 +292,7 @@ class MyCreatedItinerary extends StatelessWidget {
                       'assets/images/note.png',
                     ),
                   ),
-                  ShareIcon(itinary.id.toString())
+                  ShareIcon(widget.itinary.id.toString())
                 ],
               )
             ],

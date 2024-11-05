@@ -10,9 +10,24 @@ import '../models/states/itinerary_state.dart';
 part 'itinerary_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
-FutureOr<UserItinerary> getUserItinerary(GetUserItineraryRef ref) async {
+FutureOr<ItineraryTabState> getUserItinerary(GetUserItineraryRef ref) async {
   final userItinerary = await ref.watch(apiServiceProvider).getUserItinerary();
-  return userItinerary;
+  final Map<int, List<String>> itineraryPhotos = {};
+  for (var itinerary in userItinerary.userIteneries!) {
+    final int itineraryId = itinerary.itinerary?.id ?? 0;
+    if ((itinerary.placesCount ?? 0) > 0) {
+      final List<ItineraryPlaces> itineraryPlaces = await ref
+          .read(apiServiceProvider)
+          .getItineraryPlace(itineraryId, null);
+      final List<String> photoUrls = itineraryPlaces
+          .where((place) => place.photo != null)
+          .map((place) => place.photo ?? "")
+          .toList();
+      itineraryPhotos[itineraryId] = photoUrls;
+    }
+  }
+  return ItineraryTabState(
+      userItinerary: userItinerary, itineraryPhotos: itineraryPhotos);
 }
 
 @riverpod
@@ -135,9 +150,9 @@ class ItineraryPlacesNotifier extends _$ItineraryPlacesNotifier {
   }
 }
 
-final itineraryLocalListProvider =
-    StateNotifierProvider.autoDispose<LocalItineraryNotifier, LocalItineraryState>(
-        (ref) => LocalItineraryNotifier());
+final itineraryLocalListProvider = StateNotifierProvider.autoDispose<
+    LocalItineraryNotifier,
+    LocalItineraryState>((ref) => LocalItineraryNotifier());
 
 class LocalItineraryNotifier extends StateNotifier<LocalItineraryState> {
   LocalItineraryNotifier()
@@ -188,7 +203,3 @@ class LocalItineraryState {
     );
   }
 }
-
-
-
-

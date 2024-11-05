@@ -71,10 +71,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     for (var marker in markers) {
       if (marker.position.latitude < minLat) minLat = marker.position.latitude;
       if (marker.position.latitude > maxLat) maxLat = marker.position.latitude;
-      if (marker.position.longitude < minLng)
+      if (marker.position.longitude < minLng) {
         minLng = marker.position.longitude;
-      if (marker.position.longitude > maxLng)
+      }
+      if (marker.position.longitude > maxLng) {
         maxLng = marker.position.longitude;
+      }
     }
 
     return LatLngBounds(
@@ -571,7 +573,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             child: AsyncDataWidgetB(
                               dataProvider: getUserItineraryProvider,
                               dataBuilder: (context, itinerary) {
-                                final List<Itenery> filteredList = itinerary
+                                final List<Itenery> filteredList = itinerary.userItinerary
                                     .userIteneries!
                                     .where((e) => e.placesCount != 0)
                                     .toList();
