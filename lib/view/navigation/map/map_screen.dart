@@ -292,7 +292,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                             () async {
                                           await mapController.animateCamera(
                                             CameraUpdate.newLatLngBounds(bounds,
-                                                50), // Adjust padding as needed
+                                                100), // Adjust padding as needed
                                           );
                                         });
                                       } else {
@@ -410,7 +410,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       () async {
                                     await mapController.animateCamera(
                                       CameraUpdate.newLatLngBounds(bounds,
-                                          50), // Adjust padding as needed
+                                          100), // Adjust padding as needed
                                     );
                                   });
                                 },

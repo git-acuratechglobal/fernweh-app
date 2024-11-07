@@ -6,22 +6,28 @@ import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
+import 'package:fernweh/view/navigation/itinerary/models/trip_model.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/all_friends_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/shared_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:scrollable_clean_calendar/controllers/clean_calendar_controller.dart';
+import 'package:scrollable_clean_calendar/scrollable_clean_calendar.dart';
+import 'package:scrollable_clean_calendar/utils/enums.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:stepper_list_view/stepper_list_view.dart';
 import '../../../../utils/common/app_button.dart';
 import '../../../../utils/common/common.dart';
 import '../../../../utils/common/config.dart';
 import '../../../auth/signup/profile_setup/create_profile_screen.dart';
-import '../../friends_list/friend_details/friend_detail_screen.dart';
 import '../../friends_list/model/friends_itinerary.dart';
 import '../../profile/profile.dart';
 import '../models/itinerary_model.dart';
 import '../models/states/itinerary_state.dart';
+import '../notifier/trip_notifier.dart';
 import 'my_curated_list/curated_list_item_view/itenary_details_screen.dart';
 import 'my_curated_list/my_curated_list.dart';
 
@@ -38,6 +44,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
   late TabController tabController;
   int tabIndex = 0;
   bool mapView = false;
+  int? selectedTabIndex;
 
   @override
   void initState() {
@@ -53,11 +60,13 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userDetailProvider);
+    final tripList = ref.watch(tripNotifierProvider);
     return Scaffold(
       body: Container(
         constraints: const BoxConstraints.expand(),
         decoration: BoxDecoration(gradient: Config.backgroundGradient),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AppBar(
               automaticallyImplyLeading: false,
@@ -92,29 +101,278 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                 if (!isEditing && tabIndex == 0)
                   IconButton(
                       onPressed: () {
-                        showModalBottomSheet(
+                        showDialog(
                           context: context,
-                          backgroundColor: Colors.white,
-                          isScrollControlled: true,
-                          constraints: BoxConstraints.tightFor(
-                            height: MediaQuery.sizeOf(context).height * 0.9,
-                          ),
-                          shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.vertical(top: Radius.circular(20)),
-                          ),
-                          builder: (context) {
-                            return const CreateItinerary();
+                          builder: (BuildContext context) {
+                            return Dialog(
+                              child: SizedBox(
+                                height: 240,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 40),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+                                        OutlinedButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              showModalBottomSheet(
+                                                context: context,
+                                                backgroundColor: Colors.white,
+                                                isScrollControlled: true,
+                                                constraints:
+                                                    BoxConstraints.tightFor(
+                                                  height:
+                                                      MediaQuery.sizeOf(context)
+                                                              .height *
+                                                          0.8,
+                                                ),
+                                                shape:
+                                                    const RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.vertical(
+                                                          top: Radius.circular(
+                                                              20)),
+                                                ),
+                                                builder: (context) {
+                                                  return const AddTripSheet();
+                                                },
+                                              );
+                                            },
+                                            child: const Text('New Trip')),
+                                        const SizedBox(
+                                          height: 30,
+                                        ),
+                                        OutlinedButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              showModalBottomSheet(
+                                                context: context,
+                                                backgroundColor: Colors.white,
+                                                isScrollControlled: true,
+                                                constraints:
+                                                    BoxConstraints.tightFor(
+                                                  height:
+                                                      MediaQuery.sizeOf(context)
+                                                              .height *
+                                                          0.9,
+                                                ),
+                                                shape:
+                                                    const RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.vertical(
+                                                          top: Radius.circular(
+                                                              20)),
+                                                ),
+                                                builder: (context) {
+                                                  return const CreateItinerary();
+                                                },
+                                              );
+                                            },
+                                            child: const Text('New Itinerary')),
+                                        Center(
+                                          child: TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: const Text('Cancel'),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
                           },
                         );
-
-                        // Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //         builder: (context) => const CreateItinerary()));
                       },
                       icon: const Icon(Icons.add)),
               ],
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                "Trips",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    scrollDirection: Axis.horizontal,
+                    child: Wrap(
+                      spacing: 15,
+                      children: List.generate(tripList.length + 1, (index) {
+                        bool isSelected = selectedTabIndex == index;
+
+                        if (index == 0) {
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (selectedTabIndex == index) {
+                                  selectedTabIndex = null;
+                                } else {
+                                  selectedTabIndex = index;
+                                  // showModalBottomSheet(
+                                  //   context: context,
+                                  //   backgroundColor: Colors.white,
+                                  //   isScrollControlled: true,
+                                  //   constraints: BoxConstraints.tightFor(
+                                  //     height:
+                                  //     MediaQuery
+                                  //         .sizeOf(context)
+                                  //         .height *
+                                  //         0.8,
+                                  //   ),
+                                  //   shape: const RoundedRectangleBorder(
+                                  //     borderRadius: BorderRadius.vertical(
+                                  //         top: Radius.circular(20)),
+                                  //   ),
+                                  //   builder: (context) {
+                                  //     return  ViewTripSheet(Trip:tripList ,);
+                                  //   },
+                                  // );
+                                }
+                              });
+                            },
+                            child: Container(
+                                height: 55,
+                                width: 55,
+                                decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? Theme.of(context)
+                                            .colorScheme
+                                            .secondary
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(30)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Icon(
+                                    Icons.language_outlined,
+                                    size: 30,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                )),
+                          );
+                        }
+                        final trip = tripList[index - 1];
+                        return Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (selectedTabIndex == index) {
+                                    selectedTabIndex = null;
+                                  } else {
+                                    selectedTabIndex = index;
+                                    showModalBottomSheet(
+                                      context: context,
+                                      backgroundColor: Colors.white,
+                                      isScrollControlled: true,
+                                      constraints: BoxConstraints.tightFor(
+                                        height:
+                                            MediaQuery.sizeOf(context).height *
+                                                0.8,
+                                      ),
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.vertical(
+                                            top: Radius.circular(20)),
+                                      ),
+                                      builder: (context) {
+                                        return ViewTripSheet(
+                                          trip: trip,
+                                        );
+                                      },
+                                    );
+                                  }
+                                });
+                              },
+                              child: Container(
+                                  height: 55,
+                                  width: 55,
+                                  decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .secondary
+                                          : Colors.white,
+                                      borderRadius: BorderRadius.circular(30)),
+                                  child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Center(
+                                        child: Text(
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.center,
+                                            trip.countryName,
+                                            style: TextStyle(
+                                                color: isSelected
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500)),
+                                      ))),
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              trip.formattedDate,
+                              style: const TextStyle(
+                                  fontSize: 10, fontWeight: FontWeight.w500),
+                            )
+                          ],
+                        );
+                      }),
+                    ),
+                  ),
+                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(right: 20, left: 5),
+                //   child: Column(
+                //     children: [
+                //       Container(
+                //           height: 55,
+                //           width: 55,
+                //           decoration: BoxDecoration(
+                //               color: Colors.white,
+                //               borderRadius: BorderRadius.circular(30)),
+                //           child: Padding(
+                //               padding: const EdgeInsets.all(8.0),
+                //               child: IconButton(
+                //                   onPressed: () {},
+                //                   icon: const Icon(
+                //                     Icons.add_circle,
+                //                     color: Colors.black,
+                //                   )))),
+                //       const SizedBox(
+                //         height: 5,
+                //       ),
+                //       const Text(
+                //         "Add more",
+                //         style: TextStyle(
+                //             fontSize: 10, fontWeight: FontWeight.w500),
+                //       )
+                //     ],
+                //   ),
+                // ),
+              ],
+            ),
+            const SizedBox(
+              height: 20,
             ),
             TabBar(
               tabAlignment: TabAlignment.start,
@@ -264,7 +522,8 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                           .canView
                                                     ],
                                                     placeUrls: userItinerary
-                                                        .itineraryPhotos[itinary.id],
+                                                            .itineraryPhotos[
+                                                        itinary.id],
                                                   ),
                                                 ),
                                                 const SizedBox(height: 10),
@@ -436,7 +695,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                               placeCount: 0,
                               itinary: userItinerarydummyList[index],
                               editList: const [],
-                              placeUrls: [],
+                              placeUrls: const [],
                             );
                           },
                           separatorBuilder: (BuildContext context, int index) {
@@ -991,6 +1250,350 @@ class AllFriendsWidget extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class AddTripSheet extends ConsumerStatefulWidget {
+  const AddTripSheet({super.key});
+
+  @override
+  ConsumerState<AddTripSheet> createState() => _AddTripSheetState();
+}
+
+class _AddTripSheetState extends ConsumerState<AddTripSheet> {
+  final TextEditingController _tripFieldController = TextEditingController();
+  DateTime? startDate;
+  DateTime? endDate;
+  final FocusNode focusNode = FocusNode();
+  final calendarController = CleanCalendarController(
+    minDate: DateTime.now(),
+    maxDate: DateTime.now().add(const Duration(days: 182)),
+    weekdayStart: DateTime.monday,
+  );
+  final _fkey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Form(
+        key: _fkey,
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.clear),
+                ),
+                Text(
+                  'Add your Trip',
+                  style: TextStyle(
+                    color: const Color(0xFF1A1B28),
+                    fontSize: 20,
+                    fontVariations: FVariations.w700,
+                  ),
+                ),
+                const SizedBox.square(dimension: 40)
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextFormField(
+              controller: _tripFieldController,
+              focusNode: focusNode,
+              decoration: const InputDecoration(
+                  hintText: "Search your Trip place",
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 15),
+                  prefixIcon: Icon(
+                    Icons.location_pin,
+                    color: Colors.grey,
+                  ),
+                  suffixIcon: Icon(
+                    Icons.search,
+                    color: Colors.grey,
+                  )),
+              onTapOutside: (val) {
+                FocusScope.of(context).unfocus();
+              },
+              validator: (val) {
+                if (val!.isEmpty) {
+                  return "Please select country";
+                }
+                return null;
+              },
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Expanded(
+              child: ScrollableCleanCalendar(
+                calendarController: calendarController,
+                layout: Layout.BEAUTY,
+                calendarCrossAxisSpacing: 0,
+              ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                    child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(),
+                  child: const Text("Back"),
+                )),
+                const SizedBox(
+                  width: 20,
+                ),
+                Expanded(
+                    child: ElevatedButton(
+                        onPressed: () {
+                          if (_fkey.currentState!.validate()) {
+                            _fkey.currentState!.save();
+                            Navigator.pop(context);
+                            ref.read(tripNotifierProvider.notifier).addTrip(
+                                Trip(
+                                    countryName:
+                                        _tripFieldController.text.trim(),
+                                    startTime: calendarController.rangeMinDate!,
+                                    endTime: calendarController.rangeMaxDate!));
+                          }
+                        },
+                        child: const Text("Add new Trip")))
+              ],
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ViewTripSheet extends StatelessWidget {
+  const ViewTripSheet({
+    super.key,
+    required this.trip,
+  });
+
+  final Trip trip;
+
+  Map<String, List<String>> getDaysByMonth(DateTime start, DateTime end) {
+    Map<String, List<String>> daysByMonth = {};
+
+    DateTime currentDate = start;
+    while (currentDate.isBefore(end) || currentDate.isAtSameMomentAs(end)) {
+      String monthName = DateFormat('MMM').format(currentDate);
+      String day = DateFormat('dd').format(currentDate);
+
+      daysByMonth.putIfAbsent(monthName, () => []);
+      daysByMonth[monthName]!.add(day);
+
+      currentDate = currentDate.add(const Duration(days: 1));
+    }
+
+    return daysByMonth;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final daysByMonth = getDaysByMonth(trip.startTime, trip.endTime);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.clear),
+              ),
+              Text(
+                'See your Trip',
+                style: TextStyle(
+                  color: const Color(0xFF1A1B28),
+                  fontSize: 20,
+                  fontVariations: FVariations.w700,
+                ),
+              ),
+              const SizedBox.square(dimension: 40)
+            ],
+          ),
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              width: 300,
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black),
+                  borderRadius: BorderRadius.circular(10)),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Based in ${trip.countryName}",
+                      style: const TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: List.generate(05, (i) {
+                          return Align(
+                            widthFactor: 0.75,
+                            child: Container(
+                              constraints: BoxConstraints.tight(
+                                const Size.fromRadius(17),
+                              ),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(width: 2.5, color: Colors.white),
+                              ),
+                              child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: ImageWidget(
+                                      url:
+                                          'https://randomuser.me/api/portraits/men/$i.jpg')),
+                            ),
+                          );
+                        }),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Expanded(
+            child: ListView.separated(
+                padding: const EdgeInsets.only(left: 15),
+                shrinkWrap: true,
+                itemBuilder: (BuildContext context, int index) {
+                  final entry = daysByMonth.entries.toList()[index];
+                  final monthName = entry.key;
+                  final days = entry.value;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        monthName.toString(),
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      StepperListView(
+                        stepperData: days
+                            .map((e) => StepperItemData(
+                                  id: e.toString(),
+                                  content: ({
+                                    'day': e.toString(),
+                                  }),
+                                ))
+                            .toList(),
+                        stepAvatar: (_, data) {
+                          final stepData = data as StepperItemData;
+                          return PreferredSize(
+                            preferredSize: const Size(20, 0),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                textAlign: TextAlign.start,
+                                stepData.content["day"],
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          );
+                        },
+                        stepContentWidget: (_, data) {
+                          final stepData = data as StepperItemData;
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 25),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                stepData.content['day'] == "08" ||
+                                        stepData.content['day'] == "12"
+                                    ? const SizedBox(
+                                        height: 25,
+                                      )
+                                    : Wrap(
+                                        spacing: 8,
+                                        runSpacing: 10,
+                                        children: List.generate(5, (i) {
+                                          return Align(
+                                            widthFactor: 0.45,
+                                            child: Container(
+                                              constraints: BoxConstraints.tight(
+                                                const Size.fromRadius(13),
+                                              ),
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                    width: 2.5,
+                                                    color: Colors.white),
+                                              ),
+                                              child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  child: ImageWidget(
+                                                      url:
+                                                          'https://randomuser.me/api/portraits/men/$i.jpg')),
+                                            ),
+                                          );
+                                        }),
+                                      ),
+                                const Divider()
+                              ],
+                            ),
+                          );
+                        },
+                        stepperThemeData: StepperThemeData(
+                            lineWidth: 30,
+                            lineColor: Theme.of(context).colorScheme.secondary),
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                      )
+                    ],
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return const SizedBox(
+                    height: 0,
+                  );
+                },
+                itemCount: daysByMonth.keys.length),
+          )
+        ],
+      ),
     );
   }
 }

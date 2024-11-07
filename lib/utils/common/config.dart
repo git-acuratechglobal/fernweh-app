@@ -158,6 +158,14 @@ abstract class Config {
       type: 'Attractions'
     ),
   ];
+  static List<({String name, String date})> tripList = [
+    (name: "Tokyo", date: "10/11-15/11"),
+    (name: "New York", date: "17/11-20/11"),
+    (name: "Agra", date: "25/11-30/11"),
+    (name: "USA", date: "10/11-15/11"),
+    (name: "England", date: "17/11-20/11"),
+    (name: "Japan", date: "25/11-30/11"),
+  ];
 }
 
 final itineraryProvider = StateNotifierProvider<MyItiratons,
