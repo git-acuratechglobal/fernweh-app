@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:fernweh/view/navigation/friends_list/model/friends_itinerary.dart';
 import 'package:fernweh/view/navigation/itinerary/models/itinerary_model.dart';
+import 'package:fernweh/view/navigation/itinerary/models/trip/trip.dart';
 import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/add_notes/model/notes_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../view/navigation/explore/categories_model/categories_model.dart';
@@ -15,10 +17,11 @@ import '../../view/navigation/map/model/category.dart';
 import '../auth_service/auth_service.dart';
 import '../dio_service/dio_service.dart';
 import '../local_storage_service/local_storage_service.dart';
+
 part 'api_service.g.dart';
 
 @Riverpod(keepAlive: true)
-ApiService apiService(ApiServiceRef ref) {
+ApiService apiService(Ref ref) {
   return ApiService(ref.watch(dioProvider),
       ref.watch(localStorageServiceProvider).getToken());
 }
@@ -182,6 +185,19 @@ class ApiService {
     });
   }
 
+  Future<List<SearchResult>> getCityAndStateSearch(String search) async {
+    return asyncGuard(() async {
+      var url =
+          'https://maps.googleapis.com/maps/api/place/queryautocomplete/json'
+          '?input=$search'
+          '&types=(cities)' // Restrict to a specific country, or leave it out to be global
+          '&key=AIzaSyCG4YZMnrZwDGA2sXcUF4XLQdddSL4tz5Y';
+      var response = await _dio.get(url);
+      final List<dynamic> jsonList = response.data['predictions'];
+      return jsonList.map((place) => SearchResult.fromJson(place)).toList();
+    });
+  }
+
   Future<List<ItineraryPlaces>> getItineraryPlace(int id, int? type) async {
     return asyncGuard(() async {
       final data = FormData.fromMap({'type': type});
@@ -312,6 +328,21 @@ class ApiService {
     });
   }
 
+  Future<String> unShareItinerary(
+      Map<String, dynamic> data, String itineraryId) async {
+    return asyncGuard(() async {
+      data.remove("itineraryId");
+      final response = await _dio.post('itinerary/remove/$itineraryId',
+          data: data,
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }));
+      return response.data["success"];
+    });
+  }
+
   Future<String> inviteFriend(String email) async {
     return asyncGuard(() async {
       final response = await _dio.post('itinerary/share-by-mail',
@@ -368,6 +399,58 @@ class ApiService {
       final itineraryList =
           jsonItinerary.map((e) => FriendsItinerary.fromJson(e)).toList();
       return itineraryList;
+    });
+  }
+
+  Future<String> createTrip(
+      {required String startDate,
+      required String endDate,
+      required String goingTo}) async {
+    return asyncGuard(() async {
+      final response = await _dio.post("add-trip",
+          data: {
+            "start_date": startDate,
+            "end_date": endDate,
+            "going_to": goingTo
+          },
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }));
+      final responseData = response.data['message'];
+      return responseData;
+    });
+  }
+
+  Future<List<Trip>> getTrip() {
+    return asyncGuard(() async {
+      final response = await _dio.post('get-trips',
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }));
+      final List<dynamic> jsonTripData = response.data['trips'];
+      final tripData = jsonTripData.map((trip) => Trip.fromJson(trip)).toList();
+      return tripData;
+    });
+  }
+
+  Future<TripDetails> getTripDetails({required int id}) async {
+    return asyncGuard(() async {
+      final response = await _dio.post('get-trip-detail/$id',
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }));
+      final tripJson = response.data['trip'];
+      final List<dynamic> friendTripsJson = response.data['friends_trips'];
+      final trip = Trip.fromJson(tripJson);
+      final friendsTrips =
+          friendTripsJson.map((e) => FriendsTrip.fromJson(e)).toList();
+      return TripDetails(trip: trip, friendsTrips: friendsTrips);
     });
   }
 }

@@ -12,5 +12,5 @@ class SharedItineraryState with _$SharedItineraryState {
 
 enum SharedItineraryEvent {
   shared,
-
+unShared
 }

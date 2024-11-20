@@ -144,7 +144,7 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                             child: AsyncDataWidgetB(
                               dataProvider: itineraryPlacesNotifierProvider,
                               dataBuilder:
-                                  (BuildContext context, itineraryPlace) {
+                                  ( itineraryPlace) {
                                 markers.clear();
                                 for (var data in itineraryPlace) {
                                   markers.add(Marker(
@@ -275,7 +275,7 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                                           dataProvider:
                                               itineraryPlacesNotifierProvider,
                                           dataBuilder:
-                                              (context, itineraryPlaces) {
+                                              ( itineraryPlaces) {
                                             return ListView.separated(
                                               itemCount: itineraryPlaces.length,
                                               scrollDirection: Axis.horizontal,
@@ -426,7 +426,7 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                         Expanded(
                             child: AsyncDataWidgetB(
                                 dataProvider: itineraryPlacesNotifierProvider,
-                                dataBuilder: (context, itineraryPlaces) {
+                                dataBuilder: ( itineraryPlaces) {
                                   return ListView.separated(
                                     padding: const EdgeInsets.all(24),
                                     itemCount: itineraryPlaces.length,

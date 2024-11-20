@@ -15,13 +15,20 @@ abstract class Common {
       ),
     );
   }
- static Color getRandomColor() {
-    Random random = Random();
-    return Color.fromARGB(
-      255,
-      random.nextInt(256),
-      random.nextInt(256),
-      random.nextInt(256),
-    );
-  }
+ static  Color getColorFromName(String name) {
+   final int hash = name.codeUnits.fold(0, (prev, element) => prev + element);
+   final List<Color> colors = [
+     Colors.red,
+     Colors.green,
+     Colors.blue,
+     Colors.orange,
+     Colors.purple,
+     Colors.pink,
+     Colors.teal,
+     Colors.cyan,
+     Colors.amber,
+     Colors.deepOrange,
+   ];
+   return colors[hash % colors.length];
+ }
 }

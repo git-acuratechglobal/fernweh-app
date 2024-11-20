@@ -369,7 +369,7 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
   Widget build(BuildContext context) {
     return AsyncDataWidgetB(
         dataProvider: friendRequestProvider,
-        dataBuilder: (BuildContext context, List<Friends> friends) {
+        dataBuilder: ( List<Friends> friends) {
           return friends.isEmpty
               ? Center(
                   child: Column(

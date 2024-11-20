@@ -574,7 +574,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                   ),
                   AsyncDataWidgetB(
                     dataProvider: getUserItineraryProvider,
-                    dataBuilder: (context, userItinerary) {
+                    dataBuilder: ( userItinerary) {
                       List<Itenery> combinedItineraries = userItinerary
                           .userItinerary
                           .getCombinedItineraries(user?.id ?? 0);

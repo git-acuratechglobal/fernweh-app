@@ -352,8 +352,8 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
 
 class UserInitials extends StatelessWidget {
   final String name;
-
-  const UserInitials({super.key, required this.name});
+final double fontSize;
+  const UserInitials({super.key, required this.name,this.fontSize=18});
 
   @override
   Widget build(BuildContext context) {
@@ -363,7 +363,7 @@ class UserInitials extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Common.getRandomColor(),
+        color: Common.getColorFromName(firstInitial),
         shape: BoxShape.circle,
       ),
       alignment: Alignment.center,
@@ -371,12 +371,14 @@ class UserInitials extends StatelessWidget {
       // Set width
       height: 50,
       // Set height
-      child: Text(
-        '${firstInitial.toUpperCase()}${lastInitial.toUpperCase()}',
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
+      child: Center(
+        child: Text(
+          '${firstInitial.toUpperCase()}${lastInitial.toUpperCase()}',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );

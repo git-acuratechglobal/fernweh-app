@@ -90,7 +90,7 @@ class _FriendDetailScreenState extends ConsumerState<FriendDetailScreen> {
                 child: AsyncDataWidgetB(
                   dataProvider:
                       getFriendsItineraryListProvider(widget.friends.id ?? 0),
-                  dataBuilder: (context, itinerary) {
+                  dataBuilder: ( itinerary) {
                     List<FriendsItinerary> filteredList =
                         itinerary.where((e) => e.type == "1").toList();
                     return itinerary.isEmpty

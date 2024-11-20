@@ -33,7 +33,7 @@ class _SharedListTabState extends ConsumerState<SharedListTab> {
       },
       child: AsyncDataWidgetB(
           dataProvider: getUserItineraryProvider,
-          dataBuilder: (context, sharedItinerary) {
+          dataBuilder: ( sharedItinerary) {
             final localSharedList = ref
                 .watch(localStorageServiceProvider)
                 .getSharedItinerary(sharedItinerary.userItinerary.sharedIteneries ?? []);
@@ -246,78 +246,78 @@ class _SharedItemState extends ConsumerState<SharedItem> {
                 ],
               ),
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (widget.itinerary.canEdit!.isNotEmpty &&
-                    widget.itinerary.canEdit!
-                        .where((val) => val.id == userId?.id)
-                        .isNotEmpty)
-                  GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          backgroundColor: Colors.white,
-                          isScrollControlled: true,
-                          constraints: BoxConstraints.tightFor(
-                            height: MediaQuery.sizeOf(context).height * 0.70,
-                          ),
-                          shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.vertical(top: Radius.circular(20)),
-                          ),
-                          builder: (context) {
-                            return EditItenerary(
-                              iteneraryPhoto:
-                                  "http://fernweh.acublock.in/public/${widget.itinerary.itinerary?.image}",
-                              iteneraryName:
-                                  widget.itinerary.itinerary?.name ?? "",
-                              id: widget.itinerary.itinerary?.id,
-                              type: int.parse(
-                                  widget.itinerary.itinerary?.type ?? ""),
-                            );
-                          },
-                        );
-                      },
-                      child: Image.asset('assets/images/edit.png')),
-                if (widget.itinerary.canEdit!.isNotEmpty &&
-                    widget.itinerary.canEdit!
-                        .where((val) => val.id == userId?.id)
-                        .isNotEmpty)
-                  const SizedBox(
-                    height: 10,
-                  ),
-                if (widget.itinerary.canEdit!.isNotEmpty &&
-                    widget.itinerary.canEdit!
-                        .where((val) => val.id == userId?.id)
-                        .isNotEmpty)
-                  GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        backgroundColor: Colors.white,
-                        isScrollControlled: true,
-                        constraints: BoxConstraints.tightFor(
-                          height: MediaQuery.sizeOf(context).height * 0.85,
-                        ),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(20)),
-                        ),
-                        builder: (context) {
-                          return AddNotesSheet(
-                            itineraryId: widget.itinerary.itinerary!.id ?? 0,
-                          );
-                        },
-                      );
-                    },
-                    child: Image.asset(
-                      'assets/images/note.png',
-                    ),
-                  ),
-                ShareIcon(widget.itinerary.itinerary?.id.toString())
-              ],
-            )
+            // Column(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     if (widget.itinerary.canEdit!.isNotEmpty &&
+            //         widget.itinerary.canEdit!
+            //             .where((val) => val.id == userId?.id)
+            //             .isNotEmpty)
+            //       GestureDetector(
+            //           onTap: () {
+            //             showModalBottomSheet(
+            //               context: context,
+            //               backgroundColor: Colors.white,
+            //               isScrollControlled: true,
+            //               constraints: BoxConstraints.tightFor(
+            //                 height: MediaQuery.sizeOf(context).height * 0.70,
+            //               ),
+            //               shape: const RoundedRectangleBorder(
+            //                 borderRadius:
+            //                     BorderRadius.vertical(top: Radius.circular(20)),
+            //               ),
+            //               builder: (context) {
+            //                 return EditItenerary(
+            //                   iteneraryPhoto:
+            //                       "http://fernweh.acublock.in/public/${widget.itinerary.itinerary?.image}",
+            //                   iteneraryName:
+            //                       widget.itinerary.itinerary?.name ?? "",
+            //                   id: widget.itinerary.itinerary?.id,
+            //                   type: int.parse(
+            //                       widget.itinerary.itinerary?.type ?? ""),
+            //                 );
+            //               },
+            //             );
+            //           },
+            //           child: Image.asset('assets/images/edit.png')),
+            //     if (widget.itinerary.canEdit!.isNotEmpty &&
+            //         widget.itinerary.canEdit!
+            //             .where((val) => val.id == userId?.id)
+            //             .isNotEmpty)
+            //       const SizedBox(
+            //         height: 10,
+            //       ),
+            //     if (widget.itinerary.canEdit!.isNotEmpty &&
+            //         widget.itinerary.canEdit!
+            //             .where((val) => val.id == userId?.id)
+            //             .isNotEmpty)
+            //       GestureDetector(
+            //         onTap: () {
+            //           showModalBottomSheet(
+            //             context: context,
+            //             backgroundColor: Colors.white,
+            //             isScrollControlled: true,
+            //             constraints: BoxConstraints.tightFor(
+            //               height: MediaQuery.sizeOf(context).height * 0.85,
+            //             ),
+            //             shape: const RoundedRectangleBorder(
+            //               borderRadius:
+            //                   BorderRadius.vertical(top: Radius.circular(20)),
+            //             ),
+            //             builder: (context) {
+            //               return AddNotesSheet(
+            //                 itineraryId: widget.itinerary.itinerary!.id ?? 0,
+            //               );
+            //             },
+            //           );
+            //         },
+            //         child: Image.asset(
+            //           'assets/images/note.png',
+            //         ),
+            //       ),
+            //     ShareIcon(widget.itinerary.itinerary?.id.toString())
+            //   ],
+            // )
           ],
         ),
       ),

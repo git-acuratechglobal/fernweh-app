@@ -13,6 +13,7 @@ import '../../../../../../utils/common/pagination_widget.dart';
 import '../../../../../../utils/widgets/async_widget.dart';
 import '../../../../friends_list/model/friends.dart';
 import '../../../../profile/profile.dart';
+import '../../../models/itinerary_model.dart';
 import 'invite_friend/invite_friend_sheet.dart';
 
 class ShareItenarySheet extends ConsumerStatefulWidget {
@@ -316,7 +317,11 @@ class _ShareItenarySheetState extends ConsumerState<ShareItenarySheet> {
 }
 
 class UnShareItenarySheet extends ConsumerStatefulWidget {
-  const UnShareItenarySheet({super.key});
+  const UnShareItenarySheet(
+      {super.key, required this.viewOnly, required this.editOnly,required this.itineraryId});
+final int itineraryId;
+  final List<Can> editOnly;
+  final List<Can> viewOnly;
 
   @override
   ConsumerState<UnShareItenarySheet> createState() =>
@@ -324,24 +329,24 @@ class UnShareItenarySheet extends ConsumerStatefulWidget {
 }
 
 class _UnShareItenarySheetState extends ConsumerState<UnShareItenarySheet> {
-  final List<Friends> _selectedUsers = [];
-  final List<String> selectedUserId = [];
+  final List<String> _canEditselectedUserId = [];
+  final List<String> _canViewselectedUserId = [];
   String selectedDropdown = "view";
   final scrollController = ScrollController();
 
   @override
   void initState() {
-/*    ref.listenManual(sharedItineraryProvider, (previous, next) {
+    ref.listenManual(sharedItineraryProvider, (previous, next) {
       switch (next) {
         case AsyncData<SharedItineraryState?> data when data.value != null:
-          if (data.value!.authEvent == SharedItineraryEvent.shared) {
+          if (data.value!.authEvent == SharedItineraryEvent.unShared) {
             Navigator.of(context).pop();
             Common.showSnackBar(context, data.value!.message.toString());
           }
         case AsyncError error:
           Common.showSnackBar(context, error.error.toString());
       }
-    });*/
+    });
     super.initState();
   }
 
@@ -387,127 +392,148 @@ class _UnShareItenarySheetState extends ConsumerState<UnShareItenarySheet> {
             ),
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            "Can edit",
+            style: TextStyle(
+              color: const Color(0xFF1A1B28),
+              fontSize: 15,
+              fontVariations: FVariations.w600,
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
         Expanded(
-            child: PaginationWidget(
-          scrollController: scrollController,
-          value: ref.watch(friendListProvider),
-          itemBuilder: (int, user) {
-            return ListTile(
-              onTap: () {
-                setState(() {
-                  _selectedUsers.toggle(user);
-                  selectedUserId.toggle(user.id.toString());
-                });
-              },
-              leading: ClipOval(
-                child: SizedBox.square(
-                  dimension: 50,
-                  child: user.imageUrl == null
-                      ? UserInitials(name: user.fullName)
-                      : ImageWidget(url: user.imageUrl.toString()),
-                ),
-              ),
-              title: Text(
-                user.fullName,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontVariations: FVariations.w700,
-                ),
-              ),
-              subtitle: Text(
-                user.email.toString(),
-                style: const TextStyle(
-                  color: Color(0xFF505050),
-                  fontSize: 14,
-                ),
-              ),
-              trailing: IconButton(
-                icon: _selectedUsers.contains(user)
-                    ? Image.asset('assets/images/tick.png')
-                    : Image.asset('assets/images/untick.png'),
-                onPressed: () {
+          child: ListView.separated(
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (BuildContext context, int index) {
+              final data = widget.editOnly[index];
+              return ListTile(
+                onTap: () {
                   setState(() {
-                    _selectedUsers.toggle(user);
-                    selectedUserId.toggle(user.id.toString());
+                    _canEditselectedUserId.toggle(data.id.toString());
                   });
                 },
-              ),
-            );
-          },
-          onLoadMore: () => ref.read(friendListProvider.notifier).loadMore(),
-          separator: const SizedBox(
-            height: 0,
-          ),
-          emptyWidget: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("No friends list found"),
-                const SizedBox(
-                  height: 10,
-                ),
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    minimumSize: const Size(60, 40),
+                leading: ClipOval(
+                  child: SizedBox.square(
+                    dimension: 50,
+                    child: data.imageUrl == null
+                        ? UserInitials(name: data.name!)
+                        : ImageWidget(url: data.imageUrl.toString()),
                   ),
+                ),
+                title: Text(
+                  data.name!,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontVariations: FVariations.w700,
+                  ),
+                ),
+                trailing: IconButton(
+                  icon: _canEditselectedUserId.contains(data.id.toString())
+                      ? Image.asset('assets/images/tick.png')
+                      : Image.asset('assets/images/untick.png'),
                   onPressed: () {
-                    ref.invalidate(friendListProvider);
+                    setState(() {
+                      _canEditselectedUserId.toggle(data.id.toString());
+                    });
                   },
-                  child: const Text(
-                    "Refresh",
-                    style: TextStyle(fontSize: 14),
+                ),
+              );
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return const SizedBox(height: 0);
+            },
+            itemCount: widget.editOnly.length,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            "Can View",
+            style: TextStyle(
+              color: const Color(0xFF1A1B28),
+              fontSize: 15,
+              fontVariations: FVariations.w600,
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Expanded(
+          child: ListView.separated(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemBuilder: (BuildContext context, int index) {
+              final user = widget.viewOnly[index];
+              return ListTile(
+                onTap: () {
+                  setState(() {
+                    _canViewselectedUserId.toggle(user.id.toString());
+                  });
+                },
+                leading: ClipOval(
+                  child: SizedBox.square(
+                    dimension: 50,
+                    child: user.imageUrl == null
+                        ? UserInitials(name: user.name!)
+                        : ImageWidget(url: user.imageUrl.toString()),
                   ),
                 ),
-              ],
-            ),
+                title: Text(
+                  user.name!,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontVariations: FVariations.w700,
+                  ),
+                ),
+                trailing: IconButton(
+                  icon: _canViewselectedUserId.contains(user.id.toString())
+                      ? Image.asset('assets/images/tick.png')
+                      : Image.asset('assets/images/untick.png'),
+                  onPressed: () {
+                    setState(() {
+                      _canViewselectedUserId.toggle(user.id.toString());
+                    });
+                  },
+                ),
+              );
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return const SizedBox(height: 0);
+            },
+            itemCount: widget.viewOnly.length,
           ),
-          canLoadMore: () =>
-              ref.read(friendListProvider.notifier).canLoadMore(),
-          loading: Skeletonizer(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemBuilder: (context, index) {
-                final user = Config.users[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: AssetImage(user.image),
-                  ),
-                  title: Text(
-                    user.title,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontVariations: FVariations.w700,
-                    ),
-                  ),
-                  subtitle: Text(
-                    '${user.title.replaceAll(" ", "").toLowerCase()}@mail.com',
-                    style: const TextStyle(
-                      color: Color(0xFF505050),
-                      fontSize: 14,
-                    ),
-                  ),
-                  trailing: IconButton(
-                    icon: _selectedUsers.contains(index)
-                        ? Image.asset('assets/images/tick.png')
-                        : Image.asset('assets/images/untick.png'),
-                    onPressed: () {},
-                  ),
-                );
-              },
-              itemCount: Config.users.length,
-            ),
-          ),
-          padding: const EdgeInsets.all(8),
-        )),
+        ),
         Padding(
             padding: const EdgeInsets.all(24.0),
             child: AppButton(
                 isLoading: sharedItineraryState is AsyncLoading,
                 onTap: () {
-                  Navigator.pop(context);
+                  if (_canViewselectedUserId.isNotEmpty ||
+                      _canEditselectedUserId.isNotEmpty) {
+                    ref
+                        .read(sharedItineraryProvider.notifier)
+                        .updateForm("itineraryId", widget.itineraryId.toString());
+                    if (_canEditselectedUserId.isNotEmpty) {
+                      ref
+                          .read(sharedItineraryProvider.notifier)
+                          .updateFromList("can_edit", _canEditselectedUserId);
+                    }
+                    if (_canViewselectedUserId.isNotEmpty) {
+                      ref
+                          .read(sharedItineraryProvider.notifier)
+                          .updateFromList("can_view", _canViewselectedUserId);
+                    }
+                    ref
+                        .read(sharedItineraryProvider.notifier).unShareItinerary();
+                  }
                 },
                 child: const Text("UnShare Itinerary"))),
       ],

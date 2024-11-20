@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:fernweh/services/local_storage_service/local_storage_service.dart';
 import 'package:fernweh/utils/common/app_mixin.dart';
 import 'package:fernweh/utils/common/app_validation.dart';
@@ -6,14 +7,14 @@ import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
-import 'package:fernweh/view/navigation/itinerary/models/trip_model.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/all_friends_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
+import 'package:fernweh/view/navigation/itinerary/notifier/trip_notifier/create_trip_notifier.dart';
+import 'package:fernweh/view/navigation/itinerary/notifier/trip_notifier/trip_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/shared_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:scrollable_clean_calendar/controllers/clean_calendar_controller.dart';
 import 'package:scrollable_clean_calendar/scrollable_clean_calendar.dart';
 import 'package:scrollable_clean_calendar/utils/enums.dart';
@@ -22,12 +23,12 @@ import 'package:stepper_list_view/stepper_list_view.dart';
 import '../../../../utils/common/app_button.dart';
 import '../../../../utils/common/common.dart';
 import '../../../../utils/common/config.dart';
+import '../../../../utils/widgets/search_places_widget.dart';
 import '../../../auth/signup/profile_setup/create_profile_screen.dart';
 import '../../friends_list/model/friends_itinerary.dart';
 import '../../profile/profile.dart';
 import '../models/itinerary_model.dart';
 import '../models/states/itinerary_state.dart';
-import '../notifier/trip_notifier.dart';
 import 'my_curated_list/curated_list_item_view/itenary_details_screen.dart';
 import 'my_curated_list/my_curated_list.dart';
 
@@ -60,7 +61,6 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userDetailProvider);
-    final tripList = ref.watch(tripNotifierProvider);
     return Scaffold(
       body: Container(
         constraints: const BoxConstraints.expand(),
@@ -98,101 +98,156 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                     ),
                   ),
                 // if (!isEditing && tabIndex == 0) const ShareIcon(),
-                if (!isEditing && tabIndex == 0)
-                  IconButton(
-                      onPressed: () {
-                        showDialog(
+                // if (!isEditing && tabIndex == 0)
+                // IconButton(
+                //     onPressed: () {
+                //       showDialog(
+                //         context: context,
+                //         builder: (BuildContext context) {
+                //           return Dialog(
+                //             child: SizedBox(
+                //               height: 240,
+                //               child: Padding(
+                //                 padding: const EdgeInsets.symmetric(
+                //                     horizontal: 40),
+                //                 child: Center(
+                //                   child: Column(
+                //                     mainAxisSize: MainAxisSize.min,
+                //                     mainAxisAlignment:
+                //                         MainAxisAlignment.center,
+                //                     children: [
+                //                       const SizedBox(
+                //                         height: 20,
+                //                       ),
+                //                       OutlinedButton(
+                //                           onPressed: () {
+                //                             Navigator.pop(context);
+                //                             showModalBottomSheet(
+                //                               context: context,
+                //                               backgroundColor: Colors.white,
+                //                               isScrollControlled: true,
+                //                               constraints:
+                //                                   BoxConstraints.tightFor(
+                //                                 height:
+                //                                     MediaQuery.sizeOf(context)
+                //                                             .height *
+                //                                         0.8,
+                //                               ),
+                //                               shape:
+                //                                   const RoundedRectangleBorder(
+                //                                 borderRadius:
+                //                                     BorderRadius.vertical(
+                //                                         top: Radius.circular(
+                //                                             20)),
+                //                               ),
+                //                               builder: (context) {
+                //                                 return const AddTripSheet();
+                //                               },
+                //                             );
+                //                           },
+                //                           child: const Text('New Trip')),
+                //                       const SizedBox(
+                //                         height: 30,
+                //                       ),
+                //                       OutlinedButton(
+                //                           onPressed: () {
+                //                             Navigator.pop(context);
+                //                             showModalBottomSheet(
+                //                               context: context,
+                //                               backgroundColor: Colors.white,
+                //                               isScrollControlled: true,
+                //                               constraints:
+                //                                   BoxConstraints.tightFor(
+                //                                 height:
+                //                                     MediaQuery.sizeOf(context)
+                //                                             .height *
+                //                                         0.9,
+                //                               ),
+                //                               shape:
+                //                                   const RoundedRectangleBorder(
+                //                                 borderRadius:
+                //                                     BorderRadius.vertical(
+                //                                         top: Radius.circular(
+                //                                             20)),
+                //                               ),
+                //                               builder: (context) {
+                //                                 return const CreateItinerary();
+                //                               },
+                //                             );
+                //                           },
+                //                           child: const Text('New Itinerary')),
+                //                       Center(
+                //                         child: TextButton(
+                //                           onPressed: () =>
+                //                               Navigator.pop(context),
+                //                           child: const Text('Cancel'),
+                //                         ),
+                //                       ),
+                //                     ],
+                //                   ),
+                //                 ),
+                //               ),
+                //             ),
+                //           );
+                //         },
+                //       );
+                //     },
+                //     icon: const Icon(Icons.add)),
+                PopupMenuButton(
+                  icon: const Icon(Icons.add),
+                  itemBuilder: (BuildContext context) {
+                    return [
+                      'New Trip',
+                      'New Itinerary',
+                    ].map((String choice) {
+                      return PopupMenuItem<String>(
+                        value: choice,
+                        child: Text(
+                          choice,
+                          style: const TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.w500),
+                        ),
+                      );
+                    }).toList();
+                  },
+                  onSelected: (value) {
+                    switch (value) {
+                      case "New Trip":
+                        showModalBottomSheet(
                           context: context,
-                          builder: (BuildContext context) {
-                            return Dialog(
-                              child: SizedBox(
-                                height: 240,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 40),
-                                  child: Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const SizedBox(
-                                          height: 20,
-                                        ),
-                                        OutlinedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                              showModalBottomSheet(
-                                                context: context,
-                                                backgroundColor: Colors.white,
-                                                isScrollControlled: true,
-                                                constraints:
-                                                    BoxConstraints.tightFor(
-                                                  height:
-                                                      MediaQuery.sizeOf(context)
-                                                              .height *
-                                                          0.8,
-                                                ),
-                                                shape:
-                                                    const RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.vertical(
-                                                          top: Radius.circular(
-                                                              20)),
-                                                ),
-                                                builder: (context) {
-                                                  return const AddTripSheet();
-                                                },
-                                              );
-                                            },
-                                            child: const Text('New Trip')),
-                                        const SizedBox(
-                                          height: 30,
-                                        ),
-                                        OutlinedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                              showModalBottomSheet(
-                                                context: context,
-                                                backgroundColor: Colors.white,
-                                                isScrollControlled: true,
-                                                constraints:
-                                                    BoxConstraints.tightFor(
-                                                  height:
-                                                      MediaQuery.sizeOf(context)
-                                                              .height *
-                                                          0.9,
-                                                ),
-                                                shape:
-                                                    const RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.vertical(
-                                                          top: Radius.circular(
-                                                              20)),
-                                                ),
-                                                builder: (context) {
-                                                  return const CreateItinerary();
-                                                },
-                                              );
-                                            },
-                                            child: const Text('New Itinerary')),
-                                        Center(
-                                          child: TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context),
-                                            child: const Text('Cancel'),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
+                          backgroundColor: Colors.white,
+                          isScrollControlled: true,
+                          constraints: BoxConstraints.tightFor(
+                            height: MediaQuery.sizeOf(context).height * 0.8,
+                          ),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(20)),
+                          ),
+                          builder: (context) {
+                            return const AddTripSheet();
                           },
                         );
-                      },
-                      icon: const Icon(Icons.add)),
+                      case "New Itinerary":
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.white,
+                          isScrollControlled: true,
+                          constraints: BoxConstraints.tightFor(
+                            height: MediaQuery.sizeOf(context).height * 0.9,
+                          ),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(20)),
+                          ),
+                          builder: (context) {
+                            return const CreateItinerary();
+                          },
+                        );
+                      default:
+                    }
+                  },
+                )
               ],
             ),
             const Padding(
@@ -208,135 +263,179 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
             Row(
               children: [
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    scrollDirection: Axis.horizontal,
-                    child: Wrap(
-                      spacing: 15,
-                      children: List.generate(tripList.length + 1, (index) {
-                        bool isSelected = selectedTabIndex == index;
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: AsyncDataWidgetB(
+                      dataProvider: getTripProvider,
+                      dataBuilder: (data) {
+                        return SingleChildScrollView(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          scrollDirection: Axis.horizontal,
+                          child: Wrap(
+                            spacing: 15,
+                            children: List.generate(data.length + 1, (index) {
+                              bool isSelected = selectedTabIndex == index;
 
-                        if (index == 0) {
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                if (selectedTabIndex == index) {
-                                  selectedTabIndex = null;
-                                } else {
-                                  selectedTabIndex = index;
-                                  // showModalBottomSheet(
-                                  //   context: context,
-                                  //   backgroundColor: Colors.white,
-                                  //   isScrollControlled: true,
-                                  //   constraints: BoxConstraints.tightFor(
-                                  //     height:
-                                  //     MediaQuery
-                                  //         .sizeOf(context)
-                                  //         .height *
-                                  //         0.8,
-                                  //   ),
-                                  //   shape: const RoundedRectangleBorder(
-                                  //     borderRadius: BorderRadius.vertical(
-                                  //         top: Radius.circular(20)),
-                                  //   ),
-                                  //   builder: (context) {
-                                  //     return  ViewTripSheet(Trip:tripList ,);
-                                  //   },
-                                  // );
-                                }
-                              });
-                            },
-                            child: Container(
-                                height: 55,
-                                width: 55,
-                                decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .secondary
-                                        : Colors.white,
-                                    borderRadius: BorderRadius.circular(30)),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Icon(
-                                    Icons.language_outlined,
-                                    size: 30,
-                                    color: isSelected
-                                        ? Colors.white
-                                        : Colors.black,
+                              if (index == 0) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      if (selectedTabIndex == index) {
+                                        selectedTabIndex = null;
+                                      } else {
+                                        selectedTabIndex = index;
+                                        // showModalBottomSheet(
+                                        //   context: context,
+                                        //   backgroundColor: Colors.white,
+                                        //   isScrollControlled: true,
+                                        //   constraints: BoxConstraints.tightFor(
+                                        //     height:
+                                        //     MediaQuery
+                                        //         .sizeOf(context)
+                                        //         .height *
+                                        //         0.8,
+                                        //   ),
+                                        //   shape: const RoundedRectangleBorder(
+                                        //     borderRadius: BorderRadius.vertical(
+                                        //         top: Radius.circular(20)),
+                                        //   ),
+                                        //   builder: (context) {
+                                        //     return  ViewTripSheet(Trip:tripList ,);
+                                        //   },
+                                        // );
+                                      }
+                                    });
+                                  },
+                                  child: Container(
+                                      height: 55,
+                                      width: 55,
+                                      decoration: BoxDecoration(
+                                          color: isSelected
+                                              ? Theme.of(context)
+                                                  .colorScheme
+                                                  .secondary
+                                              : Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(
+                                          Icons.language_outlined,
+                                          size: 30,
+                                          color: isSelected
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      )),
+                                );
+                              }
+                              final trip = data[index - 1];
+                              return Column(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        if (selectedTabIndex == index) {
+                                          selectedTabIndex = null;
+                                        } else {
+                                          selectedTabIndex = index;
+                                          showModalBottomSheet(
+                                            context: context,
+                                            backgroundColor: Colors.white,
+                                            isScrollControlled: true,
+                                            constraints:
+                                                BoxConstraints.tightFor(
+                                              height: MediaQuery.sizeOf(context)
+                                                      .height *
+                                                  0.8,
+                                            ),
+                                            shape: const RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                      top: Radius.circular(20)),
+                                            ),
+                                            builder: (context) {
+                                              return ViewTripSheet(
+                                                tripId: trip.id ?? 0,
+                                              );
+                                            },
+                                          ).then((val) => setState(() {
+                                                selectedTabIndex = null;
+                                              }));
+                                        }
+                                      });
+                                    },
+                                    child: Container(
+                                        height: 55,
+                                        width: 55,
+                                        decoration: BoxDecoration(
+                                            color: isSelected
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary
+                                                : Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(30)),
+                                        child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Center(
+                                              child: Text(
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  textAlign: TextAlign.center,
+                                                  trip.goingTo ?? "",
+                                                  style: TextStyle(
+                                                      color: isSelected
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w500)),
+                                            ))),
                                   ),
-                                )),
-                          );
-                        }
-                        final trip = tripList[index - 1];
-                        return Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  if (selectedTabIndex == index) {
-                                    selectedTabIndex = null;
-                                  } else {
-                                    selectedTabIndex = index;
-                                    showModalBottomSheet(
-                                      context: context,
-                                      backgroundColor: Colors.white,
-                                      isScrollControlled: true,
-                                      constraints: BoxConstraints.tightFor(
-                                        height:
-                                            MediaQuery.sizeOf(context).height *
-                                                0.8,
-                                      ),
-                                      shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(20)),
-                                      ),
-                                      builder: (context) {
-                                        return ViewTripSheet(
-                                          trip: trip,
-                                        );
-                                      },
-                                    );
-                                  }
-                                });
-                              },
-                              child: Container(
-                                  height: 55,
-                                  width: 55,
-                                  decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .secondary
-                                          : Colors.white,
-                                      borderRadius: BorderRadius.circular(30)),
-                                  child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Center(
-                                        child: Text(
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: TextAlign.center,
-                                            trip.countryName,
-                                            style: TextStyle(
-                                                color: isSelected
-                                                    ? Colors.white
-                                                    : Colors.black,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w500)),
-                                      ))),
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              trip.formattedDate,
-                              style: const TextStyle(
-                                  fontSize: 10, fontWeight: FontWeight.w500),
-                            )
-                          ],
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    trip.formattedDate,
+                                    style: const TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500),
+                                  )
+                                ],
+                              );
+                            }),
+                          ),
                         );
-                      }),
+                      },
+                      errorBuilder: (error, st) => const SizedBox.shrink(),
+                      loadingBuilder: Skeletonizer(
+                          enableSwitchAnimation: true,
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            scrollDirection: Axis.horizontal,
+                            child: Wrap(
+                              spacing: 15,
+                              children: List.generate(5, (index) {
+                                return Container(
+                                    height: 55,
+                                    width: 55,
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(30)),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Icon(
+                                        Icons.language_outlined,
+                                        size: 35,
+                                        color: Colors.black,
+                                      ),
+                                    ));
+                              }),
+                            ),
+                          )),
                     ),
                   ),
                 ),
@@ -411,7 +510,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                     },
                     child: AsyncDataWidgetB(
                       dataProvider: getUserItineraryProvider,
-                      dataBuilder: (context, userItinerary) {
+                      dataBuilder: (userItinerary) {
                         final localStorageItinerary = ref
                             .watch(localStorageServiceProvider)
                             .getUserItinerary(
@@ -515,12 +614,12 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                                 .placesCount ??
                                                             0,
                                                     itinary: itinary!,
-                                                    editList: [
-                                                      ...?filteredList[index]
-                                                          .canEdit,
-                                                      ...?filteredList[index]
-                                                          .canView
-                                                    ],
+                                                    editList:
+                                                        filteredList[index]
+                                                            .canEdit!,
+                                                    viewOnly:
+                                                        filteredList[index]
+                                                            .canView!,
                                                     placeUrls: userItinerary
                                                             .itineraryPhotos[
                                                         itinary.id],
@@ -610,20 +709,21 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                       }
                                                     },
                                                     child: MyCreatedItinerary(
-                                                        placeCount:
-                                                            localCollaborateList[
-                                                                        index]
-                                                                    .placesCount ??
-                                                                0,
-                                                        itinary: itinary!,
-                                                        editList: [
-                                                          ...?localCollaborateList[
+                                                      placeCount:
+                                                          localCollaborateList[
+                                                                      index]
+                                                                  .placesCount ??
+                                                              0,
+                                                      itinary: itinary!,
+                                                      editList:
+                                                          localCollaborateList[
                                                                   index]
-                                                              .canEdit,
-                                                          ...?localCollaborateList[
+                                                              .canEdit!,
+                                                      viewOnly:
+                                                          localCollaborateList[
                                                                   index]
-                                                              .canView
-                                                        ]),
+                                                              .canView!,
+                                                    ),
                                                   ),
                                                   const SizedBox(height: 10),
                                                 ],
@@ -696,6 +796,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                               itinary: userItinerarydummyList[index],
                               editList: const [],
                               placeUrls: const [],
+                              viewOnly: const [],
                             );
                           },
                           separatorBuilder: (BuildContext context, int index) {
@@ -750,6 +851,7 @@ class AvatarList extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 child: avtar.imageUrl == null
                     ? UserInitials(
+                        fontSize: 14,
                         name: avtar.name ?? "",
                       )
                     : ImageWidget(url: avtar.imageUrl!)),
@@ -956,7 +1058,7 @@ class _AllFriendsState extends ConsumerState<AllFriends> {
   Widget build(BuildContext context) {
     return AsyncDataWidgetB(
       dataProvider: allFriendsNotifierProvider,
-      dataBuilder: (BuildContext context, data) {
+      dataBuilder: (data) {
         return data!.isEmpty
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1263,8 +1365,6 @@ class AddTripSheet extends ConsumerStatefulWidget {
 
 class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   final TextEditingController _tripFieldController = TextEditingController();
-  DateTime? startDate;
-  DateTime? endDate;
   final FocusNode focusNode = FocusNode();
   final calendarController = CleanCalendarController(
     minDate: DateTime.now(),
@@ -1274,7 +1374,23 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   final _fkey = GlobalKey<FormState>();
 
   @override
+  void initState() {
+    ref.listenManual(createTripNotifierProvider, (previous, next) {
+      switch (next) {
+        case AsyncData<String?> d when d.value != null:
+          ref.invalidate(getTripProvider);
+          Navigator.of(context).pop(next);
+          Common.showSnackBar(context, d.value.toString());
+        case AsyncError e:
+          Common.showSnackBar(context, e.toString());
+      }
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final loading = ref.watch(createTripNotifierProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Form(
@@ -1304,23 +1420,8 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
             const SizedBox(
               height: 10,
             ),
-            TextFormField(
-              controller: _tripFieldController,
-              focusNode: focusNode,
-              decoration: const InputDecoration(
-                  hintText: "Search your Trip place",
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 15),
-                  prefixIcon: Icon(
-                    Icons.location_pin,
-                    color: Colors.grey,
-                  ),
-                  suffixIcon: Icon(
-                    Icons.search,
-                    color: Colors.grey,
-                  )),
-              onTapOutside: (val) {
-                FocusScope.of(context).unfocus();
-              },
+            SearchPlacesWidget(
+              searchController: _tripFieldController,
               validator: (val) {
                 if (val!.isEmpty) {
                   return "Please select country";
@@ -1352,17 +1453,29 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                   width: 20,
                 ),
                 Expanded(
-                    child: ElevatedButton(
-                        onPressed: () {
+                    child: AppButton(
+                        isLoading: loading is AsyncLoading,
+                        onTap: () {
                           if (_fkey.currentState!.validate()) {
                             _fkey.currentState!.save();
-                            Navigator.pop(context);
-                            ref.read(tripNotifierProvider.notifier).addTrip(
-                                Trip(
-                                    countryName:
-                                        _tripFieldController.text.trim(),
-                                    startTime: calendarController.rangeMinDate!,
-                                    endTime: calendarController.rangeMaxDate!));
+                            ref
+                                .read(createTripNotifierProvider.notifier)
+                                .updateForm(
+                                    startDate:
+                                        calendarController
+                                            .rangeMinDate!
+                                            .toIso8601String()
+                                            .split('T')
+                                            .first,
+                                    endDate: calendarController.rangeMaxDate!
+                                        .toIso8601String()
+                                        .split('T')
+                                        .first,
+                                    tripPlace:
+                                        _tripFieldController.text.trim());
+                            ref
+                                .read(createTripNotifierProvider.notifier)
+                                .createTrip();
                           }
                         },
                         child: const Text("Add new Trip")))
@@ -1378,34 +1491,49 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   }
 }
 
-class ViewTripSheet extends StatelessWidget {
+class ViewTripSheet extends ConsumerStatefulWidget {
   const ViewTripSheet({
     super.key,
-    required this.trip,
+    required this.tripId,
   });
 
-  final Trip trip;
+  final int tripId;
 
-  Map<String, List<String>> getDaysByMonth(DateTime start, DateTime end) {
-    Map<String, List<String>> daysByMonth = {};
+  @override
+  ConsumerState<ViewTripSheet> createState() => _ViewTripSheetState();
+}
 
-    DateTime currentDate = start;
-    while (currentDate.isBefore(end) || currentDate.isAtSameMomentAs(end)) {
-      String monthName = DateFormat('MMM').format(currentDate);
-      String day = DateFormat('dd').format(currentDate);
+class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
+  // Map<String, List<String>> getDaysByMonth(DateTime start, DateTime end) {
+  //   Map<String, List<String>> daysByMonth = {};
+  //
+  //   DateTime currentDate = start;
+  //   while (currentDate.isBefore(end) || currentDate.isAtSameMomentAs(end)) {
+  //     String monthName = DateFormat('MMM').format(currentDate);
+  //     String day = DateFormat('dd').format(currentDate);
+  //
+  //     daysByMonth.putIfAbsent(monthName, () => []);
+  //     daysByMonth[monthName]!.add(day);
+  //
+  //     currentDate = currentDate.add(const Duration(days: 1));
+  //   }
+  //
+  //   return daysByMonth;
+  // }
 
-      daysByMonth.putIfAbsent(monthName, () => []);
-      daysByMonth[monthName]!.add(day);
-
-      currentDate = currentDate.add(const Duration(days: 1));
-    }
-
-    return daysByMonth;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.microtask(() {
+        ref.read(tripDetailProvider.notifier).getTripDetails(widget.tripId);
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final daysByMonth = getDaysByMonth(trip.startTime, trip.endTime);
+    // final daysByMonth = getDaysByMonth(trip.startDate, trip.endDate);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -1431,169 +1559,449 @@ class ViewTripSheet extends StatelessWidget {
               const SizedBox.square(dimension: 40)
             ],
           ),
-          Align(
-            alignment: Alignment.center,
-            child: Container(
-              width: 300,
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                  borderRadius: BorderRadius.circular(10)),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Based in ${trip.countryName}",
-                      style: const TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: List.generate(05, (i) {
-                          return Align(
-                            widthFactor: 0.75,
-                            child: Container(
-                              constraints: BoxConstraints.tight(
-                                const Size.fromRadius(17),
-                              ),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border:
-                                    Border.all(width: 2.5, color: Colors.white),
-                              ),
-                              child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: ImageWidget(
-                                      url:
-                                          'https://randomuser.me/api/portraits/men/$i.jpg')),
-                            ),
-                          );
-                        }),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
           Expanded(
-            child: ListView.separated(
-                padding: const EdgeInsets.only(left: 15),
-                shrinkWrap: true,
-                itemBuilder: (BuildContext context, int index) {
-                  final entry = daysByMonth.entries.toList()[index];
-                  final monthName = entry.key;
-                  final days = entry.value;
+            child: AsyncDataWidgetB(
+                dataProvider: tripDetailProvider,
+                dataBuilder: (tripData) {
+                  final friends = tripData?.friendsTrips;
                   return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        monthName.toString(),
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                      Align(
+                        alignment: Alignment.center,
+                        child: Container(
+                          width: 300,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black),
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Based in ${tripData?.trip?.goingTo}",
+                                  style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: InkWell(
+                                    onTap: () {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        backgroundColor: Colors.white,
+                                        isScrollControlled: true,
+                                        constraints: BoxConstraints.tightFor(
+                                          height: MediaQuery.sizeOf(context)
+                                                  .height *
+                                              0.7,
+                                        ),
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(20)),
+                                        ),
+                                        builder: (context) {
+                                          return ViewFriends(
+                                            friends: friends
+                                                .map((e) => {
+                                                      "image":
+                                                          e.friendImage == null
+                                                              ? ""
+                                                              : e.friendImage
+                                                                  .toString(),
+                                                      "name": e.friendName ?? ""
+                                                    })
+                                                .toList(),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Row(
+                                      children: friends!.isEmpty
+                                          ? [const Text("No friends matched")]
+                                          : friends.map((friend) {
+                                              return Align(
+                                                widthFactor: 0.75,
+                                                child: Container(
+                                                  constraints:
+                                                      BoxConstraints.tight(
+                                                    const Size.fromRadius(17),
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                        width: 2.5,
+                                                        color: Colors.white),
+                                                  ),
+                                                  child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                      child: friend
+                                                                  .friendImage ==
+                                                              null
+                                                          ? UserInitials(
+                                                              name: friend
+                                                                      .friendName ??
+                                                                  "",
+                                                              fontSize: 14,
+                                                            )
+                                                          : ImageWidget(
+                                                              url:
+                                                                  "http://fernweh.acublock.in/public/${friend.friendImage}")),
+                                                ),
+                                              );
+                                            }).toList(),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(
                         height: 20,
                       ),
-                      StepperListView(
-                        stepperData: days
-                            .map((e) => StepperItemData(
-                                  id: e.toString(),
-                                  content: ({
-                                    'day': e.toString(),
-                                  }),
-                                ))
-                            .toList(),
-                        stepAvatar: (_, data) {
-                          final stepData = data as StepperItemData;
-                          return PreferredSize(
-                            preferredSize: const Size(20, 0),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                textAlign: TextAlign.start,
-                                stepData.content["day"],
-                                style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                          );
-                        },
-                        stepContentWidget: (_, data) {
-                          final stepData = data as StepperItemData;
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 25),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                stepData.content['day'] == "08" ||
-                                        stepData.content['day'] == "12"
-                                    ? const SizedBox(
-                                        height: 25,
-                                      )
-                                    : Wrap(
-                                        spacing: 8,
-                                        runSpacing: 10,
-                                        children: List.generate(5, (i) {
-                                          return Align(
-                                            widthFactor: 0.45,
-                                            child: Container(
-                                              constraints: BoxConstraints.tight(
-                                                const Size.fromRadius(13),
-                                              ),
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                    width: 2.5,
-                                                    color: Colors.white),
-                                              ),
-                                              child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                  child: ImageWidget(
-                                                      url:
-                                                          'https://randomuser.me/api/portraits/men/$i.jpg')),
-                                            ),
-                                          );
-                                        }),
-                                      ),
-                                const Divider()
-                              ],
-                            ),
-                          );
-                        },
-                        stepperThemeData: StepperThemeData(
-                            lineWidth: 30,
-                            lineColor: Theme.of(context).colorScheme.secondary),
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
+                      Expanded(
+                        child: ListView.separated(
+                            padding: const EdgeInsets.only(left: 15),
+                            shrinkWrap: true,
+                            itemBuilder: (BuildContext context, int index) {
+                              final entry = tripData
+                                  .getDaysByMonthWithFriends.entries
+                                  .toList()[index];
+                              final monthName = entry.key;
+                              final days = entry.value;
+                              final stepperData = days.entries.map((e) {
+                                final day = e.key;
+                                final friends = e.value;
+
+                                return StepperItemData(
+                                  id: day,
+                                  content: {
+                                    'day': day,
+                                    'friends': friends,
+                                  },
+                                );
+                              }).toList();
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    monthName.toString(),
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  StepperListView(
+                                    stepperData: stepperData,
+                                    stepAvatar: (_, data) {
+                                      final stepData = data as StepperItemData;
+                                      final day =
+                                          stepData.content['day'] as String;
+                                      return PreferredSize(
+                                        preferredSize: const Size(20, 0),
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            textAlign: TextAlign.start,
+                                            day,
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    stepContentWidget: (_, data) {
+                                      final stepData = data as StepperItemData;
+                                      final friends =
+                                          stepData.content['friends']
+                                              as List<Map<String, String>>;
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 25),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            friends.isEmpty
+                                                ? const SizedBox(
+                                                    height: 25,
+                                                  )
+                                                : InkWell(
+                                                    onTap: () {
+                                                      showModalBottomSheet(
+                                                        context: context,
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        isScrollControlled:
+                                                            true,
+                                                        constraints:
+                                                            BoxConstraints
+                                                                .tightFor(
+                                                          height:
+                                                              MediaQuery.sizeOf(
+                                                                          context)
+                                                                      .height *
+                                                                  0.7,
+                                                        ),
+                                                        shape:
+                                                            const RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.vertical(
+                                                                  top: Radius
+                                                                      .circular(
+                                                                          20)),
+                                                        ),
+                                                        builder: (context) {
+                                                          return ViewFriends(
+                                                            friends: friends,
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: Wrap(
+                                                      spacing: 8,
+                                                      runSpacing: 10,
+                                                      children:
+                                                          friends.map((friend) {
+                                                        final image =
+                                                            friend['image'];
+                                                        return Align(
+                                                          widthFactor: 0.45,
+                                                          child: Container(
+                                                            constraints:
+                                                                BoxConstraints
+                                                                    .tight(
+                                                              const Size
+                                                                  .fromRadius(
+                                                                  13),
+                                                            ),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              border: Border.all(
+                                                                  width: 2.5,
+                                                                  color: Colors
+                                                                      .white),
+                                                            ),
+                                                            child: ClipRRect(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20),
+                                                                child: image!
+                                                                        .isEmpty
+                                                                    ? UserInitials(
+                                                                        fontSize:
+                                                                            14,
+                                                                        name: friend["name"] ??
+                                                                            "",
+                                                                      )
+                                                                    : ImageWidget(
+                                                                        url:
+                                                                            "http://fernweh.acublock.in/public/$image")),
+                                                          ),
+                                                        );
+                                                      }).toList(),
+                                                    ),
+                                                  ),
+                                            const Divider()
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    stepperThemeData: StepperThemeData(
+                                        lineWidth: 30,
+                                        lineColor: Theme.of(context)
+                                            .colorScheme
+                                            .secondary),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                  )
+                                ],
+                              );
+                            },
+                            separatorBuilder:
+                                (BuildContext context, int index) {
+                              return const SizedBox(
+                                height: 0,
+                              );
+                            },
+                            itemCount: tripData!
+                                .getDaysByMonthWithFriends.keys.length),
                       )
                     ],
                   );
                 },
-                separatorBuilder: (BuildContext context, int index) {
-                  return const SizedBox(
-                    height: 0,
-                  );
-                },
-                itemCount: daysByMonth.keys.length),
-          )
+                errorBuilder: (error, st) => Center(
+                      child: Text(error.toString()),
+                    )),
+          ),
         ],
       ),
     );
   }
 }
+
+class ViewFriends extends ConsumerStatefulWidget {
+  const ViewFriends({super.key, required this.friends});
+
+  final List<Map<String, String>> friends;
+
+  @override
+  ConsumerState<ViewFriends> createState() => _ViewFriendsState();
+}
+
+class _ViewFriendsState extends ConsumerState<ViewFriends> {
+  final searchController = TextEditingController();
+
+  @override
+  void initState() {
+    Future.microtask(() {
+      ref.read(friendViewProvider.notifier).addFriend(widget.friends);
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final friends = ref.watch(friendViewProvider);
+    return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.clear),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: TextFormField(
+                controller: searchController,
+                decoration: const InputDecoration(hintText: "Search friends"),
+                onChanged: (val) {
+                  EasyDebounce.debounce(
+                    'search-friends',
+                    const Duration(seconds: 1),
+                    () {
+                      ref.read(friendViewProvider.notifier).searchFriends(val);
+                    },
+                  );
+                },
+              ),
+            ),
+            Expanded(
+                child: ListView.separated(
+              itemCount: friends.filteredList.isEmpty
+                  ? friends.originalList.length
+                  : friends.filteredList.length,
+              itemBuilder: (BuildContext context, int index) {
+                final friend = friends.filteredList.isEmpty
+                    ? friends.originalList[index]
+                    : friends.filteredList[index];
+                final image = friend['image'];
+                if (searchController.text.isNotEmpty &&
+                    friends.filteredList.isEmpty) {
+                  return Center(
+                      child: Text(
+                          "No result found for ${searchController.text.trim()} "));
+                }
+                return ListTile(
+                  leading: SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: image!.isEmpty
+                            ? UserInitials(
+                                fontSize: 14,
+                                name: friend["name"] ?? "",
+                              )
+                            : ImageWidget(
+                                url:
+                                    "http://fernweh.acublock.in/public/$image")),
+                  ),
+                  title: Text(friend["name"] ?? ""),
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return const SizedBox.shrink();
+              },
+            ))
+          ],
+        ));
+  }
+}
+
+class FriendState {
+  final List<Map<String, String>> originalList;
+  final List<Map<String, String>> filteredList;
+
+  FriendState({required this.originalList, required this.filteredList});
+
+  FriendState copyWith({
+    List<Map<String, String>>? originalList,
+    List<Map<String, String>>? filteredList,
+  }) {
+    return FriendState(
+      originalList: originalList ?? this.originalList,
+      filteredList: filteredList ?? this.filteredList,
+    );
+  }
+}
+
+class FriendsVieNotifier extends StateNotifier<FriendState> {
+  FriendsVieNotifier() : super(FriendState(originalList: [], filteredList: []));
+
+  void addFriend(List<Map<String, String>> friends) {
+    state = state.copyWith(
+      originalList: friends,
+      filteredList: [],
+    );
+  }
+
+  void searchFriends(String query) {
+    if (query.isEmpty) {
+      state = state.copyWith(filteredList: state.originalList);
+    } else {
+      final filtered = state.originalList
+          .where((friend) =>
+              friend['name']!.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+      state = state.copyWith(filteredList: filtered);
+    }
+  }
+
+  void clearSearch() {
+    state = state.copyWith(filteredList: state.originalList);
+  }
+}
+
+final friendViewProvider =
+    StateNotifierProvider<FriendsVieNotifier, FriendState>((ref) {
+  return FriendsVieNotifier();
+});

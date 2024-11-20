@@ -29,7 +29,7 @@ class AsyncDataWidget<T> extends ConsumerWidget {
 
 class AsyncDataWidgetB<T> extends ConsumerWidget {
   final ProviderBase<AsyncValue<T>> dataProvider;
-  final Widget Function(BuildContext context, T data) dataBuilder;
+  final Widget Function( T data) dataBuilder;
   final Widget loadingBuilder;
   final Widget Function(Object, StackTrace) errorBuilder;
 
@@ -49,7 +49,7 @@ class AsyncDataWidgetB<T> extends ConsumerWidget {
       key: ValueKey(asyncValue),
       duration: const Duration(milliseconds: 300),
       child: asyncValue.when(
-          data: (data) => dataBuilder(context, data),
+          data: (data) => dataBuilder( data),
           loading: () => loadingBuilder,
           error: (error, stackTrace) => errorBuilder(error, stackTrace)),
     );

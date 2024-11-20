@@ -34,7 +34,6 @@ class ItenaryDetailsScreen extends ConsumerStatefulWidget {
 }
 
 class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -69,20 +68,6 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
   Widget build(BuildContext context) {
     final itineraryState = ref.watch(itineraryLocalListProvider);
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        elevation: 0,
-        heroTag: null,
-        shape: const StadiumBorder(),
-        backgroundColor: Colors.black,
-        onPressed: () {
-          setState(() {
-            mapView = !mapView;
-          });
-        },
-        child: Image.asset(
-            mapView ? 'assets/images/task.png' : 'assets/images/map.png'),
-      ),
       body: Container(
         constraints: const BoxConstraints.expand(),
         decoration: BoxDecoration(gradient: Config.backgroundGradient),
@@ -208,26 +193,49 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
               ),
               const SizedBox(height: 12),
               Expanded(
-                child: TabBarView(
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      DetailPage(
-                        isMapView: mapView,
-                        type: type,
+                child: Stack(
+                  children: [
+                    TabBarView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          DetailPage(
+                            isMapView: mapView,
+                            type: type,
+                          ),
+                          DetailPage(
+                            isMapView: mapView,
+                            type: type,
+                          ),
+                          DetailPage(
+                            isMapView: mapView,
+                            type: type,
+                          ),
+                          DetailPage(
+                            isMapView: mapView,
+                            type: type,
+                          ),
+                        ]),
+                    AnimatedPositioned(
+                      bottom: mapView ? 230 : 20,
+                      right: mapView ? 10 : 160,
+                      duration: const Duration(milliseconds: 200),
+                      child: FloatingActionButton(
+                        elevation: 0,
+                        heroTag: null,
+                        shape: const StadiumBorder(),
+                        backgroundColor: Colors.black,
+                        onPressed: () {
+                          setState(() {
+                            mapView = !mapView;
+                          });
+                        },
+                        child: Image.asset(mapView
+                            ? 'assets/images/task.png'
+                            : 'assets/images/map.png'),
                       ),
-                      DetailPage(
-                        isMapView: mapView,
-                        type: type,
-                      ),
-                      DetailPage(
-                        isMapView: mapView,
-                        type: type,
-                      ),
-                      DetailPage(
-                        isMapView: mapView,
-                        type: type,
-                      ),
-                    ]),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -253,6 +261,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
   final CustomInfoWindowController _customInfoWindowController =
       CustomInfoWindowController();
   late GoogleMapController mapController;
+
   LatLngBounds calculateBounds(List<Marker> markers) {
     assert(markers.isNotEmpty);
     double minLat = markers.first.position.latitude;
@@ -276,6 +285,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
       northeast: LatLng(maxLat, maxLng),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final icon = ref.watch(bitmapIconProvider);
@@ -287,7 +297,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
           children: [
             AsyncDataWidgetB(
               dataProvider: itineraryPlacesNotifierProvider,
-              dataBuilder: (BuildContext context, itineraryPlace) {
+              dataBuilder: ( itineraryPlace) {
                 markers.clear();
                 for (var data in itineraryPlace) {
                   markers.add(Marker(
@@ -327,14 +337,13 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                         controller;
                     if (itineraryPlace.isNotEmpty) {
                       final bounds = calculateBounds(markers);
-                      Future.delayed(
-                          const Duration(milliseconds: 500),
-                              () async {
-                            await mapController.animateCamera(
-                              CameraUpdate.newLatLngBounds(bounds,
-                                  50), // Adjust padding as needed
-                            );
-                          });
+                      Future.delayed(const Duration(milliseconds: 500),
+                          () async {
+                        await mapController.animateCamera(
+                          CameraUpdate.newLatLngBounds(
+                              bounds, 50), // Adjust padding as needed
+                        );
+                      });
                     }
                   },
                   onCameraMove: (position) async {
@@ -377,7 +386,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
             ),
             _isHide
                 ? Padding(
-                    padding: const EdgeInsets.only(bottom: 100),
+                    padding: const EdgeInsets.only(bottom: 20),
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: AspectRatio(
@@ -385,7 +394,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                           child: AsyncDataWidgetB(
                             dataProvider: itineraryPlacesNotifierProvider,
                             dataBuilder:
-                                (BuildContext context, itineraryPlaces) {
+                                ( itineraryPlaces) {
                               return ListView.separated(
                                 itemCount: itineraryPlaces.length,
                                 scrollDirection: Axis.horizontal,
@@ -452,12 +461,13 @@ class _DetailPageState extends ConsumerState<DetailPage> {
     }
     return AsyncDataWidgetB(
       dataProvider: itineraryPlacesNotifierProvider,
-      dataBuilder: (context, itineraryPlace) {
+      dataBuilder: ( itineraryPlace) {
         return itineraryState.itineraryPlaces.isEmpty
             ? const Center(
                 child: Text("No Places found"),
               )
             : ListView.separated(
+                shrinkWrap: true,
                 itemCount: itineraryState.itineraryPlaces.length,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 itemBuilder: (context, index) {
@@ -476,8 +486,8 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                         ),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
-                      child: ListViewItems(
-                        isWishlist: false,
+                      child: ItinerayItem(
+                        // isWishlist: false,
                         isSelected: itineraryState.selectedItems.isNotEmpty,
                         id: data.id,
                         itineraryId: data.intineraryListId,
@@ -516,7 +526,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
           itemCount: 4,
           padding: const EdgeInsets.symmetric(horizontal: 24),
           itemBuilder: (context, index) {
-            return const ListViewItems(
+            return const ItinerayItem(
               placeType: "kkklkk",
               name: "data.name",
               url:
@@ -545,6 +555,374 @@ class _DetailPageState extends ConsumerState<DetailPage> {
   }
 }
 
+class ItinerayItem extends ConsumerStatefulWidget {
+  final double? width;
+  final String? url;
+  final String? name;
+  final String? address;
+  final String? rating;
+  final String? walkTime;
+  final String? distance;
+  final String placeType;
+  final String? selection;
+  final double? latitude;
+  final double? longitude;
+  final String? placeId;
+  final int? itineraryId;
+  final int? userId;
+  final String? locationId;
+  final int? id;
+  final int? type;
+  final bool isSelected;
+
+  const ItinerayItem(
+      {super.key,
+      this.width,
+      this.url,
+      this.name,
+      this.address,
+      this.rating,
+      this.walkTime,
+      this.distance,
+      required this.placeType,
+      this.selection,
+      this.latitude,
+      this.placeId,
+      this.longitude,
+      this.id,
+      this.locationId,
+      this.userId,
+      this.itineraryId,
+      this.type,
+      this.isSelected = false});
+
+  @override
+  ConsumerState<ItinerayItem> createState() => _ItinerayItemState();
+}
+
+class _ItinerayItemState extends ConsumerState<ItinerayItem> {
+  String? selectedType;
+
+  @override
+  void initState() {
+    setState(() {
+      selectedType = widget.selection;
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Container(
+        //   width: widget.width ?? MediaQuery.sizeOf(context).width,
+        //   height: 30,
+        //   decoration: const BoxDecoration(
+        //     borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+        //     color: Color(0xffF7F7F7),
+        //     border: Border(
+        //       top: BorderSide(color: Color(0xffE2E2E2)),
+        //       left: BorderSide(color: Color(0xffE2E2E2)),
+        //       right: BorderSide(color: Color(0xffE2E2E2)),
+        //     ),
+        //   ),
+        //   child: Padding(
+        //     padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //       children: List.generate(Config.selectionOptions.length, (index) {
+        //         final option = Config.selectionOptions[index].toUpperCase();
+        //         return InkWell(
+        //           onTap: () {
+        //             ref
+        //                 .read(myItineraryNotifierProvider.notifier)
+        //                 .updateForm("type", widget.type);
+        //             ref
+        //                 .read(myItineraryNotifierProvider.notifier)
+        //                 .updateForm("itinerary_id", widget.itineraryId);
+        //             ref
+        //                 .read(myItineraryNotifierProvider.notifier)
+        //                 .updateMyItinerary(id: widget.id ?? 0, form: {
+        //               "intineraryListId": widget.itineraryId,
+        //               "type": index + 1,
+        //               "locationId": widget.locationId,
+        //               "userId": widget.userId
+        //             });
+        //           },
+        //           child: Text(
+        //             option,
+        //             style: TextStyle(
+        //               fontSize: 12,
+        //               fontVariations: FVariations.w600,
+        //               color: widget.selection == option
+        //                   ? const Color(0xff12B347)
+        //                   : Colors.grey,
+        //             ),
+        //           ),
+        //         );
+        //       }),
+        //     ),
+        //   ),
+        // ),
+        InkWell(
+          onTap: () {
+            if (widget.isSelected) {
+              ref
+                  .read(itineraryLocalListProvider.notifier)
+                  .toggleSelection(widget.id ?? 0);
+            } else {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => RestaurantDetailScreen(
+                    locationId: widget.placeId,
+                    latitude: widget.latitude,
+                    longitude: widget.longitude,
+                    types: const [],
+                    image: widget.url ?? "",
+                    name: widget.name,
+                    rating: widget.rating,
+                    walkingTime: widget.walkTime,
+                    distance: widget.distance,
+                    address: widget.address,
+                  ),
+                ),
+              );
+            }
+          },
+          child: Card(
+            elevation: 3,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            child: SizedBox(
+              height: 190,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: AspectRatio(
+                          aspectRatio: 0.85,
+                          child: ImageWidget(
+                            url: widget.url ?? "",
+                          )),
+                    ),
+                    const SizedBox(width: 8.0),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          SizedBox(
+                            // width: 140.0,
+                            child: Text(
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              widget.name ?? "",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontVariations: FVariations.w700,
+                                color: const Color(0xFF1A1B28),
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.star_rounded,
+                                size: 18,
+                                color: Color(0xffF4CA12),
+                              ),
+                              Text(
+                                widget.rating ?? "0",
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: const BoxDecoration(
+                                  color: Color(0xffFFE9E9),
+                                  borderRadius: BorderRadius.horizontal(
+                                    right: Radius.circular(6.0),
+                                    left: Radius.circular(6.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  widget.placeType,
+                                  style: TextStyle(
+                                    color: const Color(0xFFCF5253),
+                                    fontSize: 11,
+                                    fontVariations: FVariations.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          // LocationRow(
+                          //   address: widget.address ?? "",
+                          // ),
+                          const Text(
+                            "Description:",
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 05,),
+                          SizedBox(
+                            height: 30,
+                            child: Text(
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                widget.address ?? "",
+                                style: const TextStyle(
+                                    fontSize: 10, fontWeight: FontWeight.w500)),
+                          ),
+                          // DistanceRow(
+                          //   walkingTime: widget.walkTime ?? "",
+                          //   distance: widget.distance ?? "",
+                          // ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text("Added by:",
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.w500)),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                           Expanded(child: ColoredDropdownButton(selectedType: widget.selection??"",))
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+class DropdownType {
+  final String text;
+  final Color color;
+
+  DropdownType(this.text, this.color);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is DropdownType &&
+              runtimeType == other.runtimeType &&
+              text == other.text &&
+              color == other.color;
+
+  @override
+  int get hashCode => text.hashCode ^ color.hashCode;
+}
+class ColoredDropdownButton extends StatefulWidget {
+  const ColoredDropdownButton({super.key, required this.selectedType});
+
+  final String selectedType;
+
+  @override
+  _ColoredDropdownButtonState createState() => _ColoredDropdownButtonState();
+}
+
+class _ColoredDropdownButtonState extends State<ColoredDropdownButton> {
+  DropdownType? selectedType;
+
+  final List<DropdownType> types = [
+    DropdownType("Want to visit", Colors.red),
+    DropdownType("Visited", Colors.orange),
+    DropdownType("Visited & Liked", Colors.green),
+  ];
+  @override
+  void initState() {
+    super.initState();
+   setState(() {
+     selectedType = _findSelectedType(widget.selectedType);
+   });
+  }
+
+  DropdownType? _findSelectedType(String selectedText) {
+
+    return types.firstWhere(
+          (type) => type.text == selectedText,
+      orElse: () => DropdownType("",Colors.grey),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      height: 45,
+      width: 220,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<DropdownType>(
+          value: types.contains(selectedType) ? selectedType : null,
+          hint: const Text(
+            'choose one',
+            style: TextStyle(
+              color: Colors.grey,
+            ),
+          ),
+          icon: const Icon(
+            Icons.arrow_forward_ios_outlined,
+            size: 16,
+            color: Colors.grey,
+          ),
+          isExpanded: true,
+          items: types.map((type) {
+            return DropdownMenuItem<DropdownType>(
+              value: type,
+              child: Text(
+                type.text,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: type.color,
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              selectedType = value;
+            });
+          },
+          selectedItemBuilder: (BuildContext context) {
+            return types.map((type) {
+              return Text(
+                selectedType?.text ?? 'choose one',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: selectedType?.color ?? Colors.grey,
+                ),
+              );
+            }).toList();
+          },
+        ),
+      ),
+    );
+  }
+}
+
+
 class DetailItem extends ConsumerStatefulWidget {
   final double? width;
   final String? url;
@@ -563,6 +941,7 @@ class DetailItem extends ConsumerStatefulWidget {
   final String? locationId;
   final int? id;
   final int? type;
+  final bool isSelected;
 
   const DetailItem(
       {super.key,
@@ -582,7 +961,8 @@ class DetailItem extends ConsumerStatefulWidget {
       this.locationId,
       this.userId,
       this.itineraryId,
-      this.type});
+      this.type,
+      this.isSelected = false});
 
   @override
   ConsumerState<DetailItem> createState() => _DetailItemState();
@@ -655,22 +1035,28 @@ class _DetailItemState extends ConsumerState<DetailItem> {
         ),
         InkWell(
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => RestaurantDetailScreen(
-                  locationId: widget.placeId,
-                  latitude: widget.latitude,
-                  longitude: widget.longitude,
-                  types: const [],
-                  image: widget.url ?? "",
-                  name: widget.name,
-                  rating: widget.rating,
-                  walkingTime: widget.walkTime,
-                  distance: widget.distance,
-                  address: widget.address,
+            if (widget.isSelected) {
+              ref
+                  .read(itineraryLocalListProvider.notifier)
+                  .toggleSelection(widget.id ?? 0);
+            } else {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => RestaurantDetailScreen(
+                    locationId: widget.placeId,
+                    latitude: widget.latitude,
+                    longitude: widget.longitude,
+                    types: const [],
+                    image: widget.url ?? "",
+                    name: widget.name,
+                    rating: widget.rating,
+                    walkingTime: widget.walkTime,
+                    distance: widget.distance,
+                    address: widget.address,
+                  ),
                 ),
-              ),
-            );
+              );
+            }
           },
           child: Container(
             height: 150,
@@ -800,28 +1186,28 @@ class ListViewItems extends ConsumerStatefulWidget {
   final bool isSelected;
   final bool isWishlist;
 
-  const ListViewItems(
-      {super.key,
-      this.width,
-      this.url,
-      this.name,
-      this.address,
-      this.rating,
-      this.walkTime,
-      this.distance,
-      required this.placeType,
-      this.selection,
-      this.latitude,
-      this.placeId,
-      this.longitude,
-      this.id,
-      this.locationId,
-      this.userId,
-      this.itineraryId,
-      this.isSelected = false,
-      this.type, this.isWishlist = true,
-      });
-
+  const ListViewItems({
+    super.key,
+    this.width,
+    this.url,
+    this.name,
+    this.address,
+    this.rating,
+    this.walkTime,
+    this.distance,
+    required this.placeType,
+    this.selection,
+    this.latitude,
+    this.placeId,
+    this.longitude,
+    this.id,
+    this.locationId,
+    this.userId,
+    this.itineraryId,
+    this.isSelected = false,
+    this.type,
+    this.isWishlist = true,
+  });
 
   @override
   ConsumerState<ListViewItems> createState() => _ListViewItemsState();
@@ -903,9 +1289,13 @@ class _ListViewItemsState extends ConsumerState<ListViewItems> {
             if (widget.isSelected) {
               // Choose the correct provider based on `isWishlist`
               if (widget.isWishlist) {
-                ref.read(wishListProvider.notifier).toggleSelection(widget.placeId!);
+                ref
+                    .read(wishListProvider.notifier)
+                    .toggleSelection(widget.placeId!);
               } else {
-                ref.read(itineraryLocalListProvider.notifier).toggleSelection(widget.id ?? 0);
+                ref
+                    .read(itineraryLocalListProvider.notifier)
+                    .toggleSelection(widget.id ?? 0);
               }
             } else {
               Navigator.of(context).push(

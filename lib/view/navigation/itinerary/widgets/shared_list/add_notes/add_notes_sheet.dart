@@ -103,7 +103,7 @@ class _AddNotesSheetState extends ConsumerState<AddNotesSheet> {
             },
             child: AsyncDataWidgetB(
               dataProvider: getNotesProvider(widget.itineraryId),
-              dataBuilder: (BuildContext context, List<Notes> notes) {
+              dataBuilder: ( List<Notes> notes) {
                 return notes.isEmpty
                     ? Center(
                         child: Column(

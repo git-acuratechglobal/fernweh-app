@@ -148,7 +148,7 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
             Expanded(
                 child: AsyncDataWidgetB(
               dataProvider: searchFriendProvider,
-              dataBuilder: (BuildContext context, friends) {
+              dataBuilder: ( friends) {
                 return ListView.separated(
                   padding: const EdgeInsets.all(24),
                   separatorBuilder: (context, index) =>

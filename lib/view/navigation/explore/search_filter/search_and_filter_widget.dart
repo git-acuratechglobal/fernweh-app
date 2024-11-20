@@ -68,7 +68,7 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
                       bottomRight: Radius.circular(10)),
                   child: AsyncDataWidgetB(
                       dataProvider: searchPlaceNotifierProvider,
-                      dataBuilder: (context, data) {
+                      dataBuilder: ( data) {
                         return ListView.separated(
                             padding: EdgeInsets.zero,
                             shrinkWrap: true,
@@ -232,10 +232,10 @@ class _SearchAndFilterWidgetState extends ConsumerState<SearchAndFilterWidget> {
                             EasyDebounce.debounce(
                               'search-theater',
                               const Duration(seconds: 1),
-                                  () {
-                                    ref
-                                        .read(searchPlaceNotifierProvider.notifier)
-                                        .setSearch(val);
+                              () {
+                                ref
+                                    .read(searchPlaceNotifierProvider.notifier)
+                                    .setSearch(val);
                               },
                             );
                             // ref
@@ -377,6 +377,24 @@ class SearchPlaceNotifier extends _$SearchPlaceNotifier {
     try {
       state = const AsyncLoading();
       final data = await ref.watch(apiServiceProvider).getPlaceSearch(search);
+      state = AsyncData(data);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+}
+
+@riverpod
+class SearchCityAndState extends _$SearchCityAndState {
+  @override
+  FutureOr<List<SearchResult>> build() async {
+    return [];
+  }
+
+  Future<void> searchCityAndState(String search) async {
+    try {
+      state = const AsyncLoading();
+      final data = await ref.watch(apiServiceProvider).getCityAndStateSearch(search);
       state = AsyncData(data);
     } catch (e, st) {
       state = AsyncError(e, st);

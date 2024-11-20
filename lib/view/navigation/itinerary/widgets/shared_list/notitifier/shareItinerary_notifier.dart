@@ -26,7 +26,23 @@ class SharedItinerary extends _$SharedItinerary {
     });
   }
 
+  Future<void> unShareItinerary() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final message = await ref
+          .watch(apiServiceProvider)
+          .unShareItinerary(_formData, _formData["itineraryId"]);
+      ref.invalidate(getUserItineraryProvider);
+      return SharedItineraryState(
+          authEvent: SharedItineraryEvent.unShared, message: message);
+    });
+  }
+
   void updateForm(String key, dynamic value) {
     _formData[key] = value;
+  }
+  void updateFromList(String key, List<String> userIdList) {
+    final commaSeparatedIds = userIdList.join(",");
+    _formData[key] = commaSeparatedIds;
   }
 }

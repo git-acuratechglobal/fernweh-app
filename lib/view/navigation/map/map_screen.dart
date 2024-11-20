@@ -183,7 +183,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         ),
                         AsyncDataWidgetB(
                           dataProvider: addressProvider,
-                          dataBuilder: (BuildContext context, data) {
+                          dataBuilder: (  data) {
                             return Row(
                               children: [
                                 ConstrainedBox(
@@ -241,7 +241,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             visible: _categoryMapView,
                             child: AsyncDataWidgetB(
                                 dataProvider: itineraryNotifierProvider,
-                                dataBuilder: (BuildContext context, category) {
+                                dataBuilder: (  category) {
                                   markers.clear();
                                   for (var data in category) {
                                     markers.add(Marker(
@@ -354,7 +354,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           child: AsyncDataWidgetB(
                             dataProvider: itineraryPlacesNotifierProvider,
                             dataBuilder:
-                                (BuildContext context, itineraryPlace) {
+                                (  itineraryPlace) {
                               markers.clear();
                               if (itineraryPlace.isNotEmpty) {
                                 for (var data in itineraryPlace) {
@@ -572,7 +572,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             height: 36,
                             child: AsyncDataWidgetB(
                               dataProvider: getUserItineraryProvider,
-                              dataBuilder: (context, itinerary) {
+                              dataBuilder: ( itinerary) {
                                 final List<Itenery> filteredList = itinerary.userItinerary
                                     .userIteneries!
                                     .where((e) => e.placesCount != 0)
@@ -737,7 +737,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             padding: const EdgeInsets.only(top: 180),
                             child: AsyncDataWidgetB(
                                 dataProvider: itineraryPlacesNotifierProvider,
-                                dataBuilder: (BuildContext context, category) {
+                                dataBuilder: ( category) {
                                   return ListView.separated(
                                     itemCount: category.length,
                                     padding: const EdgeInsets.symmetric(
@@ -817,7 +817,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                               child: AsyncDataWidgetB(
                                   dataProvider: itineraryPlacesNotifierProvider,
                                   dataBuilder:
-                                      (BuildContext context, category) {
+                                      (  category) {
                                     return ListView.separated(
                                       controller: _scrollController,
                                       scrollDirection: Axis.horizontal,
@@ -925,7 +925,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             padding: const EdgeInsets.only(top: 180),
                             child: AsyncDataWidgetB(
                                 dataProvider: itineraryNotifierProvider,
-                                dataBuilder: (BuildContext context, category) {
+                                dataBuilder: (  category) {
                                   return ListView.separated(
                                     itemCount: category.length,
                                     padding: const EdgeInsets.symmetric(
@@ -1016,7 +1016,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                               child: AsyncDataWidgetB(
                                   dataProvider: itineraryNotifierProvider,
                                   dataBuilder:
-                                      (BuildContext context, category) {
+                                      (  category) {
                                     return category.isEmpty
                                         ? const SizedBox.shrink()
                                         : ListView.separated(

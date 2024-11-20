@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../utils/common/extensions.dart';
+import '../../../../auth/auth_provider/auth_provider.dart';
 import '../../models/itinerary_places.dart';
 import '../../notifier/itinerary_notifier.dart';
 import '../my_itenary_screen.dart';
@@ -13,18 +14,18 @@ import '../shared_list/shared_list_details/shared_details_screen.dart';
 import 'edit_itenerary/edit_itenerary.dart';
 
 class MyCuratedListTab extends StatelessWidget {
-  const MyCuratedListTab({
-    super.key,
-    required this.itinary,
-    required this.isEditing,
-    required this.isSelected,
-    this.placeUrls
-  });
+  const MyCuratedListTab(
+      {super.key,
+      required this.itinary,
+      required this.isEditing,
+      required this.isSelected,
+      this.placeUrls});
 
   final Itinerary itinary;
   final bool isEditing;
   final bool isSelected;
   final List<String>? placeUrls;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -50,25 +51,25 @@ class MyCuratedListTab extends StatelessWidget {
                       child: placeUrls == null
                           ? ImageWidget(url: itinary.imageUrl)
                           : GridView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          padding: EdgeInsets.zero,
-                          itemCount: 4,
-                          shrinkWrap: true,
-                          gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 4.0,
-                            crossAxisSpacing: 4.0,
-                          ),
-                          itemBuilder: (context, index) {
-                            if (index < placeUrls!.length) {
-                              return ImageWidget(url: placeUrls![index]);
-                            } else {
-                              return Container(
-                                color: Colors.grey[300],
-                              );
-                            }
-                          })),
+                              physics: const NeverScrollableScrollPhysics(),
+                              padding: EdgeInsets.zero,
+                              itemCount: 4,
+                              shrinkWrap: true,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 4.0,
+                                crossAxisSpacing: 4.0,
+                              ),
+                              itemBuilder: (context, index) {
+                                if (index < placeUrls!.length) {
+                                  return ImageWidget(url: placeUrls![index]);
+                                } else {
+                                  return Container(
+                                    color: Colors.grey[300],
+                                  );
+                                }
+                              })),
                   Positioned(
                     top: 1,
                     right: 1,
@@ -103,11 +104,13 @@ class MyCreatedItinerary extends ConsumerStatefulWidget {
       required this.itinary,
       required this.placeCount,
       required this.editList,
+      required this.viewOnly,
       this.placeUrls});
 
   final Itinerary itinary;
   final int placeCount;
   final List<Can> editList;
+  final List<Can> viewOnly;
   final List<String>? placeUrls;
 
   @override
@@ -115,9 +118,9 @@ class MyCreatedItinerary extends ConsumerStatefulWidget {
 }
 
 class _MyCreatedItineraryState extends ConsumerState<MyCreatedItinerary> {
-
   @override
   Widget build(BuildContext context) {
+    final userId = ref.watch(userDetailProvider);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -155,7 +158,8 @@ class _MyCreatedItineraryState extends ConsumerState<MyCreatedItinerary> {
                             ),
                             itemBuilder: (context, index) {
                               if (index < widget.placeUrls!.length) {
-                                return ImageWidget(url: widget.placeUrls![index]);
+                                return ImageWidget(
+                                    url: widget.placeUrls![index]);
                               } else {
                                 return Container(
                                   color: Colors.grey[300],
@@ -191,6 +195,7 @@ class _MyCreatedItineraryState extends ConsumerState<MyCreatedItinerary> {
                     const SizedBox(
                       height: 10,
                     ),
+
                     const Text(
                       'Shared with',
                       style: TextStyle(
@@ -202,24 +207,36 @@ class _MyCreatedItineraryState extends ConsumerState<MyCreatedItinerary> {
                       flex: 1,
                       child: GestureDetector(
                           onTap: () {
-                            showModalBottomSheet(
-                              context: context,
-                              backgroundColor: Colors.white,
-                              isScrollControlled: true,
-                              constraints: BoxConstraints.tightFor(
-                                height:
-                                    MediaQuery.sizeOf(context).height * 0.85,
-                              ),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(20)),
-                              ),
-                              builder: (context) {
-                                return const UnShareItenarySheet();
-                              },
-                            );
+                            // if(widget.editList
+                            //     .where((val) => val.id == userId?.id)
+                            //     .isNotEmpty){
+                              showModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.white,
+                                isScrollControlled: true,
+                                constraints: BoxConstraints.tightFor(
+                                  height:
+                                  MediaQuery.sizeOf(context).height * 0.85,
+                                ),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(20)),
+                                ),
+                                builder: (context) {
+                                  return UnShareItenarySheet(
+                                    itineraryId: widget.itinary.id!,
+                                    viewOnly: widget.viewOnly,
+                                    editOnly: widget.editList,
+                                  );
+                                },
+                              );
+                            // }
+
                           },
-                          child: AvatarList(images: widget.editList)),
+                          child: AvatarList(images: [
+                            ...widget.editList,
+                            ...widget.viewOnly
+                          ])),
                     )
                     // const Text(
                     //   'Shared with',

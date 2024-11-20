@@ -71,7 +71,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             ),
                             AsyncDataWidgetB(
                               dataProvider: addressProvider,
-                              dataBuilder: (BuildContext context, data) {
+                              dataBuilder: ( data) {
                                 return Row(
                                   children: [
                                     ConstrainedBox(
@@ -304,7 +304,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               const SizedBox(height: 16),
               AsyncDataWidgetB(
                   dataProvider: friendsItineraryNotifierProvider,
-                  dataBuilder: (context, category) {
+                  dataBuilder: ( category) {
                     return category.isFilterApplied &&
                             category.filterCategories.isEmpty
                         ? const Center(child: Text("No Itinerary Found"))
@@ -458,7 +458,7 @@ class _FriendListState extends ConsumerState<FriendList> {
     final height = MediaQuery.of(context).size.height;
     return AsyncDataWidgetB<FriendsPlacesState>(
         dataProvider: friendsItineraryNotifierProvider,
-        dataBuilder: (context, category) {
+        dataBuilder: ( category) {
           return category.isFilterApplied && category.filterList.isEmpty
               ? const Center(child: Text("No Itinerary Found"))
               : category.placesList.isEmpty

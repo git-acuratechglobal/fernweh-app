@@ -74,6 +74,7 @@ class Can {
       return null;
     }
   }
+
 }
 
 @JsonSerializable()

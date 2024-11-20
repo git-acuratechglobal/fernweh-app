@@ -1,26 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'shareItinerary_notifier.dart';
+part of 'create_trip_notifier.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sharedItineraryHash() => r'0617802d497f913ba31e3f7c4cfc666ba7c80a17';
+String _$createTripNotifierHash() =>
+    r'f2a869cbd9efa53e7485d1b06265e5ff9b3b2dc3';
 
-/// See also [SharedItinerary].
-@ProviderFor(SharedItinerary)
-final sharedItineraryProvider = AutoDisposeAsyncNotifierProvider<
-    SharedItinerary, SharedItineraryState?>.internal(
-  SharedItinerary.new,
-  name: r'sharedItineraryProvider',
+/// See also [CreateTripNotifier].
+@ProviderFor(CreateTripNotifier)
+final createTripNotifierProvider =
+    AutoDisposeAsyncNotifierProvider<CreateTripNotifier, String?>.internal(
+  CreateTripNotifier.new,
+  name: r'createTripNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$sharedItineraryHash,
+      : _$createTripNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$SharedItinerary = AutoDisposeAsyncNotifier<SharedItineraryState?>;
+typedef _$CreateTripNotifier = AutoDisposeAsyncNotifier<String?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
