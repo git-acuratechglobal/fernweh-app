@@ -1,3 +1,4 @@
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/view/navigation/explore/wish_list/wish_list_screen.dart';
 import 'package:fernweh/view/navigation/map/notifier/category_notifier.dart';
@@ -183,7 +184,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         ),
                         AsyncDataWidgetB(
                           dataProvider: addressProvider,
-                          dataBuilder: (  data) {
+                          dataBuilder: (data) {
                             return Row(
                               children: [
                                 ConstrainedBox(
@@ -241,7 +242,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             visible: _categoryMapView,
                             child: AsyncDataWidgetB(
                                 dataProvider: itineraryNotifierProvider,
-                                dataBuilder: (  category) {
+                                dataBuilder: (category) {
                                   markers.clear();
                                   for (var data in category) {
                                     markers.add(Marker(
@@ -322,8 +323,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     markers: Set.from(markers),
                                     onCameraMoveStarted: () {
                                       setState(() {
-                                        showSearchMessage = true;
+                                        showSearchMessage = false;
                                       });
+                                      EasyDebounce.debounce(
+                                        'search-message',
+                                        const Duration(seconds: 3),
+                                        () {
+                                          setState(() {
+                                            showSearchMessage = true;
+                                          });
+                                        },
+                                      );
                                     },
                                     onCameraMove: (position) {
                                       setState(() {
@@ -353,8 +363,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           visible: _itineraryMapView,
                           child: AsyncDataWidgetB(
                             dataProvider: itineraryPlacesNotifierProvider,
-                            dataBuilder:
-                                (  itineraryPlace) {
+                            dataBuilder: (itineraryPlace) {
                               markers.clear();
                               if (itineraryPlace.isNotEmpty) {
                                 for (var data in itineraryPlace) {
@@ -572,9 +581,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             height: 36,
                             child: AsyncDataWidgetB(
                               dataProvider: getUserItineraryProvider,
-                              dataBuilder: ( itinerary) {
-                                final List<Itenery> filteredList = itinerary.userItinerary
-                                    .userIteneries!
+                              dataBuilder: (itinerary) {
+                                final List<Itenery> filteredList = itinerary
+                                    .userItinerary.userIteneries!
                                     .where((e) => e.placesCount != 0)
                                     .toList();
                                 return filteredList.isEmpty
@@ -737,7 +746,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             padding: const EdgeInsets.only(top: 180),
                             child: AsyncDataWidgetB(
                                 dataProvider: itineraryPlacesNotifierProvider,
-                                dataBuilder: ( category) {
+                                dataBuilder: (category) {
                                   return ListView.separated(
                                     itemCount: category.length,
                                     padding: const EdgeInsets.symmetric(
@@ -816,8 +825,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                               aspectRatio: 2.7,
                               child: AsyncDataWidgetB(
                                   dataProvider: itineraryPlacesNotifierProvider,
-                                  dataBuilder:
-                                      (  category) {
+                                  dataBuilder: (category) {
                                     return ListView.separated(
                                       controller: _scrollController,
                                       scrollDirection: Axis.horizontal,
@@ -925,7 +933,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             padding: const EdgeInsets.only(top: 180),
                             child: AsyncDataWidgetB(
                                 dataProvider: itineraryNotifierProvider,
-                                dataBuilder: (  category) {
+                                dataBuilder: (category) {
                                   return ListView.separated(
                                     itemCount: category.length,
                                     padding: const EdgeInsets.symmetric(
@@ -1015,8 +1023,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                               aspectRatio: 2.7,
                               child: AsyncDataWidgetB(
                                   dataProvider: itineraryNotifierProvider,
-                                  dataBuilder:
-                                      (  category) {
+                                  dataBuilder: (category) {
                                     return category.isEmpty
                                         ? const SizedBox.shrink()
                                         : ListView.separated(
@@ -1293,624 +1300,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
   }
 
-// void navigateToScreen(Category data) {
-//   _customInfoWindowController.addInfoWindow!(
-//       MarkerInfo(
-//         data: data,
-//       ),
-//       LatLng(double.parse(data.latitude.toString()),
-//           double.parse(data.longitude.toString())));
-// }
-//
-// void itineraryMarkerInfo(ItineraryPlaces data) {
-//   _customInfoWindowController.addInfoWindow!(
-//       ItineraryMarkersInfo(
-//         data: data,
-//       ),
-//       LatLng(double.parse(data.latitude.toString()),
-//           double.parse(data.longitude.toString())));
-// }
+
 }
 
-// class MarkerInfo extends StatelessWidget {
-//   const MarkerInfo({super.key, required this.data});
-//
-//   final Category data;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return GestureDetector(
-//       onTap: () {
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(
-//             builder: (context) => RestaurantDetailScreen(
-//               distance: data.distance.toString(),
-//               walkingTime:
-//                   convertMinutes(int.parse(data.walkingTime.toString())),
-//               address: data.vicinity,
-//               images: data.photoUrls!.isEmpty ? [""] : data.photoUrls,
-//               name: data.name,
-//               rating: data.rating.toString(),
-//               locationId: data.placeId ?? "",
-//             ),
-//           ),
-//         );
-//       },
-//       child: Container(
-//         decoration: const BoxDecoration(
-//           color: Colors.white,
-//           boxShadow: [
-//             BoxShadow(
-//               color: Color(0x661A1B28),
-//               blurRadius: 24,
-//               offset: Offset(0, 12),
-//               spreadRadius: 0,
-//             )
-//           ],
-//         ),
-//         child: Row(
-//           children: [
-//             SizedBox(
-//               height: 70,
-//               width: 80,
-//               child: CachedNetworkImage(
-//                   imageUrl: data.photoUrls!.isEmpty ? "" : data.photoUrls![0],
-//                   progressIndicatorBuilder: (context, url, progress) =>
-//                       const Center(child: LoadingWidget()),
-//                   errorWidget: (context, url, error) => const Icon(Icons.error),
-//                   fit: BoxFit.cover),
-//             ),
-//             const SizedBox(width: 16),
-//             Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               children: [
-//                 SizedBox(
-//                   width: 120,
-//                   child: Text(
-//                       overflow: TextOverflow.ellipsis,
-//                       data.name.toString(),
-//                       style: const TextStyle(
-//                           fontSize: 18, fontWeight: FontWeight.bold)),
-//                 ),
-//                 const SizedBox(height: 4),
-//                 Row(
-//                   children: [
-//                     const Icon(
-//                       Icons.star_rounded,
-//                       size: 18,
-//                       color: Color(0xffF4CA12),
-//                     ),
-//                     data.rating == null
-//                         ? const Text(
-//                             "0",
-//                             style: TextStyle(fontSize: 12),
-//                           )
-//                         : Text(
-//                             data.rating.toString(),
-//                             style: const TextStyle(fontSize: 12),
-//                           )
-//                   ],
-//                 )
-//               ],
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class PlacesSheet extends StatelessWidget {
-//   const PlacesSheet(
-//       {super.key, required this.scrollController, required this.categories});
-//
-//   final List<Category> categories;
-//
-//   final ScrollController scrollController;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListView(
-//       controller: scrollController,
-//       children: [
-//         Padding(
-//           padding: const EdgeInsets.all(15.0),
-//           child: Align(
-//             alignment: Alignment.topCenter,
-//             child: Container(
-//               width: 40,
-//               height: 6,
-//               decoration: BoxDecoration(
-//                 color: const Color(0xffCDCFD0),
-//                 borderRadius: BorderRadius.circular(10),
-//               ),
-//             ),
-//           ),
-//         ),
-//         ListView.separated(
-//           physics: const NeverScrollableScrollPhysics(),
-//           shrinkWrap: true,
-//           padding: const EdgeInsets.symmetric(horizontal: 20),
-//           itemCount: categories.length,
-//           itemBuilder: (BuildContext context, int index) {
-//             final category = categories[index];
-//             return GestureDetector(
-//               onTap: () {
-//                 Navigator.of(context).push(
-//                   MaterialPageRoute(
-//                     builder: (context) => RestaurantDetailScreen(
-//                       distance: category.distance.toString(),
-//                       walkingTime: convertMinutes(
-//                           int.parse(category.walkingTime.toString())),
-//                       address: category.vicinity,
-//                       images: category.photoUrls!.isEmpty
-//                           ? null
-//                           : category.photoUrls,
-//                       name: category.name,
-//                       rating: category.rating.toString(),
-//                       locationId: category.placeId ?? "",
-//                     ),
-//                   ),
-//                 );
-//               },
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   AspectRatio(
-//                     aspectRatio: 3,
-//                     child: category.photoUrls!.isEmpty
-//                         ? const ImageWidget(url: "")
-//                         : ListView.separated(
-//                             scrollDirection: Axis.horizontal,
-//                             itemCount: category.photoUrls!.length,
-//                             itemBuilder: (BuildContext context, int index1) {
-//                               final url = category.photoUrls?[index1];
-//                               return ClipRRect(
-//                                 borderRadius: BorderRadius.circular(10),
-//                                 child: ImageWidget(url: url ?? ""),
-//                               );
-//                             },
-//                             separatorBuilder:
-//                                 (BuildContext context, int index) {
-//                               return const SizedBox(width: 10);
-//                             },
-//                           ),
-//                   ),
-//                   const SizedBox(
-//                     height: 10,
-//                   ),
-//                   Row(
-//                     children: [
-//                       Expanded(
-//                         child: Text(
-//                           overflow: TextOverflow.ellipsis,
-//                           category.name ?? "",
-//                           style: TextStyle(
-//                             fontSize: 18,
-//                             fontVariations: FVariations.w700,
-//                             color: const Color(0xFF1A1B28),
-//                           ),
-//                         ),
-//                       ),
-//                       const SizedBox(
-//                         width: 10,
-//                       ),
-//                       // Text(
-//                       //  "(${formatCategory(category.type ?? "")})" ,
-//                       //   style: TextStyle(
-//                       //     fontSize: 18,
-//                       //     fontVariations: FVariations.w700,
-//                       //     color: const Color(0xFF1A1B28),
-//                       //   ),
-//                       // ),
-//                     ],
-//                   ),
-//                   const SizedBox(
-//                     height: 5,
-//                   ),
-//                   Row(
-//                     children: [
-//                       const Icon(
-//                         Icons.star_rounded,
-//                         size: 18,
-//                         color: Color(0xffF4CA12),
-//                       ),
-//                       category.rating.toString() == "null"
-//                           ? const Text(
-//                               '0 ',
-//                               style: TextStyle(fontSize: 12),
-//                             )
-//                           : Text(
-//                               category.rating.toString(),
-//                               style: const TextStyle(fontSize: 12),
-//                             ),
-//                       Text(
-//                         " (${category.userRatingsTotal})",
-//                         style: const TextStyle(fontSize: 12),
-//                       )
-//                     ],
-//                   ),
-//                   const SizedBox(height: 5),
-//                   SizedBox(
-//                       width: 280,
-//                       child: LocationRow(
-//                         address: category.vicinity ?? "",
-//                       )),
-//                   const SizedBox(height: 5),
-//                   DistanceRow(
-//                     walkingTime: category.walkingTime.toString(),
-//                     distance: category.distance.toString(),
-//                   ),
-//                 ],
-//               ),
-//             );
-//           },
-//           separatorBuilder: (BuildContext context, int index) {
-//             return Padding(
-//               padding: const EdgeInsets.symmetric(vertical: 20),
-//               child: Container(
-//                 height: 6,
-//                 decoration: BoxDecoration(
-//                     color: Colors.grey.shade200,
-//                     borderRadius: BorderRadius.circular(10)),
-//               ),
-//             );
-//           },
-//         )
-//       ],
-//     );
-//   }
-// }
-
-// class SinglePlaceSheet extends StatelessWidget {
-//   const SinglePlaceSheet(
-//       {super.key, required this.category, required this.scrollController});
-//
-//   final Category category;
-//   final ScrollController scrollController;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(horizontal: 15),
-//       child: GestureDetector(
-//         onTap: () {
-//           Navigator.of(context).push(
-//             MaterialPageRoute(
-//               builder: (context) => RestaurantDetailScreen(
-//                 distance: category.distance.toString(),
-//                 walkingTime:
-//                     convertMinutes(int.parse(category.walkingTime.toString())),
-//                 address: category.vicinity,
-//                 images: category.photoUrls!.isEmpty ? null : category.photoUrls,
-//                 name: category.name,
-//                 rating: category.rating.toString(),
-//                 locationId: category.placeId ?? "",
-//               ),
-//             ),
-//           );
-//         },
-//         child: ListView(
-//           controller: scrollController,
-//           children: [
-//             Padding(
-//               padding: const EdgeInsets.all(15.0),
-//               child: Align(
-//                 alignment: Alignment.topCenter,
-//                 child: Container(
-//                   width: 40,
-//                   height: 6,
-//                   decoration: BoxDecoration(
-//                     color: const Color(0xffCDCFD0),
-//                     borderRadius: BorderRadius.circular(10),
-//                   ),
-//                 ),
-//               ),
-//             ),
-//             AspectRatio(
-//               aspectRatio: 3,
-//               child: category.photoUrls!.isEmpty
-//                   ? const ImageWidget(url: "")
-//                   : ListView.separated(
-//                       scrollDirection: Axis.horizontal,
-//                       itemCount: category.photoUrls!.length,
-//                       itemBuilder: (BuildContext context, int index1) {
-//                         final url = category.photoUrls?[index1];
-//                         return ClipRRect(
-//                           borderRadius: BorderRadius.circular(10),
-//                           child: ImageWidget(url: url ?? ""),
-//                         );
-//                       },
-//                       separatorBuilder: (BuildContext context, int index) {
-//                         return const SizedBox(width: 10);
-//                       },
-//                     ),
-//             ),
-//             const SizedBox(
-//               height: 10,
-//             ),
-//             Text(
-//               category.name ?? "",
-//               style: TextStyle(
-//                 fontSize: 18,
-//                 fontVariations: FVariations.w700,
-//                 color: const Color(0xFF1A1B28),
-//               ),
-//             ),
-//             const SizedBox(
-//               height: 5,
-//             ),
-//             Row(
-//               children: [
-//                 const Icon(
-//                   Icons.star_rounded,
-//                   size: 18,
-//                   color: Color(0xffF4CA12),
-//                 ),
-//                 category.rating.toString() == "null"
-//                     ? const Text(
-//                         '0 ',
-//                         style: TextStyle(fontSize: 12),
-//                       )
-//                     : Text(
-//                         category.rating.toString(),
-//                         style: const TextStyle(fontSize: 12),
-//                       ),
-//                 Text(
-//                   " (${category.userRatingsTotal})",
-//                   style: const TextStyle(fontSize: 12),
-//                 )
-//               ],
-//             ),
-//             const SizedBox(height: 5),
-//             SizedBox(
-//                 width: 280,
-//                 child: LocationRow(
-//                   address: category.vicinity ?? "",
-//                 )),
-//             const SizedBox(height: 5),
-//             DistanceRow(
-//               walkingTime: category.walkingTime.toString(),
-//               distance: category.distance.toString(),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class ItineraryPlacesSheet extends StatelessWidget {
-//   const ItineraryPlacesSheet(
-//       {super.key, required this.itineraries, required this.scrollController});
-//
-//   final List<ItineraryPlaces> itineraries;
-//
-//   final ScrollController scrollController;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListView(
-//       controller: scrollController,
-//       children: [
-//         Padding(
-//           padding: const EdgeInsets.all(15.0),
-//           child: Align(
-//             alignment: Alignment.topCenter,
-//             child: Container(
-//               width: 40,
-//               height: 6,
-//               decoration: BoxDecoration(
-//                 color: const Color(0xffCDCFD0),
-//                 borderRadius: BorderRadius.circular(10),
-//               ),
-//             ),
-//           ),
-//         ),
-//         ListView.separated(
-//           physics: const NeverScrollableScrollPhysics(),
-//           shrinkWrap: true,
-//           padding: const EdgeInsets.symmetric(horizontal: 20),
-//           itemCount: itineraries.length,
-//           itemBuilder: (BuildContext context, int index) {
-//             final category = itineraries[index];
-//             return GestureDetector(
-//               onTap: () {
-//                 Navigator.of(context).push(
-//                   MaterialPageRoute(
-//                     builder: (context) => RestaurantDetailScreen(
-//                       distance: category.distance.toString(),
-//                       walkingTime: convertMinutes(
-//                           int.parse(category.walkingTime.toString())),
-//                       address: category.vicinity,
-//                       name: category.name,
-//                       rating: category.rating.toString(),
-//                     ),
-//                   ),
-//                 );
-//               },
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   AspectRatio(
-//                     aspectRatio: 3,
-//                     child: ClipRRect(
-//                       borderRadius: BorderRadius.circular(10),
-//                       child: ImageWidget(url: category.photo ?? ""),
-//                     ),
-//                   ),
-//                   const SizedBox(
-//                     height: 10,
-//                   ),
-//                   Text(
-//                     category.name ?? "",
-//                     style: TextStyle(
-//                       fontSize: 18,
-//                       fontVariations: FVariations.w700,
-//                       color: const Color(0xFF1A1B28),
-//                     ),
-//                   ),
-//                   const SizedBox(
-//                     height: 5,
-//                   ),
-//                   Row(
-//                     children: [
-//                       const Icon(
-//                         Icons.star_rounded,
-//                         size: 18,
-//                         color: Color(0xffF4CA12),
-//                       ),
-//                       category.rating.toString() == "null"
-//                           ? const Text(
-//                               '0 ',
-//                               style: TextStyle(fontSize: 12),
-//                             )
-//                           : Text(
-//                               category.rating.toString(),
-//                               style: const TextStyle(fontSize: 12),
-//                             ),
-//                       // Text(
-//                       //   " (${category})",
-//                       //   style: const TextStyle(fontSize: 12),
-//                       // )
-//                     ],
-//                   ),
-//                   const SizedBox(height: 5),
-//                   SizedBox(
-//                       width: 280,
-//                       child: LocationRow(
-//                         address: category.vicinity ?? "",
-//                       )),
-//                   const SizedBox(height: 5),
-//                   DistanceRow(
-//                     walkingTime: category.walkingTime.toString(),
-//                     distance: category.distance.toString(),
-//                   ),
-//                 ],
-//               ),
-//             );
-//           },
-//           separatorBuilder: (BuildContext context, int index) {
-//             return Padding(
-//               padding: const EdgeInsets.symmetric(vertical: 10),
-//               child: Container(
-//                 height: 6,
-//                 decoration: BoxDecoration(
-//                     color: Colors.grey.shade200,
-//                     borderRadius: BorderRadius.circular(10)),
-//               ),
-//             );
-//           },
-//         )
-//       ],
-//     );
-//   }
-// }
-
-// class ItinerarySinglePlace extends StatelessWidget {
-//   const ItinerarySinglePlace(
-//       {super.key,
-//       required this.itineraryPlaces,
-//       required this.scrollController});
-//
-//   final ItineraryPlaces itineraryPlaces;
-//   final ScrollController scrollController;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(horizontal: 15),
-//       child: GestureDetector(
-//         onTap: () {
-//           Navigator.of(context).push(
-//             MaterialPageRoute(
-//               builder: (context) => RestaurantDetailScreen(
-//                 distance: itineraryPlaces.distance.toString(),
-//                 walkingTime: convertMinutes(
-//                     int.parse(itineraryPlaces.walkingTime.toString())),
-//                 address: itineraryPlaces.vicinity,
-//                 name: itineraryPlaces.name,
-//                 rating: itineraryPlaces.rating.toString(),
-//               ),
-//             ),
-//           );
-//         },
-//         child: ListView(
-//           controller: scrollController,
-//           children: [
-//             Padding(
-//               padding: const EdgeInsets.all(15.0),
-//               child: Align(
-//                 alignment: Alignment.topCenter,
-//                 child: Container(
-//                   width: 40,
-//                   height: 6,
-//                   decoration: BoxDecoration(
-//                     color: const Color(0xffCDCFD0),
-//                     borderRadius: BorderRadius.circular(10),
-//                   ),
-//                 ),
-//               ),
-//             ),
-//             AspectRatio(
-//               aspectRatio: 3,
-//               child: ClipRRect(
-//                 borderRadius: BorderRadius.circular(10),
-//                 child: ImageWidget(url: itineraryPlaces.photo ?? ""),
-//               ),
-//             ),
-//             const SizedBox(
-//               height: 10,
-//             ),
-//             Text(
-//               itineraryPlaces.name ?? "",
-//               style: TextStyle(
-//                 fontSize: 18,
-//                 fontVariations: FVariations.w700,
-//                 color: const Color(0xFF1A1B28),
-//               ),
-//             ),
-//             const SizedBox(
-//               height: 5,
-//             ),
-//             Row(
-//               children: [
-//                 const Icon(
-//                   Icons.star_rounded,
-//                   size: 18,
-//                   color: Color(0xffF4CA12),
-//                 ),
-//                 itineraryPlaces.rating.toString() == "null"
-//                     ? const Text(
-//                         '0 ',
-//                         style: TextStyle(fontSize: 12),
-//                       )
-//                     : Text(
-//                         itineraryPlaces.rating.toString(),
-//                         style: const TextStyle(fontSize: 12),
-//                       ),
-//                 // Text(
-//                 //   " (${category.userRatingsTotal})",
-//                 //   style: const TextStyle(fontSize: 12),
-//                 // )
-//               ],
-//             ),
-//             const SizedBox(height: 5),
-//             SizedBox(
-//                 width: 280,
-//                 child: LocationRow(
-//                   address: itineraryPlaces.vicinity ?? "",
-//                 )),
-//             const SizedBox(height: 5),
-//             DistanceRow(
-//               walkingTime: itineraryPlaces.walkingTime.toString(),
-//               distance: itineraryPlaces.distance.toString(),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
