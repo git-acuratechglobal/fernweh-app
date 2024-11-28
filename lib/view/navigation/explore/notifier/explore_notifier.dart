@@ -6,6 +6,7 @@ import '../../../../services/api_service/api_service.dart';
 import '../../../location_permission/location_service.dart';
 import '../../friends_list/model/friends.dart';
 import '../../friends_list/model/friends_itinerary.dart';
+import '../../itinerary/models/itinerary_model.dart';
 import '../../itinerary/models/itinerary_places.dart';
 import '../../map/model/category.dart';
 
@@ -20,12 +21,12 @@ class FriendsItineraryNotifier extends _$FriendsItineraryNotifier {
         await ref.watch(friendListProvider.notifier).loadAllData();
     final List<int> friendsId =
         friendsList.data.map((friend) => friend.id ?? 0).toList();
-    final List<FriendsItinerary> friendItineray = [];
+    final List<Itinerary> friendItineray = [];
     for (int friendId in friendsId) {
       try {
-        final List<FriendsItinerary> friendItinerary =
+        final List<Itinerary> friendItinerary =
             await ref.watch(apiServiceProvider).getFriendsItinerary(friendId);
-        List<FriendsItinerary> filteredList =
+        List<Itinerary> filteredList =
             friendItinerary.where((e) => e.type == "1").toList();
         friendItineray.addAll(filteredList);
       } catch (e) {

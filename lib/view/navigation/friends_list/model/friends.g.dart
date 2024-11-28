@@ -26,4 +26,5 @@ Friends _$FriendsFromJson(Map<String, dynamic> json) => Friends(
           ? null
           : DateTime.parse(json['updated_at'] as String),
       itineraryCount: (json['itinerary_count'] as num?)?.toInt(),
+      userFollowed: json['user_followed'] as String?,
     );

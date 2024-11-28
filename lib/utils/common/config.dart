@@ -1,7 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-
+printLog(String message) {
+  if (kDebugMode) {
+    return debugPrint(message);
+  }
+}
 abstract class Config {
   static LinearGradient backgroundGradient = const LinearGradient(
     begin: Alignment.topCenter,
@@ -55,14 +60,14 @@ abstract class Config {
   static List<({String name, int id})> itinaryOptions = [
     (name: "Want to visit", id: 1),
     (name: "Visited", id: 2),
-    (name: "Will visit again", id: 3),
+    (name: "Visited & Liked", id: 3),
   ];
 
   static List<String> tabOptions = [
     "All",
     "Want to visit",
     "Visited",
-    "Will visit again",
+    "Visited & Liked",
   ];
 
   static List<({String image, String title})> onboarding = [
@@ -77,7 +82,7 @@ abstract class Config {
   static List<String> selectionOptions = [
     "Want to visit",
     "Visited",
-    "Will visit again",
+    "Visited & Liked",
   ];
 
   static List<String> sortBy = [

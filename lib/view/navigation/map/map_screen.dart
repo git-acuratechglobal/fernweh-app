@@ -342,13 +342,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     },
                                   );
                                 },
-                                loadingBuilder: const Stack(
-                                  children: [
-                                    Scaffold(
-                                      backgroundColor: Colors.black54,
-                                      body: Center(child: LoadingWidget()),
-                                    )
-                                  ],
+                                loadingBuilder: const Scaffold(
+                                  backgroundColor: Colors.black54,
+                                  body: Center(child: LoadingWidget()),
                                 ),
                                 errorBuilder: (error, stack) =>
                                     const SizedBox())),
@@ -362,90 +358,89 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         child: Visibility.maintain(
                           visible: _itineraryMapView,
                           child: AsyncDataWidgetB(
-                            dataProvider: itineraryPlacesNotifierProvider,
-                            dataBuilder: (itineraryPlace) {
-                              markers.clear();
-                              if (itineraryPlace.isNotEmpty) {
-                                for (var data in itineraryPlace) {
-                                  markers.add(Marker(
-                                      icon: icon.value ??
-                                          BitmapDescriptor.defaultMarker,
-                                      consumeTapEvents: true,
-                                      markerId:
-                                          MarkerId(data.locationId.toString()),
-                                      position: LatLng(
-                                        double.parse(data.latitude.toString()),
-                                        double.parse(data.longitude.toString()),
-                                      ),
-                                      onTap: () async {
-                                        final latlng = LatLng(
+                              dataProvider: itineraryPlacesNotifierProvider,
+                              dataBuilder: (itineraryPlace) {
+                                markers.clear();
+                                if (itineraryPlace.isNotEmpty) {
+                                  for (var data in itineraryPlace) {
+                                    markers.add(Marker(
+                                        icon: icon.value ??
+                                            BitmapDescriptor.defaultMarker,
+                                        consumeTapEvents: true,
+                                        markerId: MarkerId(
+                                            data.locationId.toString()),
+                                        position: LatLng(
                                           double.parse(
                                               data.latitude.toString()),
                                           double.parse(
                                               data.longitude.toString()),
-                                        );
-                                        await mapController
-                                            .animateCamera(
-                                                CameraUpdate.newLatLng(latlng))
-                                            .then((val) {
-                                          // itineraryMarkerInfo(data);
-                                        });
-                                        setState(() {
-                                          _scrollToSelectedItineraryPlace(
-                                              itineraryPlace,
-                                              data.id.toString());
-                                          selectedPlaceId = data.id.toString();
-                                        });
-                                      }));
+                                        ),
+                                        onTap: () async {
+                                          final latlng = LatLng(
+                                            double.parse(
+                                                data.latitude.toString()),
+                                            double.parse(
+                                                data.longitude.toString()),
+                                          );
+                                          await mapController
+                                              .animateCamera(
+                                                  CameraUpdate.newLatLng(
+                                                      latlng))
+                                              .then((val) {
+                                            // itineraryMarkerInfo(data);
+                                          });
+                                          setState(() {
+                                            _scrollToSelectedItineraryPlace(
+                                                itineraryPlace,
+                                                data.id.toString());
+                                            selectedPlaceId =
+                                                data.id.toString();
+                                          });
+                                        }));
+                                  }
                                 }
-                              }
 
-                              return GoogleMap(
-                                zoomControlsEnabled: false,
-                                myLocationButtonEnabled: false,
-                                initialCameraPosition: CameraPosition(
-                                  zoom: 10.0,
-                                  target: latLag == null
-                                      ? LatLng(currentPosition!.latitude,
-                                          currentPosition.longitude)
-                                      : LatLng(
-                                          latLag.latitude, latLag.longitude),
-                                ),
-                                onMapCreated: (controller) async {
-                                  mapController = controller;
-                                  final bounds = calculateBounds(markers);
-                                  Future.delayed(
-                                      const Duration(milliseconds: 500),
-                                      () async {
-                                    await mapController.animateCamera(
-                                      CameraUpdate.newLatLngBounds(bounds,
-                                          100), // Adjust padding as needed
-                                    );
-                                  });
-                                },
-                                onCameraMove: (position) async {},
-                                onTap: (latLng) {
-                                  setState(() {
-                                    itemsHide = !itemsHide;
-                                  });
-                                },
-                                markers: Set.from(markers),
-                              );
-                            },
-                            errorBuilder: (e, st) => Center(
-                              child: Text(e.toString()),
-                            ),
-                            loadingBuilder: const Stack(
-                              children: [
-                                Scaffold(
-                                  backgroundColor: Colors.black45,
-                                  body: Center(
-                                    child: LoadingWidget(),
+                                return GoogleMap(
+                                  zoomControlsEnabled: false,
+                                  myLocationButtonEnabled: false,
+                                  initialCameraPosition: CameraPosition(
+                                    zoom: 10.0,
+                                    target: latLag == null
+                                        ? LatLng(currentPosition!.latitude,
+                                            currentPosition.longitude)
+                                        : LatLng(
+                                            latLag.latitude, latLag.longitude),
                                   ),
-                                )
-                              ],
-                            ),
-                          ),
+                                  onMapCreated: (controller) async {
+                                    mapController = controller;
+                                    final bounds = calculateBounds(markers);
+                                    Future.delayed(
+                                        const Duration(milliseconds: 500),
+                                        () async {
+                                      await mapController.animateCamera(
+                                        CameraUpdate.newLatLngBounds(bounds,
+                                            100), // Adjust padding as needed
+                                      );
+                                    });
+                                  },
+                                  onCameraMove: (position) async {},
+                                  onTap: (latLng) {
+                                    setState(() {
+                                      itemsHide = !itemsHide;
+                                    });
+                                  },
+                                  markers: Set.from(markers),
+                                );
+                              },
+                              errorBuilder: (e, st) => Center(
+                                    child: Text(e.toString()),
+                                  ),
+                              loadingBuilder: const Scaffold(
+                                backgroundColor: Colors.black45,
+                                body: Center(
+                                  child: LoadingWidget(),
+                                ),
+                              )),
                         ),
                       ),
                     Positioned(
@@ -1299,7 +1294,4 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       );
     }
   }
-
-
 }
-

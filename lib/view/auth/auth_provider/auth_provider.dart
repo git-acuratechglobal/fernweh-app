@@ -4,6 +4,7 @@ import 'package:fernweh/view/auth/signup/profile_setup/profile_step/model/intres
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../services/api_service/api_service.dart';
 import '../../../services/auth_service/auth_service.dart';
+import '../../location_permission/location_service.dart';
 import '../../navigation/itinerary/notifier/itinerary_notifier.dart';
 import '../model/user_model.dart';
 
@@ -58,12 +59,13 @@ class AuthNotifier extends _$AuthNotifier {
   }
 
   Future<void> updateUser() async {
+    final adress= await ref.watch(addressProvider.future);
     try {
       state = Loading();
       final user = await ref.watch(authServiceProvider).updateUser(_formData);
       final data = await ref
           .watch(apiServiceProvider)
-          .createUserItinerary({'name': "Default list", 'type': 1});
+          .createUserItinerary({'name': "Default list", 'type': 1,"location":adress});
       final List<String> placeId = [
         "ChIJmQJIxlVYwokRLgeuocVOGVU",
         "ChIJCewJkL2LGGAR3Qmk0vCTGkg",

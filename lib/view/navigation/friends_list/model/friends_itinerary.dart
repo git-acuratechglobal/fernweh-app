@@ -1,5 +1,6 @@
-
 import 'package:json_annotation/json_annotation.dart';
+
+import '../../itinerary/models/itinerary_model.dart';
 
 part 'friends_itinerary.g.dart';
 
@@ -14,6 +15,7 @@ class FriendsItinerary {
     required this.canView,
     required this.canEdit,
     required this.isDeleted,
+    required this.location,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -40,13 +42,24 @@ class FriendsItinerary {
 
   @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
+  final String? location;
 
-  factory FriendsItinerary.fromJson(Map<String, dynamic> json) => _$FriendsItineraryFromJson(json);
-  String get imageUrl{
-    if(image==null){
+  factory FriendsItinerary.fromJson(Map<String, dynamic> json) =>
+      _$FriendsItineraryFromJson(json);
+
+  String get imageUrl {
+    if (image == null) {
       return "https://cdn-icons-png.flaticon.com/512/2343/2343940.png";
-    }else{
+    } else {
       return "http://fernweh.acublock.in/public/$image";
     }
   }
+}
+
+class AllFriendsState {
+  List<Itinerary> friendsList;
+
+  Map<int, List<String>>? itineraryPhotos;
+
+  AllFriendsState({required this.friendsList,  this.itineraryPhotos});
 }

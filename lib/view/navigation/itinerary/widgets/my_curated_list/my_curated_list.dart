@@ -105,6 +105,7 @@ class MyCreatedItinerary extends ConsumerStatefulWidget {
       required this.placeCount,
       required this.editList,
       required this.viewOnly,
+    required  this.isEditAccess ,
       this.placeUrls});
 
   final Itinerary itinary;
@@ -112,6 +113,7 @@ class MyCreatedItinerary extends ConsumerStatefulWidget {
   final List<Can> editList;
   final List<Can> viewOnly;
   final List<String>? placeUrls;
+  final bool isEditAccess;
 
   @override
   ConsumerState<MyCreatedItinerary> createState() => _MyCreatedItineraryState();
@@ -120,7 +122,6 @@ class MyCreatedItinerary extends ConsumerStatefulWidget {
 class _MyCreatedItineraryState extends ConsumerState<MyCreatedItinerary> {
   @override
   Widget build(BuildContext context) {
-    final userId = ref.watch(userDetailProvider);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -196,13 +197,13 @@ class _MyCreatedItineraryState extends ConsumerState<MyCreatedItinerary> {
                       height: 10,
                     ),
 
-                    const Text(
+                    widget.isEditAccess? const Text(
                       'Shared with',
                       style: TextStyle(
                         color: Color(0xFF505050),
                         fontSize: 12,
                       ),
-                    ),
+                    ):const SizedBox.shrink(),
                     Flexible(
                       flex: 1,
                       child: GestureDetector(
@@ -210,28 +211,27 @@ class _MyCreatedItineraryState extends ConsumerState<MyCreatedItinerary> {
                             // if(widget.editList
                             //     .where((val) => val.id == userId?.id)
                             //     .isNotEmpty){
-                              showModalBottomSheet(
-                                context: context,
-                                backgroundColor: Colors.white,
-                                isScrollControlled: true,
-                                constraints: BoxConstraints.tightFor(
-                                  height:
-                                  MediaQuery.sizeOf(context).height * 0.85,
-                                ),
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                      top: Radius.circular(20)),
-                                ),
-                                builder: (context) {
-                                  return UnShareItenarySheet(
-                                    itineraryId: widget.itinary.id!,
-                                    viewOnly: widget.viewOnly,
-                                    editOnly: widget.editList,
-                                  );
-                                },
-                              );
+                            showModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.white,
+                              isScrollControlled: true,
+                              constraints: BoxConstraints.tightFor(
+                                height:
+                                    MediaQuery.sizeOf(context).height * 0.85,
+                              ),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20)),
+                              ),
+                              builder: (context) {
+                                return UnShareItenarySheet(
+                                  itineraryId: widget.itinary.id!,
+                                  viewOnly: widget.viewOnly,
+                                  editOnly: widget.editList,
+                                );
+                              },
+                            );
                             // }
-
                           },
                           child: AvatarList(images: [
                             ...widget.editList,
@@ -255,63 +255,67 @@ class _MyCreatedItineraryState extends ConsumerState<MyCreatedItinerary> {
                   ],
                 ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          backgroundColor: Colors.white,
-                          isScrollControlled: true,
-                          constraints: BoxConstraints.tightFor(
-                            height: MediaQuery.sizeOf(context).height * 0.80,
-                          ),
-                          shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.vertical(top: Radius.circular(20)),
-                          ),
-                          builder: (context) {
-                            return EditItenerary(
-                              iteneraryPhoto: widget.itinary.imageUrl,
-                              iteneraryName: widget.itinary.name ?? "",
-                              id: widget.itinary.id,
-                              type: int.parse(widget.itinary.type ?? ""),
+              widget.isEditAccess
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.white,
+                                isScrollControlled: true,
+                                constraints: BoxConstraints.tightFor(
+                                  height:
+                                      MediaQuery.sizeOf(context).height * 0.80,
+                                ),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(20)),
+                                ),
+                                builder: (context) {
+                                  return EditItenerary(
+                                    iteneraryPhoto: widget.itinary.imageUrl,
+                                    iteneraryName: widget.itinary.name ?? "",
+                                    id: widget.itinary.id,
+                                    type: int.parse(widget.itinary.type ?? ""),
+                                  );
+                                },
+                              );
+                            },
+                            child: Image.asset('assets/images/edit.png')),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.white,
+                              isScrollControlled: true,
+                              constraints: BoxConstraints.tightFor(
+                                height:
+                                    MediaQuery.sizeOf(context).height * 0.85,
+                              ),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20)),
+                              ),
+                              builder: (context) {
+                                return AddNotesSheet(
+                                  itineraryId: widget.itinary.id ?? 0,
+                                );
+                              },
                             );
                           },
-                        );
-                      },
-                      child: Image.asset('assets/images/edit.png')),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        backgroundColor: Colors.white,
-                        isScrollControlled: true,
-                        constraints: BoxConstraints.tightFor(
-                          height: MediaQuery.sizeOf(context).height * 0.85,
+                          child: Image.asset(
+                            'assets/images/note.png',
+                          ),
                         ),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(20)),
-                        ),
-                        builder: (context) {
-                          return AddNotesSheet(
-                            itineraryId: widget.itinary.id ?? 0,
-                          );
-                        },
-                      );
-                    },
-                    child: Image.asset(
-                      'assets/images/note.png',
-                    ),
-                  ),
-                  ShareIcon(widget.itinary.id.toString())
-                ],
-              )
+                        ShareIcon(widget.itinary.id.toString())
+                      ],
+                    )
+                  : const SizedBox.shrink()
             ],
           ),
         ),

@@ -102,6 +102,8 @@ class _SharedListTabState extends ConsumerState<SharedListTab> {
               return SharedItem(
                 itinerary: Itenery(
                     itinerary: Itinerary(
+                      placesCount: 0,
+                      location: '',
                         id: null,
                         userId: null,
                         name: 'dummy name',

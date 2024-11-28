@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:fernweh/view/navigation/friends_list/controller/follow_friend_notifier.dart';
+import 'package:fernweh/view/navigation/friends_list/model/following_friends.dart';
 import 'package:fernweh/view/navigation/friends_list/model/friends_itinerary.dart';
 import 'package:fernweh/view/navigation/itinerary/models/itinerary_model.dart';
 import 'package:fernweh/view/navigation/itinerary/models/trip/trip.dart';
@@ -66,8 +68,6 @@ class ApiService {
       final response = await _dio.get('category',
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final List<dynamic> categoriesJson = response.data["categories"];
       final categories =
@@ -81,8 +81,6 @@ class ApiService {
       final response = await _dio.post('itinerary/get-shared-user',
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final userItineraryJson = response.data;
       final userItinerary = UserItinerary.fromJson(userItineraryJson);
@@ -101,8 +99,6 @@ class ApiService {
           data: FormData.fromMap(formData),
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final createdItineraryJson = response.data["data"];
       final createdItinerary = ItineraryModel.fromJson(createdItineraryJson);
@@ -122,8 +118,6 @@ class ApiService {
           data: FormData.fromMap(formData),
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final updatedItineraryJson = response.data["data"];
       final updatedItinerary = UserItinerary.fromJson(updatedItineraryJson);
@@ -137,8 +131,6 @@ class ApiService {
       final response = await _dio.post('itinerary/delete/$id',
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       return response.data["message"];
     });
@@ -150,8 +142,6 @@ class ApiService {
           data: FormData.fromMap(formData),
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final myItineraryJson = response.data["data"];
       final myItinerary = MyItinerary.fromJson(myItineraryJson);
@@ -166,8 +156,6 @@ class ApiService {
           data: FormData.fromMap(formData),
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final myItineraryJson = response.data["message"];
 
@@ -205,8 +193,6 @@ class ApiService {
           data: data,
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final List<dynamic> jsonList = response.data['data'];
       return jsonList.map((place) => ItineraryPlaces.fromJson(place)).toList();
@@ -218,8 +204,6 @@ class ApiService {
       final response = await _dio.post('user-management',
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final List<dynamic> jsonList = response.data['data'];
       return jsonList.map((friend) => Friends.fromJson(friend)).toList();
@@ -235,8 +219,6 @@ class ApiService {
           }),
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       return response.data["data"]["friendUserId"];
     });
@@ -249,8 +231,6 @@ class ApiService {
           data: search != null ? FormData.fromMap({"search": search}) : null,
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final List<dynamic> jsonList = response.data['data'];
       final friendList =
@@ -267,8 +247,6 @@ class ApiService {
       final response = await _dio.post('user-management/friend-request-list',
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final List<dynamic> jsonList = response.data['data'];
       return jsonList.map((friend) => Friends.fromJson(friend)).toList();
@@ -281,8 +259,6 @@ class ApiService {
           data: FormData.fromMap({"status": status, "userId": userId}),
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       return response.data["data"]['userId'].toString();
     });
@@ -293,10 +269,33 @@ class ApiService {
       final response = await _dio.post('user-management/delete',
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       return response.data["data"]["friendUserId"];
+    });
+  }
+
+  Future<FollowFriendState> followUser({required int id}) async {
+    return asyncGuard(() async {
+      final response = await _dio.post('follow-user',
+          data: {"follow": id},
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+          }));
+      final message = response.data["message"];
+      return FollowFriendState(message: message, id: id);
+    });
+  }
+
+  Future<List<FollowingFriends>> getFollowingFriends() async {
+    return asyncGuard(() async {
+      final response = await _dio.get('get-followings',
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+          }));
+      final List<dynamic> jsonList = response.data['followings'];
+      final followingFriendList =
+          jsonList.map((friend) => FollowingFriends.fromJson(friend)).toList();
+      return followingFriendList;
     });
   }
 
@@ -305,8 +304,6 @@ class ApiService {
         data: {'search': search},
         options: Options(headers: {
           'Authorization': "Bearer $_token",
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
         }));
     final List<dynamic> jsonList = response.data['data'];
 
@@ -321,8 +318,6 @@ class ApiService {
           data: data,
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       return response.data["success"];
     });
@@ -336,8 +331,6 @@ class ApiService {
           data: data,
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       return response.data["success"];
     });
@@ -349,8 +342,6 @@ class ApiService {
           data: FormData.fromMap({'email': email}),
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       return response.data["message"];
     });
@@ -363,8 +354,6 @@ class ApiService {
               data: FormData.fromMap(formData),
               options: Options(headers: {
                 'Authorization': "Bearer $_token",
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
               }));
       final note = response.data["message"];
       return note;
@@ -377,8 +366,6 @@ class ApiService {
           'itinerary/user-itinerary-management/get-notes/$itineraryId',
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final List<dynamic> jsonNotes = response.data["data"];
       final notesList = jsonNotes.map((e) => Notes.fromJson(e)).toList();
@@ -386,18 +373,16 @@ class ApiService {
     });
   }
 
-  Future<List<FriendsItinerary>> getFriendsItinerary(int userId) async {
+  Future<List<Itinerary>> getFriendsItinerary(int userId) async {
     return asyncGuard(() async {
       final response =
           await _dio.post('user-management/friend-itinerary-list/$userId',
               options: Options(headers: {
                 'Authorization': "Bearer $_token",
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
               }));
       final List<dynamic> jsonItinerary = response.data["data"];
       final itineraryList =
-          jsonItinerary.map((e) => FriendsItinerary.fromJson(e)).toList();
+          jsonItinerary.map((e) => Itinerary.fromJson(e)).toList();
       return itineraryList;
     });
   }
@@ -415,8 +400,6 @@ class ApiService {
           },
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final responseData = response.data['message'];
       return responseData;
@@ -428,8 +411,6 @@ class ApiService {
       final response = await _dio.post('get-trips',
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final List<dynamic> jsonTripData = response.data['trips'];
       final tripData = jsonTripData.map((trip) => Trip.fromJson(trip)).toList();
@@ -442,8 +423,6 @@ class ApiService {
       final response = await _dio.post('get-trip-detail/$id',
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final tripJson = response.data['trip'];
       final List<dynamic> friendTripsJson = response.data['friends_trips'];

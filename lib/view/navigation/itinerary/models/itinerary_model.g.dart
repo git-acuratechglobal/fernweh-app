@@ -71,6 +71,8 @@ Itinerary _$ItineraryFromJson(Map<String, dynamic> json) => Itinerary(
           : DateTime.parse(json['updated_at'] as String),
       haveAccess: json['have_access'] as String?,
       shareUrl: json['shareUrl'] as String?,
+      location: json['location'] as String?,
+      placesCount: (json['placesCount'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$ItineraryToJson(Itinerary instance) => <String, dynamic>{
@@ -86,4 +88,6 @@ Map<String, dynamic> _$ItineraryToJson(Itinerary instance) => <String, dynamic>{
       'updated_at': instance.updatedAt?.toIso8601String(),
       'have_access': instance.haveAccess,
       'shareUrl': instance.shareUrl,
+      'location': instance.location,
+      'placesCount': instance.placesCount,
     };

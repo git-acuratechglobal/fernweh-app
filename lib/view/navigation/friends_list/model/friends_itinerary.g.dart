@@ -16,6 +16,7 @@ FriendsItinerary _$FriendsItineraryFromJson(Map<String, dynamic> json) =>
       canView: json['can_view'],
       canEdit: json['can_edit'],
       isDeleted: (json['is_deleted'] as num?)?.toInt(),
+      location: json['location'] as String?,
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),

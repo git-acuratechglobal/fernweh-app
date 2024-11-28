@@ -1,4 +1,3 @@
-
 import 'package:json_annotation/json_annotation.dart';
 
 part 'create_itinerary_model.g.dart';
@@ -15,6 +14,7 @@ class ItineraryModel {
     required this.updatedAt,
     required this.createdAt,
     required this.id,
+    required this.location,
   });
 
   @JsonKey(name: 'user_id')
@@ -35,7 +35,8 @@ class ItineraryModel {
   @JsonKey(name: 'created_at')
   final DateTime? createdAt;
   final int? id;
+  final String? location;
 
-  factory ItineraryModel.fromJson(Map<String, dynamic> json) => _$ItineraryModelFromJson(json);
-
+  factory ItineraryModel.fromJson(Map<String, dynamic> json) =>
+      _$ItineraryModelFromJson(json);
 }

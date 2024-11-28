@@ -6,6 +6,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/widgets/async_widget.dart';
 import '../../../../utils/widgets/image_widget.dart';
+import '../../itinerary/models/itinerary_model.dart';
 import '../../itinerary/notifier/itinerary_notifier.dart';
 import '../../itinerary/widgets/my_curated_list/curated_list_item_view/itenary_details_screen.dart';
 import '../../profile/profile.dart';
@@ -91,7 +92,7 @@ class _FriendDetailScreenState extends ConsumerState<FriendDetailScreen> {
                   dataProvider:
                       getFriendsItineraryListProvider(widget.friends.id ?? 0),
                   dataBuilder: ( itinerary) {
-                    List<FriendsItinerary> filteredList =
+                    List<Itinerary> filteredList =
                         itinerary.where((e) => e.type == "1").toList();
                     return itinerary.isEmpty
                         ? Column(
@@ -239,7 +240,7 @@ class FriendItineraryList extends StatelessWidget {
     required this.isSelected,
   });
 
-  final FriendsItinerary itinary;
+  final Itinerary itinary;
   final bool isEditing;
   final bool isSelected;
 

@@ -1,5 +1,4 @@
 import 'package:fernweh/services/api_service/api_service.dart';
-import 'package:fernweh/services/local_storage_service/local_storage_service.dart';
 import 'package:fernweh/view/navigation/itinerary/models/itinerary_places.dart';
 import 'package:fernweh/view/navigation/itinerary/models/states/my_itinerary_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +9,7 @@ import '../models/states/itinerary_state.dart';
 part 'itinerary_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
-FutureOr<ItineraryTabState> getUserItinerary(GetUserItineraryRef ref) async {
+FutureOr<ItineraryTabState> getUserItinerary(Ref ref) async {
   final userItinerary = await ref.watch(apiServiceProvider).getUserItinerary();
   final Map<int, List<String>> itineraryPhotos = {};
   for (var itinerary in userItinerary.userIteneries!) {
@@ -101,7 +100,9 @@ class MyItineraryNotifier extends _$MyItineraryNotifier {
     try {
       state = MyItineraryLoading();
       await ref.watch(apiServiceProvider).updateMyItinerary(form, id);
-      ref
+
+      ///after update itinerary here get updated itinerary using id and type*********
+      await ref
           .read(itineraryPlacesNotifierProvider.notifier)
           .getTypeItineraryPlace(_formData["itinerary_id"], _formData["type"]);
       state = MyItineraryUpdatedState();
@@ -118,8 +119,11 @@ class MyItineraryNotifier extends _$MyItineraryNotifier {
 
 @Riverpod(keepAlive: true)
 class ItineraryPlacesNotifier extends _$ItineraryPlacesNotifier {
+  int? savedItineraryId;
+
   @override
   FutureOr<List<ItineraryPlaces>> build() async {
+
     return [];
   }
 

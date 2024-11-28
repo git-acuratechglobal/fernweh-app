@@ -92,6 +92,8 @@ class Itinerary {
     required this.updatedAt,
     required this.haveAccess,
     required this.shareUrl,
+    required this.location,
+     this.placesCount,
   });
 
   final int? id;
@@ -120,6 +122,8 @@ class Itinerary {
   @JsonKey(name: 'have_access')
   final String? haveAccess;
   final String? shareUrl;
+  final String? location;
+  final int ?placesCount;
 
   factory Itinerary.fromJson(Map<String, dynamic> json) =>
       _$ItineraryFromJson(json);
@@ -138,6 +142,8 @@ class Itinerary {
 List<Itinerary> get userItinerarydummyList {
   return List.generate(8, (index) {
     return Itinerary(
+      placesCount: 0,
+      location: "",
         id: null,
         userId: null,
         name: 'dummy name',

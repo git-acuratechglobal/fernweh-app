@@ -109,7 +109,7 @@ class PositionNotifier extends StateNotifier<Position?> {
 }
 
 @Riverpod(keepAlive: true)
-FutureOr<String> address(AddressRef ref) async {
+FutureOr<String> address(Ref ref) async {
   final position = await ref.watch(currentPositionProvider.future);
   final locationService = ref.watch(locationServiceProvider);
   return await locationService.getAddressFromPosition(position);

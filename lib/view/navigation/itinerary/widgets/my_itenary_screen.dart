@@ -11,7 +11,8 @@ import 'package:fernweh/view/navigation/itinerary/notifier/all_friends_notifier.
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/trip_notifier/create_trip_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/trip_notifier/trip_notifier.dart';
-import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/shared_list.dart';
+import 'package:fernweh/view/navigation/itinerary/widgets/following_list/following.dart';
+import 'package:fernweh/view/navigation/itinerary/widgets/following_list/notifier/followlist_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -25,10 +26,10 @@ import '../../../../utils/common/common.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/widgets/search_places_widget.dart';
 import '../../../auth/signup/profile_setup/create_profile_screen.dart';
-import '../../friends_list/model/friends_itinerary.dart';
 import '../../profile/profile.dart';
 import '../models/itinerary_model.dart';
 import '../models/states/itinerary_state.dart';
+import 'following_list/model/following_model.dart';
 import 'my_curated_list/curated_list_item_view/itenary_details_screen.dart';
 import 'my_curated_list/my_curated_list.dart';
 
@@ -279,32 +280,32 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                               if (index == 0) {
                                 return GestureDetector(
                                   onTap: () {
-                                    setState(() {
-                                      if (selectedTabIndex == index) {
-                                        selectedTabIndex = null;
-                                      } else {
-                                        selectedTabIndex = index;
-                                        // showModalBottomSheet(
-                                        //   context: context,
-                                        //   backgroundColor: Colors.white,
-                                        //   isScrollControlled: true,
-                                        //   constraints: BoxConstraints.tightFor(
-                                        //     height:
-                                        //     MediaQuery
-                                        //         .sizeOf(context)
-                                        //         .height *
-                                        //         0.8,
-                                        //   ),
-                                        //   shape: const RoundedRectangleBorder(
-                                        //     borderRadius: BorderRadius.vertical(
-                                        //         top: Radius.circular(20)),
-                                        //   ),
-                                        //   builder: (context) {
-                                        //     return  ViewTripSheet(Trip:tripList ,);
-                                        //   },
-                                        // );
-                                      }
-                                    });
+                                    // setState(() {
+                                    //   if (selectedTabIndex == index) {
+                                    //     selectedTabIndex = null;
+                                    //   } else {
+                                    //     selectedTabIndex = index;
+                                    //     showModalBottomSheet(
+                                    //       context: context,
+                                    //       backgroundColor: Colors.white,
+                                    //       isScrollControlled: true,
+                                    //       constraints: BoxConstraints.tightFor(
+                                    //         height:
+                                    //         MediaQuery
+                                    //             .sizeOf(context)
+                                    //             .height *
+                                    //             0.8,
+                                    //       ),
+                                    //       shape: const RoundedRectangleBorder(
+                                    //         borderRadius: BorderRadius.vertical(
+                                    //             top: Radius.circular(20)),
+                                    //       ),
+                                    //       builder: (context) {
+                                    //         return  ViewTripSheet(Trip:tripList ,);
+                                    //       },
+                                    //     );
+                                    //   }
+                                    // });
                                   },
                                   child: Container(
                                       height: 55,
@@ -494,8 +495,9 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
               ),
               tabs: const [
                 Tab(child: Text("My Curated List")),
+                Tab(child: Text("Following")),
                 Tab(child: Text("Shared List")),
-                Tab(child: Text("Friends List")),
+
               ],
             ),
             Expanded(
@@ -609,6 +611,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                     }
                                                   },
                                                   child: MyCreatedItinerary(
+                                                    isEditAccess: true,
                                                     placeCount:
                                                         filteredList[index]
                                                                 .placesCount ??
@@ -709,6 +712,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                       }
                                                     },
                                                     child: MyCreatedItinerary(
+                                                      isEditAccess: true,
                                                       placeCount:
                                                           localCollaborateList[
                                                                       index]
@@ -792,6 +796,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                           itemCount: userItinerarydummyList.length,
                           itemBuilder: (context, index) {
                             return MyCreatedItinerary(
+                              isEditAccess: false,
                               placeCount: 0,
                               itinary: userItinerarydummyList[index],
                               editList: const [],
@@ -808,7 +813,15 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                       ),
                     ),
                   ),
-                  SharedListTab(isMapView: mapView),
+                  // SharedListTab(isMapView: mapView),
+
+                RefreshIndicator(
+                    color: const Color(0xffCF5253),
+                    edgeOffset: 10,
+                    onRefresh: ()async{
+                      ref.invalidate(followingNotifierProvider);
+                    },
+                    child: const  FollowingList()),
                   const AllFriends(),
                 ],
               ),
@@ -877,6 +890,7 @@ class _CreateItineraryState extends ConsumerState<CreateItinerary>
     ("Private", 0),
     ("Public", 1),
   ];
+  final _searchCountryController = TextEditingController();
 
   @override
   void initState() {
@@ -933,6 +947,25 @@ class _CreateItineraryState extends ConsumerState<CreateItinerary>
               style: TextStyle(
                 fontVariations: FVariations.w700,
               ),
+            ),
+          ),
+          Padding(
+            padding:
+                const EdgeInsets.only(top: 12, left: 24, bottom: 8, right: 24),
+            child: SearchPlacesWidget(
+              hintText: "Search Country,State or City",
+              searchController: _searchCountryController,
+              validator: (val) {
+                if (val!.isEmpty) {
+                  return "Please select country";
+                }
+                return null;
+              },
+              onSaved: (val) {
+                ref
+                    .read(userItineraryNotifierProvider.notifier)
+                    .updateForm('location', val);
+              },
             ),
           ),
           Padding(
@@ -1059,7 +1092,9 @@ class _AllFriendsState extends ConsumerState<AllFriends> {
     return AsyncDataWidgetB(
       dataProvider: allFriendsNotifierProvider,
       dataBuilder: (data) {
-        return data!.isEmpty
+        List<Country> countries =
+        convertItinerariesToHierarchy(data.friendsList);
+        return data.friendsList.isEmpty
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -1082,32 +1117,33 @@ class _AllFriendsState extends ConsumerState<AllFriends> {
                   ),
                 ],
               )
-            : ListView.separated(
-                padding: const EdgeInsets.all(24),
-                itemCount: data.length,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ItenaryDetailsScreen(
-                            title: data[index].name ?? "",
-                            itineraryId: data[index].id ?? 0,
-                          ),
-                        ),
-                      );
-                    },
-                    child: AllFriendsWidget(
-                      itinary: data[index],
-                    ),
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return const SizedBox(
-                    height: 10,
-                  );
-                },
-              );
+            : followingWidget(countries, data.itineraryPhotos??{});
+        // ListView.separated(
+        //         padding: const EdgeInsets.all(24),
+        //         itemCount: data.friendsList.length,
+        //         itemBuilder: (context, index) {
+        //           return InkWell(
+        //             onTap: () {
+        //               Navigator.of(context).push(
+        //                 MaterialPageRoute(
+        //                   builder: (context) => ItenaryDetailsScreen(
+        //                     title: data.friendsList[index].name ?? "",
+        //                     itineraryId: data.friendsList[index].id ?? 0,
+        //                   ),
+        //                 ),
+        //               );
+        //             },
+        //             child: AllFriendsWidget(
+        //               itinary: data.friendsList[index],
+        //             ),
+        //           );
+        //         },
+        //         separatorBuilder: (BuildContext context, int index) {
+        //           return const SizedBox(
+        //             height: 10,
+        //           );
+        //         },
+        //       );
       },
       loadingBuilder: Skeletonizer(
           child: GridView.builder(
@@ -1188,7 +1224,7 @@ class AllFriendsWidget extends StatelessWidget {
     required this.itinary,
   });
 
-  final FriendsItinerary itinary;
+  final Itinerary itinary;
 
   // final int placeCount;
   // final List<Can> editList;
@@ -1421,12 +1457,16 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
               height: 10,
             ),
             SearchPlacesWidget(
+              hintText: "Search Country,State or City",
               searchController: _tripFieldController,
               validator: (val) {
                 if (val!.isEmpty) {
                   return "Please select country";
                 }
                 return null;
+              },
+              onSaved: (val){
+
               },
             ),
             const SizedBox(
@@ -2005,3 +2045,7 @@ final friendViewProvider =
     StateNotifierProvider<FriendsVieNotifier, FriendState>((ref) {
   return FriendsVieNotifier();
 });
+
+
+
+

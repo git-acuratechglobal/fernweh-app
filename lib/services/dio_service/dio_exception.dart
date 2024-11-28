@@ -15,7 +15,7 @@ class DioExceptions implements Exception {
         message = "Receive timeout in connection with API server";
         break;
       case DioExceptionType.badCertificate:
-        message = "Recieved bad certificate from server";
+        message = "Received bad certificate from server";
         break;
       case DioExceptionType.cancel:
         message = "Request to API server was cancelled";

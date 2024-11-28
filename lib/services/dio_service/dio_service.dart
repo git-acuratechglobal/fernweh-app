@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../utils/common/common.dart';
@@ -6,7 +7,7 @@ import 'dio_exception.dart';
 part 'dio_service.g.dart';
 
 @Riverpod(keepAlive: true)
-Dio dio(DioRef ref) {
+Dio dio(Ref ref) {
   final dio = Dio();
   final logger = Logger(
     printer: PrettyPrinter(
@@ -23,6 +24,10 @@ Dio dio(DioRef ref) {
     receiveTimeout: const Duration(minutes: 2),
     sendTimeout: const Duration(minutes: 2),
     connectTimeout: const Duration(minutes: 2),
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
   );
   dio.interceptors.add(
     InterceptorsWrapper(

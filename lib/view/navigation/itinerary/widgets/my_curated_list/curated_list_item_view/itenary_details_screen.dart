@@ -297,7 +297,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
           children: [
             AsyncDataWidgetB(
               dataProvider: itineraryPlacesNotifierProvider,
-              dataBuilder: ( itineraryPlace) {
+              dataBuilder: (itineraryPlace) {
                 markers.clear();
                 for (var data in itineraryPlace) {
                   markers.add(Marker(
@@ -393,9 +393,9 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                           aspectRatio: 2,
                           child: AsyncDataWidgetB(
                             dataProvider: itineraryPlacesNotifierProvider,
-                            dataBuilder:
-                                ( itineraryPlaces) {
+                            dataBuilder: (itineraryPlaces) {
                               return ListView.separated(
+                                shrinkWrap: true,
                                 itemCount: itineraryPlaces.length,
                                 scrollDirection: Axis.horizontal,
                                 padding:
@@ -414,7 +414,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                                         ? "WANT TO VISIT"
                                         : data.type == 2
                                             ? "VISITED"
-                                            : "WILL VISIT AGAIN",
+                                            : "VISITED & LIKED",
                                     placeType: data.placeTypes ?? "",
                                     width:
                                         MediaQuery.sizeOf(context).width - 50,
@@ -459,87 +459,93 @@ class _DetailPageState extends ConsumerState<DetailPage> {
         );
       });
     }
-    return AsyncDataWidgetB(
-      dataProvider: itineraryPlacesNotifierProvider,
-      dataBuilder: ( itineraryPlace) {
-        return itineraryState.itineraryPlaces.isEmpty
-            ? const Center(
-                child: Text("No Places found"),
-              )
-            : ListView.separated(
-                shrinkWrap: true,
-                itemCount: itineraryState.itineraryPlaces.length,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemBuilder: (context, index) {
-                  final data = itineraryState.itineraryPlaces[index];
-                  bool isSelected =
-                      itineraryState.selectedItems.contains(data.id);
-                  return GestureDetector(
-                    onLongPress: () {
-                      itineraryNotifier.toggleSelection(data.id ?? 0);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: isSelected ? Colors.blue : Colors.transparent,
-                          width: 2.0,
+    return Align(
+      alignment: Alignment.topCenter,
+      child: AsyncDataWidgetB(
+        dataProvider: itineraryPlacesNotifierProvider,
+        dataBuilder: (itineraryPlace) {
+          return itineraryState.itineraryPlaces.isEmpty
+              ? const Center(
+                  child: Text("No Places found"),
+                )
+              : ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: itineraryState.itineraryPlaces.length,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  itemBuilder: (context, index) {
+                    final data = itineraryState.itineraryPlaces[index];
+                    bool isSelected =
+                        itineraryState.selectedItems.contains(data.id);
+                    return GestureDetector(
+                      onLongPress: () {
+                        itineraryNotifier.toggleSelection(data.id ?? 0);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color:
+                                isSelected ? Colors.blue : Colors.transparent,
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
-                        borderRadius: BorderRadius.circular(8.0),
+                        child: ItinerayItem(
+                          // isWishlist: false,
+                          isSelected: itineraryState.selectedItems.isNotEmpty,
+                          id: data.id,
+                          itineraryId: data.intineraryListId,
+                          userId: data.userId,
+                          locationId: data.locationId,
+                          placeId: data.locationId,
+                          latitude: data.latitude,
+                          longitude: data.longitude,
+                          selection: data.type == 1
+                              ? "Want to visit"
+                              : data.type == 2
+                                  ? "Visited"
+                                  : "Visited & Liked",
+                          placeType: data.placeTypes ?? "",
+                          name: data.name,
+                          url: data.photo,
+                          address: data.formattedAddress,
+                          rating: data.rating.toString(),
+                          walkTime: convertMinutes(
+                              int.parse(data.walkingTime.toString())),
+                          distance: data.distance.toString(),
+                        ),
                       ),
-                      child: ItinerayItem(
-                        // isWishlist: false,
-                        isSelected: itineraryState.selectedItems.isNotEmpty,
-                        id: data.id,
-                        itineraryId: data.intineraryListId,
-                        userId: data.userId,
-                        locationId: data.locationId,
-                        placeId: data.locationId,
-                        latitude: data.latitude,
-                        longitude: data.longitude,
-                        selection: data.type == 1
-                            ? "WANT TO VISIT"
-                            : data.type == 2
-                                ? "VISITED"
-                                : "WILL VISIT AGAIN",
-                        placeType: data.placeTypes ?? "",
-                        name: data.name,
-                        url: data.photo,
-                        address: data.formattedAddress,
-                        rating: data.rating.toString(),
-                        walkTime: convertMinutes(
-                            int.parse(data.walkingTime.toString())),
-                        distance: data.distance.toString(),
-                      ),
-                    ),
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return const SizedBox(height: 16.0);
-                },
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(height: 16.0);
+                  },
+                );
+        },
+        errorBuilder: (e, st) => Center(
+          child: Text(e.toString()),
+        ),
+        loadingBuilder: Skeletonizer(
+          child: ListView.separated(
+            itemCount: 4,
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            itemBuilder: (context, index) {
+              return const ItinerayItem(
+                placeType: "kkklkk",
+                name: "data.name",
+                url:
+                    "https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg",
+                address: "data.vicinity",
+                rating: "4",
+                walkTime: "ytytyty",
+                distance: "uyuyuyu",
               );
-      },
-      errorBuilder: (e, st) => Center(
-        child: Text(e.toString()),
-      ),
-      loadingBuilder: Skeletonizer(
-        child: ListView.separated(
-          itemCount: 4,
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          itemBuilder: (context, index) {
-            return const ItinerayItem(
-              placeType: "kkklkk",
-              name: "data.name",
-              url:
-                  "https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg",
-              address: "data.vicinity",
-              rating: "4",
-              walkTime: "ytytyty",
-              distance: "uyuyuyu",
-            );
-          },
-          separatorBuilder: (BuildContext context, int index) {
-            return const SizedBox(height: 16.0);
-          },
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return const SizedBox(height: 16.0);
+            },
+          ),
         ),
       ),
     );
@@ -773,7 +779,9 @@ class _ItinerayItemState extends ConsumerState<ItinerayItem> {
                             style: TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.w600),
                           ),
-                          const SizedBox(height: 05,),
+                          const SizedBox(
+                            height: 05,
+                          ),
                           SizedBox(
                             height: 30,
                             child: Text(
@@ -796,7 +804,34 @@ class _ItinerayItemState extends ConsumerState<ItinerayItem> {
                           const SizedBox(
                             height: 5,
                           ),
-                           Expanded(child: ColoredDropdownButton(selectedType: widget.selection??"",))
+                          Expanded(
+                              child: ColoredDropdownButton(
+                            selectedType: selectedType ?? "",
+                            onChanged: (String? value) {
+                              setState(() {
+                                selectedType = value;
+                              });
+                              ref
+                                  .read(myItineraryNotifierProvider.notifier)
+                                  .updateForm("type", widget.type);
+                              ref
+                                  .read(myItineraryNotifierProvider.notifier)
+                                  .updateForm(
+                                      "itinerary_id", widget.itineraryId);
+                              ref
+                                  .read(myItineraryNotifierProvider.notifier)
+                                  .updateMyItinerary(id: widget.id ?? 0, form: {
+                                "intineraryListId": widget.itineraryId,
+                                "type": selectedType == "Want to visit"
+                                    ? 1
+                                    : selectedType == "Visited"
+                                        ? 2
+                                        : 3,
+                                "locationId": widget.locationId,
+                                "userId": widget.userId
+                              });
+                            },
+                          ))
                         ],
                       ),
                     ),
@@ -810,55 +845,19 @@ class _ItinerayItemState extends ConsumerState<ItinerayItem> {
     );
   }
 }
-class DropdownType {
-  final String text;
-  final Color color;
 
-  DropdownType(this.text, this.color);
+class ColoredDropdownButton extends StatelessWidget {
+  const ColoredDropdownButton({
+    super.key,
+    required this.selectedType,
+    required this.onChanged,
+    // required this.index,
+  });
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-          other is DropdownType &&
-              runtimeType == other.runtimeType &&
-              text == other.text &&
-              color == other.color;
+  final String? selectedType;
+  final ValueChanged<String?> onChanged;
 
-  @override
-  int get hashCode => text.hashCode ^ color.hashCode;
-}
-class ColoredDropdownButton extends StatefulWidget {
-  const ColoredDropdownButton({super.key, required this.selectedType});
-
-  final String selectedType;
-
-  @override
-  _ColoredDropdownButtonState createState() => _ColoredDropdownButtonState();
-}
-
-class _ColoredDropdownButtonState extends State<ColoredDropdownButton> {
-  DropdownType? selectedType;
-
-  final List<DropdownType> types = [
-    DropdownType("Want to visit", Colors.red),
-    DropdownType("Visited", Colors.orange),
-    DropdownType("Visited & Liked", Colors.green),
-  ];
-  @override
-  void initState() {
-    super.initState();
-   setState(() {
-     selectedType = _findSelectedType(widget.selectedType);
-   });
-  }
-
-  DropdownType? _findSelectedType(String selectedText) {
-
-    return types.firstWhere(
-          (type) => type.text == selectedText,
-      orElse: () => DropdownType("",Colors.grey),
-    );
-  }
+  // final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -872,10 +871,12 @@ class _ColoredDropdownButtonState extends State<ColoredDropdownButton> {
         border: Border.all(color: Colors.grey.shade300),
       ),
       child: DropdownButtonHideUnderline(
-        child: DropdownButton<DropdownType>(
-          value: types.contains(selectedType) ? selectedType : null,
+        child: DropdownButton<String>(
+          value: Config.itinaryOptions.any((e) => e.name == selectedType)
+              ? selectedType
+              : null,
           hint: const Text(
-            'choose one',
+            'Choose one',
             style: TextStyle(
               color: Colors.grey,
             ),
@@ -886,42 +887,31 @@ class _ColoredDropdownButtonState extends State<ColoredDropdownButton> {
             color: Colors.grey,
           ),
           isExpanded: true,
-          items: types.map((type) {
-            return DropdownMenuItem<DropdownType>(
-              value: type,
+          items: Config.itinaryOptions.map((type) {
+            return DropdownMenuItem<String>(
+              value: type.name,
               child: Text(
-                type.text,
+                type.name,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: type.color,
+                  color: type.id == 1
+                      ? Colors.red
+                      : type.id == 2
+                          ? Colors.amberAccent
+                          : Colors.green,
                 ),
               ),
             );
           }).toList(),
           onChanged: (value) {
-            setState(() {
-              selectedType = value;
-            });
-          },
-          selectedItemBuilder: (BuildContext context) {
-            return types.map((type) {
-              return Text(
-                selectedType?.text ?? 'choose one',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: selectedType?.color ?? Colors.grey,
-                ),
-              );
-            }).toList();
+            onChanged(value);
           },
         ),
       ),
     );
   }
 }
-
 
 class DetailItem extends ConsumerStatefulWidget {
   final double? width;

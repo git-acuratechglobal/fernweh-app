@@ -24,5 +24,6 @@ class TripDetail extends _$TripDetail {
     state=await AsyncValue.guard((){
       return  ref.watch(apiServiceProvider).getTripDetails(id: id);
     });
+
   }
 }

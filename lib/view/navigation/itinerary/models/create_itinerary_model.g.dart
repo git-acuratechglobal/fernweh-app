@@ -21,4 +21,5 @@ ItineraryModel _$ItineraryModelFromJson(Map<String, dynamic> json) =>
           ? null
           : DateTime.parse(json['created_at'] as String),
       id: (json['id'] as num?)?.toInt(),
+      location: json['location'] as String?,
     );

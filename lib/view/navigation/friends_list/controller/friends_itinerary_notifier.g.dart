@@ -7,7 +7,7 @@ part of 'friends_itinerary_notifier.dart';
 // **************************************************************************
 
 String _$getFriendsItineraryListHash() =>
-    r'd3768c7f92a953bf7b3a15e5f76707b52405def5';
+    r'3542a1853bde6833452306deb9db710331a2b36d';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -36,7 +36,7 @@ const getFriendsItineraryListProvider = GetFriendsItineraryListFamily();
 
 /// See also [getFriendsItineraryList].
 class GetFriendsItineraryListFamily
-    extends Family<AsyncValue<List<FriendsItinerary>>> {
+    extends Family<AsyncValue<List<Itinerary>>> {
   /// See also [getFriendsItineraryList].
   const GetFriendsItineraryListFamily();
 
@@ -75,7 +75,7 @@ class GetFriendsItineraryListFamily
 
 /// See also [getFriendsItineraryList].
 class GetFriendsItineraryListProvider
-    extends AutoDisposeFutureProvider<List<FriendsItinerary>> {
+    extends AutoDisposeFutureProvider<List<Itinerary>> {
   /// See also [getFriendsItineraryList].
   GetFriendsItineraryListProvider(
     int userId,
@@ -110,8 +110,7 @@ class GetFriendsItineraryListProvider
 
   @override
   Override overrideWith(
-    FutureOr<List<FriendsItinerary>> Function(
-            GetFriendsItineraryListRef provider)
+    FutureOr<List<Itinerary>> Function(GetFriendsItineraryListRef provider)
         create,
   ) {
     return ProviderOverride(
@@ -129,7 +128,7 @@ class GetFriendsItineraryListProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<List<FriendsItinerary>> createElement() {
+  AutoDisposeFutureProviderElement<List<Itinerary>> createElement() {
     return _GetFriendsItineraryListProviderElement(this);
   }
 
@@ -150,13 +149,13 @@ class GetFriendsItineraryListProvider
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 mixin GetFriendsItineraryListRef
-    on AutoDisposeFutureProviderRef<List<FriendsItinerary>> {
+    on AutoDisposeFutureProviderRef<List<Itinerary>> {
   /// The parameter `userId` of this provider.
   int get userId;
 }
 
 class _GetFriendsItineraryListProviderElement
-    extends AutoDisposeFutureProviderElement<List<FriendsItinerary>>
+    extends AutoDisposeFutureProviderElement<List<Itinerary>>
     with GetFriendsItineraryListRef {
   _GetFriendsItineraryListProviderElement(super.provider);
 

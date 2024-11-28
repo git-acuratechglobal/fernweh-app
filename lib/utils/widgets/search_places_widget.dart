@@ -6,9 +6,17 @@ import '../../view/navigation/explore/search_filter/search_and_filter_widget.dar
 import 'async_widget.dart';
 
 class SearchPlacesWidget extends ConsumerStatefulWidget {
-  const SearchPlacesWidget({super.key, required this.searchController,required this.validator});
-final String? Function(String?)? validator;
+  const SearchPlacesWidget(
+      {super.key,
+      required this.searchController,
+      required this.validator,
+      this.onSaved,
+      this.hintText});
+
+  final String? Function(String?)? validator;
   final TextEditingController searchController;
+  final Function(String?)? onSaved;
+  final String? hintText;
 
   @override
   ConsumerState<SearchPlacesWidget> createState() => _SearchPlacesWidgetState();
@@ -57,7 +65,7 @@ class _SearchPlacesWidgetState extends ConsumerState<SearchPlacesWidget> {
                     width: size.width,
                     child: AsyncDataWidgetB(
                         dataProvider: searchCityAndStateProvider,
-                        dataBuilder: ( data) {
+                        dataBuilder: (data) {
                           return ListView.separated(
                               padding: EdgeInsets.zero,
                               shrinkWrap: true,
@@ -133,12 +141,11 @@ class _SearchPlacesWidgetState extends ConsumerState<SearchPlacesWidget> {
                 _removeOverlay();
               }
             },
+            onSaved: (val) {
+              widget.onSaved!(val);
+            },
             decoration: InputDecoration(
-                hintStyle: TextStyle(
-                    letterSpacing: -1,
-                    color: Colors.grey.shade700,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500),
+                hintText: widget.hintText,
                 prefixIcon: const Icon(
                   Icons.location_pin,
                   color: Colors.grey,
@@ -146,10 +153,10 @@ class _SearchPlacesWidgetState extends ConsumerState<SearchPlacesWidget> {
                 suffixIcon: widget.searchController.text.trim().isNotEmpty
                     ? GestureDetector(
                         onTap: () {
-                         setState(() {
-                           widget.searchController.clear();
-                           _removeOverlay();
-                         });
+                          setState(() {
+                            widget.searchController.clear();
+                            _removeOverlay();
+                          });
                         },
                         child: const Icon(
                           Icons.clear,

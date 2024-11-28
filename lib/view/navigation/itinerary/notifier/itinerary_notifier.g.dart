@@ -6,7 +6,7 @@ part of 'itinerary_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getUserItineraryHash() => r'16d8f0baec9ac5d028c51c72386876a1840cc4aa';
+String _$getUserItineraryHash() => r'35864743da7581f802c20434524b372f927d3139';
 
 /// See also [getUserItinerary].
 @ProviderFor(getUserItinerary)
@@ -41,7 +41,7 @@ final userItineraryNotifierProvider = AutoDisposeNotifierProvider<
 
 typedef _$UserItineraryNotifier = AutoDisposeNotifier<UserItineraryState>;
 String _$myItineraryNotifierHash() =>
-    r'0ef07efa70125e7ae1d8054816bfcdb9496ca686';
+    r'd284d334ae3e49dd323d77997c29fe4a36b0cc08';
 
 /// See also [MyItineraryNotifier].
 @ProviderFor(MyItineraryNotifier)
@@ -58,7 +58,7 @@ final myItineraryNotifierProvider =
 
 typedef _$MyItineraryNotifier = AutoDisposeNotifier<MyItineraryState>;
 String _$itineraryPlacesNotifierHash() =>
-    r'7770f7f721cbb316ea6aadde62043dd66a024652';
+    r'c3ea3a125d855a92382a92ca1428c3bfc1b2bf56';
 
 /// See also [ItineraryPlacesNotifier].
 @ProviderFor(ItineraryPlacesNotifier)

@@ -2,6 +2,7 @@ import 'package:fernweh/utils/common/app_button.dart';
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
+import 'package:fernweh/view/navigation/friends_list/controller/follow_friend_notifier.dart';
 import 'package:fernweh/view/navigation/friends_list/controller/friends_notifier.dart';
 import 'package:fernweh/view/navigation/profile/profile.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
 
   @override
   void initState() {
-    tabController = TabController(length: 2, vsync: this);
+    tabController = TabController(length: 3, vsync: this);
     super.initState();
   }
 
@@ -110,11 +111,13 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
                         )
                       ])),
               TabBar(
-                  indicatorPadding: const EdgeInsets.symmetric(horizontal: 40),
+                  tabAlignment: TabAlignment.center,
+                  isScrollable: true,
+                  indicatorPadding: const EdgeInsets.symmetric(horizontal: 10),
                   labelColor: Theme.of(context).colorScheme.secondary,
                   indicatorColor: Theme.of(context).colorScheme.secondary,
                   dividerColor: const Color(0xffE2E2E2),
-                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicatorSize: TabBarIndicatorSize.label,
                   unselectedLabelStyle: TextStyle(
                     fontFamily: "Plus Jakarta Sans",
                     fontSize: 15,
@@ -132,6 +135,9 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
                     ),
                     Tab(
                       text: 'Friend Requests',
+                    ),
+                    Tab(
+                      text: 'Following',
                     )
                   ]),
               Expanded(
@@ -147,7 +153,14 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
                       onRefresh: () async {
                         ref.invalidate(friendRequestProvider);
                       },
-                      child: const FriendRequests())
+                      child: const FriendRequests()),
+                  RefreshIndicator(
+                      color: const Color(0xffCF5253),
+                      onRefresh: () async {
+                        ref.invalidate(getFollowingFriendProvider);
+                      },
+                      child:  const FollowList()),
+
                 ]),
               )
             ],
@@ -369,7 +382,7 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
   Widget build(BuildContext context) {
     return AsyncDataWidgetB(
         dataProvider: friendRequestProvider,
-        dataBuilder: ( List<Friends> friends) {
+        dataBuilder: (List<Friends> friends) {
           return friends.isEmpty
               ? Center(
                   child: Column(
@@ -437,7 +450,8 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                                   dimension: 50,
                                   child: user.imageUrl == null
                                       ? UserInitials(name: user.fullName)
-                                      : ImageWidget(url: user.imageUrl.toString())),
+                                      : ImageWidget(
+                                          url: user.imageUrl.toString())),
                             ),
                             const SizedBox(width: 16),
                             SizedBox(
@@ -613,5 +627,147 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
             },
           ),
         ));
+  }
+}
+
+class FollowList extends ConsumerStatefulWidget {
+  const FollowList({super.key});
+
+  @override
+  ConsumerState<FollowList> createState() => _FollowListState();
+}
+
+class _FollowListState extends ConsumerState<FollowList> {
+  List<int> loading = [];
+  List<int> unfollowList = [];
+  @override
+  void initState() {
+    super.initState();
+    ref.listenManual(followFriendProvider, (previous, next) {
+      switch (next) {
+        case AsyncData<FollowFriendState?> data when data.value != null:
+          setState(() {
+            loading.remove(data.value?.id);
+            if (data.value?.message == "User Unfollowed!") {
+              unfollowList.add(data.value?.id ?? 0);
+            } else {
+              unfollowList.remove(data.value?.id ?? 0);
+            }
+          });
+          // ref.invalidate(searchFriendProvider);
+          Common.showSnackBar(context, data.value!.message.toString());
+        case AsyncError error:
+          Common.showSnackBar(context, error.error.toString());
+      }
+    });
+  }
+  @override
+  Widget build(BuildContext context) {
+    return AsyncDataWidgetB(
+      dataProvider: getFollowingFriendProvider,
+      dataBuilder: (data) {
+        return data.isEmpty
+            ? Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text("No following found"),
+              const SizedBox(
+                height: 10,
+              ),
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  minimumSize: const Size(60, 40),
+                ),
+                onPressed: () {
+                  ref.invalidate(getFollowingFriendProvider);
+                },
+                child: const Text(
+                  "Refresh",
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+        )
+            : ListView.separated(
+          padding: const EdgeInsets.all(24),
+          itemBuilder: (BuildContext context, int index) {
+            final user=data[index];
+            bool isloading=loading.contains(user.following);
+            bool isUnfollowed=unfollowList.contains(user.following);
+            return Container(
+              width: double.infinity,
+              height: 85,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xffE2E2E2)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(children: [
+                ClipOval(
+                  child: SizedBox.square(
+                      dimension: 50,
+                      child: user.imageUrl == null
+                          ? UserInitials(name: user.fullName)
+                          : ImageWidget(
+                          url: user.imageUrl.toString())),
+                ),
+                const SizedBox(width: 16),
+                SizedBox(
+                  width: 120,
+                  child: Text(
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    user.fullName ,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontVariations: FVariations.w700,
+                    ),
+                  ),
+                ),
+             CustomButton(
+               isFollow: !isUnfollowed,
+                    fixedSize: const Size(110, 40),
+                    isLoading: isloading,
+                    onTap:(){
+                      setState(() {
+                        loading.add(user.following??0);
+                      });
+                      ref
+                          .read(followFriendProvider.notifier)
+                          .followFriend(user.following ?? 0);
+                    },
+                    child: Text(
+                      isUnfollowed?"follow":"Following",
+                      style:  TextStyle(
+                          fontSize: 12,
+                          color:isUnfollowed? Colors.white:Colors.black,
+                          fontWeight: FontWeight.w900),
+                    )),
+              ],),
+            );
+          },
+          separatorBuilder: (BuildContext context, int index) {
+            return const SizedBox(height: 10,);
+          },
+          itemCount: data.length,
+        );
+      },
+      errorBuilder: (error, st) => Center(
+        child: Text(error.toString()),
+      ),
+    );
   }
 }

@@ -27,11 +27,7 @@ class AuthService {
     return asyncGuard(() async {
       final response = await _dio.post('login',
           data: formData,
-          options: Options(headers: {
-            'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }));
+      );
       final userJson = response.data["user"];
       final user = User.fromJson(userJson);
       await _localStorageService.setUser(user);
@@ -44,11 +40,7 @@ class AuthService {
     return asyncGuard(() async {
       final response = await _dio.post('register-otp',
           data: formData,
-          options: Options(headers: {
-            'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }));
+      );
       final userJson = response.data["user"];
       final user = User.fromJson(userJson);
       return user;
@@ -61,8 +53,6 @@ class AuthService {
           data: formData,
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final userJson = response.data["user"];
       final user = User.fromJson(userJson);
@@ -77,8 +67,6 @@ class AuthService {
       final response = await _dio.get('category',
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final categories = (response.data['categories'] as List)
           .map((json) => IntrestedInCategory.fromJson(json))
@@ -97,8 +85,6 @@ class AuthService {
           data: FormData.fromMap(userDetails),
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final userJson = response.data["user"];
       final user = User.fromJson(userJson);
@@ -108,14 +94,11 @@ class AuthService {
   }
 
   Future<String> logOut(String token) async {
-    print(token);
     return asyncGuard(() async {
       final response = await _dio.post('logout',
           data: FormData.fromMap({'token': token}),
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final message = response.data['message'];
       return message;
@@ -127,8 +110,6 @@ class AuthService {
       final response = await _dio.post("refresh-token",
           options: Options(headers: {
             'Authorization': "Bearer $_token",
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
           }));
       final token = response.data['token'];
       await _localStorageService.setToken(token);
