@@ -7,6 +7,7 @@ import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
+import 'package:fernweh/view/navigation/friends_list/model/friends.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/all_friends_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/trip_notifier/create_trip_notifier.dart';
@@ -26,6 +27,7 @@ import '../../../../utils/common/common.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/widgets/search_places_widget.dart';
 import '../../../auth/signup/profile_setup/create_profile_screen.dart';
+import '../../friends_list/friend_details/friend_detail_screen.dart';
 import '../../profile/profile.dart';
 import '../models/itinerary_model.dart';
 import '../models/states/itinerary_state.dart';
@@ -865,7 +867,7 @@ class AvatarList extends StatelessWidget {
                 child: avtar.imageUrl == null
                     ? UserInitials(
                         fontSize: 14,
-                        name: avtar.name ?? "",
+                        name: avtar.fullName ?? "",
                       )
                     : ImageWidget(url: avtar.imageUrl!)),
           ),
@@ -1648,23 +1650,26 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                         builder: (context) {
                                           return ViewFriends(
                                             friends: friends
-                                                .map((e) => {
-                                                      "image":
-                                                          e.friendImage == null
-                                                              ? ""
-                                                              : e.friendImage
-                                                                  .toString(),
-                                                      "name": e.friendName ?? ""
-                                                    })
+                                                .map((e) =>
+                                                  Friends.fromJson({
+                                                    "id":e.userId,
+                                                    "image":
+                                                    e.friendImage == null
+                                                        ? ""
+                                                        : e.friendImage
+                                                        .toString(),
+                                                    "firstname": e.friendFirstName,
+                                                    "lastname": e.friendLastName
+                                                  }))
                                                 .toList(),
                                           );
                                         },
                                       );
                                     },
                                     child: Row(
-                                      children: friends!.isEmpty
-                                          ? [const Text("No friends matched")]
-                                          : friends.map((friend) {
+                                      children: friends!.isEmpty? [const Text("No friends match")]
+                                          :
+                                      friends.map((friend) {
                                               return Align(
                                                 widthFactor: 0.75,
                                                 child: Container(
@@ -1686,9 +1691,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                                   .friendImage ==
                                                               null
                                                           ? UserInitials(
-                                                              name: friend
-                                                                      .friendName ??
-                                                                  "",
+                                                              name:friend.fullName,
                                                               fontSize: 14,
                                                             )
                                                           : ImageWidget(
@@ -1721,7 +1724,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                               final stepperData = days.entries.map((e) {
                                 final day = e.key;
                                 final friends = e.value;
-
+                                // print(friends);
                                 return StepperItemData(
                                   id: day,
                                   content: {
@@ -1808,7 +1811,12 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                         ),
                                                         builder: (context) {
                                                           return ViewFriends(
-                                                            friends: friends,
+                                                            friends: friends.map((e)=>Friends.fromJson({
+                                                              "id":int.parse(e['id'].toString()),
+                                                              "firstname":e['firstName'],
+                                                              "lastname":e['lastName'],
+                                                              "image":e['image'],
+                                                            })).toList(),
                                                           );
                                                         },
                                                       );
@@ -1849,8 +1857,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                                     ? UserInitials(
                                                                         fontSize:
                                                                             14,
-                                                                        name: friend["name"] ??
-                                                                            "",
+                                                                        name: friend["fullName"]??""
                                                                       )
                                                                     : ImageWidget(
                                                                         url:
@@ -1902,7 +1909,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
 class ViewFriends extends ConsumerStatefulWidget {
   const ViewFriends({super.key, required this.friends});
 
-  final List<Map<String, String>> friends;
+  final List<Friends> friends;
 
   @override
   ConsumerState<ViewFriends> createState() => _ViewFriendsState();
@@ -1963,7 +1970,6 @@ class _ViewFriendsState extends ConsumerState<ViewFriends> {
                 final friend = friends.filteredList.isEmpty
                     ? friends.originalList[index]
                     : friends.filteredList[index];
-                final image = friend['image'];
                 if (searchController.text.isNotEmpty &&
                     friends.filteredList.isEmpty) {
                   return Center(
@@ -1971,21 +1977,30 @@ class _ViewFriendsState extends ConsumerState<ViewFriends> {
                           "No result found for ${searchController.text.trim()} "));
                 }
                 return ListTile(
+                  onTap: (){
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => FriendDetailScreen(
+                          friends: friend,
+                        ),
+                      ),
+                    );
+                  },
                   leading: SizedBox(
                     height: 40,
                     width: 40,
                     child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
-                        child: image!.isEmpty
+                        child: friend.imageUrl==null
                             ? UserInitials(
                                 fontSize: 14,
-                                name: friend["name"] ?? "",
+                                name: friend.fullName
                               )
                             : ImageWidget(
                                 url:
-                                    "http://fernweh.acublock.in/public/$image")),
+                                    friend.imageUrl??"")),
                   ),
-                  title: Text(friend["name"] ?? ""),
+                  title: Text(friend.fullName),
                 );
               },
               separatorBuilder: (BuildContext context, int index) {
@@ -1998,14 +2013,14 @@ class _ViewFriendsState extends ConsumerState<ViewFriends> {
 }
 
 class FriendState {
-  final List<Map<String, String>> originalList;
-  final List<Map<String, String>> filteredList;
+  final List<Friends> originalList;
+  final List<Friends> filteredList;
 
   FriendState({required this.originalList, required this.filteredList});
 
   FriendState copyWith({
-    List<Map<String, String>>? originalList,
-    List<Map<String, String>>? filteredList,
+    List<Friends>? originalList,
+    List<Friends>? filteredList,
   }) {
     return FriendState(
       originalList: originalList ?? this.originalList,
@@ -2017,7 +2032,7 @@ class FriendState {
 class FriendsVieNotifier extends StateNotifier<FriendState> {
   FriendsVieNotifier() : super(FriendState(originalList: [], filteredList: []));
 
-  void addFriend(List<Map<String, String>> friends) {
+  void addFriend(List<Friends> friends) {
     state = state.copyWith(
       originalList: friends,
       filteredList: [],
@@ -2030,7 +2045,7 @@ class FriendsVieNotifier extends StateNotifier<FriendState> {
     } else {
       final filtered = state.originalList
           .where((friend) =>
-              friend['name']!.toLowerCase().contains(query.toLowerCase()))
+              friend.fullName.toLowerCase().contains(query.toLowerCase()))
           .toList();
       state = state.copyWith(filteredList: filtered);
     }

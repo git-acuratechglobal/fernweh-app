@@ -28,7 +28,8 @@ FriendsTrip _$FriendsTripFromJson(Map<String, dynamic> json) => FriendsTrip(
       goingTo: json['going_to'] as String?,
       startDate: json['start_date'],
       endDate: json['end_date'],
-      friendName: json['friend_name'] as String?,
+      friendFirstName: json['friend_firstname'] as String?,
+      friendLastName: json['friend_lastname'] as String?,
       friendImage: json['friend_image'],
     );
 

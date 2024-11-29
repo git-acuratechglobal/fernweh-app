@@ -8,7 +8,8 @@ part of 'friends.dart';
 
 Friends _$FriendsFromJson(Map<String, dynamic> json) => Friends(
       id: (json['id'] as num?)?.toInt(),
-      name: json['name'] as String?,
+      firstname: json['firstname'] as String?,
+      lastname: json['lastname'] as String?,
       email: json['email'] as String?,
       image: json['image'],
       gender: json['gender'] as String?,

@@ -55,12 +55,14 @@ class Itenery {
 class Can {
   Can({
     required this.id,
-    required this.name,
+    required this.firstname,
+    required this.lastname,
     required this.image,
   });
 
   final int? id;
-  final String? name;
+  final String? firstname;
+  final String? lastname;
   final String? image;
 
   factory Can.fromJson(Map<String, dynamic> json) => _$CanFromJson(json);
@@ -74,6 +76,30 @@ class Can {
       return null;
     }
   }
+
+  String get fullName {
+    if ((firstname == null || firstname!.isEmpty) && (lastname == null || lastname!.isEmpty)) {
+      return ''; // Return empty if both firstname and lastname are missing or empty.
+    }
+
+    String capitalize(String name) {
+      return name[0].toUpperCase() + name.substring(1).toLowerCase();
+    }
+
+    String formattedFirstName = firstname != null && firstname!.isNotEmpty
+        ? capitalize(firstname!)
+        : '';
+    String formattedLastName = lastname != null && lastname!.isNotEmpty
+        ? capitalize(lastname!)
+        : '';
+
+    if (formattedLastName.isEmpty) {
+      return formattedFirstName; // Return only firstname if lastname is missing or empty.
+    } else {
+      return '$formattedFirstName $formattedLastName'; // Return both if available.
+    }
+  }
+
 
 }
 

@@ -232,7 +232,7 @@ class _FriendsListState extends ConsumerState<FriendsList> {
                     Expanded(
                       child: Text(
                         overflow: TextOverflow.fade,
-                        user.name ?? "",
+                        user.fullName ?? "",
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 18,
@@ -459,7 +459,7 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                               child: Text(
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
-                                user.name ?? "",
+                                user.fullName ?? "",
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 18,

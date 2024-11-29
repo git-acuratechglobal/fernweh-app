@@ -63,7 +63,8 @@ class FriendsTrip {
     required this.goingTo,
     required this.startDate,
     required this.endDate,
-    required this.friendName,
+    required this.friendFirstName,
+    required this.friendLastName,
     required this.friendImage,
   });
 
@@ -82,13 +83,39 @@ class FriendsTrip {
   @JsonKey(name: 'end_date')
   final dynamic endDate;
 
-  @JsonKey(name: 'friend_name')
-  final String? friendName;
+  @JsonKey(name: 'friend_firstname')
+  final String? friendFirstName;
+  @JsonKey(name: 'friend_lastname')
+  final String? friendLastName;
 
   @JsonKey(name: 'friend_image')
   final dynamic friendImage;
 
   factory FriendsTrip.fromJson(Map<String, dynamic> json) => _$FriendsTripFromJson(json);
+
+  String get fullName {
+    if ((friendFirstName == null || friendFirstName!.isEmpty) && (friendLastName == null || friendLastName!.isEmpty)) {
+      return ''; // Return empty if both firstname and lastname are missing or empty.
+    }
+
+    String capitalize(String name) {
+      return name[0].toUpperCase() + name.substring(1).toLowerCase();
+    }
+
+    String formattedFirstName = friendFirstName != null && friendFirstName!.isNotEmpty
+        ? capitalize(friendFirstName!)
+        : '';
+    String formattedLastName = friendLastName != null && friendLastName!.isNotEmpty
+        ? capitalize(friendLastName!)
+        : '';
+
+    if (formattedLastName.isEmpty) {
+      return formattedFirstName; // Return only firstname if lastname is missing or empty.
+    } else {
+      return '$formattedFirstName $formattedLastName'; // Return both if available.
+    }
+  }
+
 
 }
 @JsonSerializable(createToJson: false)
@@ -128,8 +155,11 @@ class TripDetails {
 
         if (!currentDate.isBefore(friendStart) && !currentDate.isAfter(friendEnd)) {
           daysByMonth[monthName]![day]!.add({
-            'name': friendTrip.friendName??"",
+            "id":friendTrip.userId.toString(),
+            'firstName': friendTrip.friendFirstName??"",
+            'lastName': friendTrip.friendLastName??"",
             'image': friendTrip.friendImage ?? '',
+            "fullName": friendTrip.fullName
           });
         }
       }

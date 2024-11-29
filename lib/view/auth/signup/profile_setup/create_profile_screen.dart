@@ -134,11 +134,19 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen>
                       const SizedBox(height: 24),
                       TextFormField(
                           decoration:
-                              const InputDecoration(hintText: "Full name"),
+                              const InputDecoration(hintText: "First name"),
                           validator: (val) => validation.validateName(val),
                           onSaved: (val) => ref
                               .read(authNotifierProvider.notifier)
-                              .updateFormData("name", val)),
+                              .updateFormData("firstname", val)),
+                      const SizedBox(height: 24),
+                      TextFormField(
+                          decoration:
+                          const InputDecoration(hintText: "Last name"),
+                          validator: (val) => validation.validateName(val),
+                          onSaved: (val) => ref
+                              .read(authNotifierProvider.notifier)
+                              .updateFormData("lastname", val)),
                       const SizedBox(height: 24),
                       TextFormField(
                         readOnly: true,

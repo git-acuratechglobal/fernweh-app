@@ -421,12 +421,12 @@ class _UnShareItenarySheetState extends ConsumerState<UnShareItenarySheet> {
                   child: SizedBox.square(
                     dimension: 50,
                     child: data.imageUrl == null
-                        ? UserInitials(name: data.name!)
+                        ? UserInitials(name: data.fullName)
                         : ImageWidget(url: data.imageUrl.toString()),
                   ),
                 ),
                 title: Text(
-                  data.name!,
+                  data.fullName,
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 16,
@@ -481,12 +481,12 @@ class _UnShareItenarySheetState extends ConsumerState<UnShareItenarySheet> {
                   child: SizedBox.square(
                     dimension: 50,
                     child: user.imageUrl == null
-                        ? UserInitials(name: user.name!)
+                        ? UserInitials(name: user.fullName)
                         : ImageWidget(url: user.imageUrl.toString()),
                   ),
                 ),
                 title: Text(
-                  user.name!,
+                  user.fullName,
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 16,

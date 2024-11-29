@@ -44,13 +44,15 @@ Map<String, dynamic> _$IteneryToJson(Itenery instance) => <String, dynamic>{
 
 Can _$CanFromJson(Map<String, dynamic> json) => Can(
       id: (json['id'] as num?)?.toInt(),
-      name: json['name'] as String?,
+      firstname: json['firstname'] as String?,
+      lastname: json['lastname'] as String?,
       image: json['image'] as String?,
     );
 
 Map<String, dynamic> _$CanToJson(Can instance) => <String, dynamic>{
       'id': instance.id,
-      'name': instance.name,
+      'firstname': instance.firstname,
+      'lastname': instance.lastname,
       'image': instance.image,
     };
 

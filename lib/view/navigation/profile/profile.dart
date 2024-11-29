@@ -130,7 +130,7 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                       child: file == null
                           ? user!.imageUrl == null
                               ? UserInitials(
-                                  name: user.name,
+                                  name: user.fullName,
                                 )
                               : ImageWidget(
                                   url: user.imageUrl.toString(),
@@ -174,7 +174,7 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: TextFormField(
                       validator: (val) => validation.validateName(val),
-                      initialValue: user?.name,
+                      initialValue: user?.firstname,
                       onSaved: (val) => ref
                           .read(authNotifierProvider.notifier)
                           .updateFormData("name", val),
@@ -184,6 +184,18 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: TextFormField(
+                      validator: (val) => validation.validateName(val),
+                      initialValue: user?.lastname,
+                      onSaved: (val) => ref
+                          .read(authNotifierProvider.notifier)
+                          .updateFormData("name", val),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TextFormField(
+                      enabled: false,
                       readOnly: true,
                       initialValue: user?.email,
                     ),
@@ -329,6 +341,7 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
       ],
     );
   }
+
   DateTime? parseDate(String? dateString) {
     if (dateString == null) return null;
     final DateFormat inputFormat = DateFormat('d/M/yyyy');
@@ -352,15 +365,15 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
 
 class UserInitials extends StatelessWidget {
   final String name;
-final double fontSize;
-  const UserInitials({super.key, required this.name,this.fontSize=18});
+  final double fontSize;
+
+  const UserInitials({super.key, required this.name, this.fontSize = 18});
 
   @override
   Widget build(BuildContext context) {
     List<String> nameParts = name.split(' ');
     String firstInitial = nameParts.isNotEmpty ? nameParts[0][0] : '';
     String lastInitial = nameParts.length > 1 ? nameParts[1][0] : '';
-
     return Container(
       decoration: BoxDecoration(
         color: Common.getColorFromName(firstInitial),

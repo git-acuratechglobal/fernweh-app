@@ -8,7 +8,8 @@ part of 'user_model.dart';
 
 User _$UserFromJson(Map<String, dynamic> json) => User(
       id: (json['id'] as num?)?.toInt(),
-      name: json['name'],
+      firstname: json['firstname'] as String?,
+      lastname: json['lastname'] as String?,
       email: json['email'] as String?,
       image: json['image'],
       gender: json['gender'],
@@ -32,7 +33,8 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'id': instance.id,
-      'name': instance.name,
+      'firstname': instance.firstname,
+      'lastname': instance.lastname,
       'email': instance.email,
       'image': instance.image,
       'gender': instance.gender,

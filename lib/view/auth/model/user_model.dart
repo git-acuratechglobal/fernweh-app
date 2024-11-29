@@ -6,7 +6,8 @@ part 'user_model.g.dart';
 class User {
   User({
     required this.id,
-    required this.name,
+    required this.firstname,
+    required this.lastname,
     required this.email,
     required this.image,
     required this.gender,
@@ -23,7 +24,8 @@ class User {
   });
 
   final int? id;
-  final dynamic name;
+  final String? firstname;
+  final String? lastname;
   final String? email;
   final dynamic image;
   final dynamic gender;
@@ -60,5 +62,27 @@ class User {
       return "http://fernweh.acublock.in/public/$image";
     }
     return null;
+  }
+  String get fullName {
+    if ((firstname == null || firstname!.isEmpty) && (lastname == null || lastname!.isEmpty)) {
+      return ''; // Return empty if both firstname and lastname are missing or empty.
+    }
+
+    String capitalize(String name) {
+      return name[0].toUpperCase() + name.substring(1).toLowerCase();
+    }
+
+    String formattedFirstName = firstname != null && firstname!.isNotEmpty
+        ? capitalize(firstname!)
+        : '';
+    String formattedLastName = lastname != null && lastname!.isNotEmpty
+        ? capitalize(lastname!)
+        : '';
+
+    if (formattedLastName.isEmpty) {
+      return formattedFirstName; // Return only firstname if lastname is missing or empty.
+    } else {
+      return '$formattedFirstName $formattedLastName'; // Return both if available.
+    }
   }
 }
