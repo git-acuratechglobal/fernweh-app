@@ -8,7 +8,8 @@ part 'following_friends.g.dart';
 @JsonSerializable(createToJson: false)
 class FollowingFriends {
   FollowingFriends({
-    required this.name,
+    required this.firstname,
+    required this.lastname,
     required this.email,
     required this.image,
     required this.id,
@@ -17,7 +18,8 @@ class FollowingFriends {
     required this.itineries,
   });
 
-  final String? name;
+  final String? firstname;
+  final String? lastname;
   final String? email;
   final String? image;
   final int? id;
@@ -37,24 +39,25 @@ class FollowingFriends {
     return null;
   }
   String get fullName {
-    if (name == null || name!.isEmpty) {
-      return '';
+    if ((firstname == null || firstname!.isEmpty) && (lastname == null || lastname!.isEmpty)) {
+      return ''; // Return empty if both firstname and lastname are missing or empty.
     }
 
-    // Split the full name by spaces
-    List<String> nameParts = name!.split(' ');
+    String capitalize(String name) {
+      return name[0].toUpperCase() + name.substring(1).toLowerCase();
+    }
 
-    // The first part is considered the first name
-    String firstName = nameParts[0];
+    String formattedFirstName = firstname != null && firstname!.isNotEmpty
+        ? capitalize(firstname!)
+        : '';
+    String formattedLastName = lastname != null && lastname!.isNotEmpty
+        ? capitalize(lastname!)
+        : '';
 
-    // Check if there is a last name
-    if (nameParts.length > 1) {
-      // Get the first letter of the last name
-      String lastNameInitial = nameParts.last[0];
-      return '$firstName $lastNameInitial.';
+    if (formattedLastName.isEmpty) {
+      return formattedFirstName; // Return only firstname if lastname is missing or empty.
     } else {
-      // If no last name, return just the first name
-      return firstName;
+      return '$formattedFirstName $formattedLastName'; // Return both if available.
     }
   }
 }

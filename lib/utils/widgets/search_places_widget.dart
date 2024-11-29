@@ -11,13 +11,14 @@ class SearchPlacesWidget extends ConsumerStatefulWidget {
       required this.searchController,
       required this.validator,
       this.onSaved,
+        this.onTap,
       this.hintText});
 
   final String? Function(String?)? validator;
   final TextEditingController searchController;
   final Function(String?)? onSaved;
   final String? hintText;
-
+  final Function(String?)? onTap;
   @override
   ConsumerState<SearchPlacesWidget> createState() => _SearchPlacesWidgetState();
 }
@@ -72,6 +73,7 @@ class _SearchPlacesWidgetState extends ConsumerState<SearchPlacesWidget> {
                               itemBuilder: (context, index) {
                                 return ListTile(
                                   onTap: () {
+                                    widget.onTap!(data[index].placeId!);
                                     widget.searchController.text =
                                         data[index].description!;
                                     _removeOverlay();
@@ -119,6 +121,7 @@ class _SearchPlacesWidgetState extends ConsumerState<SearchPlacesWidget> {
             focusNode: _focusNode,
             onTapOutside: (val) {
               _focusNode.unfocus();
+
             },
             onChanged: (val) {
               if (val.isNotEmpty) {
@@ -166,6 +169,7 @@ class _SearchPlacesWidgetState extends ConsumerState<SearchPlacesWidget> {
                         Icons.search,
                         color: Colors.grey,
                       )),
+
           ),
           const SizedBox(
             height: 10,

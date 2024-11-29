@@ -59,7 +59,7 @@ Widget followingWidget(
   return StatefulBuilder(
       builder: (BuildContext context, void Function(void Function()) setState) {
     return ListView.builder(
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.only(bottom: 60),
       itemCount: countries.length,
       itemBuilder: (context, countryIndex) {
         final country = countries[countryIndex];

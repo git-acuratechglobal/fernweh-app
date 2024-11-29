@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:fernweh/view/navigation/friends_list/controller/follow_friend_notifier.dart';
 import 'package:fernweh/view/navigation/friends_list/model/following_friends.dart';
@@ -6,6 +8,7 @@ import 'package:fernweh/view/navigation/itinerary/models/itinerary_model.dart';
 import 'package:fernweh/view/navigation/itinerary/models/trip/trip.dart';
 import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/add_notes/model/notes_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../view/navigation/explore/categories_model/categories_model.dart';
@@ -415,6 +418,40 @@ class ApiService {
       final List<dynamic> jsonTripData = response.data['trips'];
       final tripData = jsonTripData.map((trip) => Trip.fromJson(trip)).toList();
       return tripData;
+    });
+  }
+
+  Future<String> getFullAdress({required String placeId}) {
+    return asyncGuard(() async {
+      final url =
+          "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&fields=address_component&key=AIzaSyCG4YZMnrZwDGA2sXcUF4XLQdddSL4tz5Y";
+      final response = await _dio.get(url);
+      final data = response.data['result'];
+      final List<dynamic> addressComponents = data['address_components'];
+
+      final String? city = addressComponents.firstWhere(
+          (entry) => entry['types'].contains('locality'),
+          orElse: () => null)?['long_name'];
+      final String? state = addressComponents.firstWhere(
+          (entry) => entry['types'].contains('administrative_area_level_1'),
+          orElse: () => null)?['long_name'];
+      final String? country = addressComponents.firstWhere(
+          (entry) => entry['types'].contains('country'),
+          orElse: () => null)?['long_name'];
+      return "$city,$state,$country";
+    });
+  }
+
+  Future<String?> getPlaceIdFromCoordinates(Position position) async {
+    return asyncGuard(() async {
+      const apiKey =
+          "AIzaSyCG4YZMnrZwDGA2sXcUF4XLQdddSL4tz5Y"; // Replace with your API Key
+      final url =
+          "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$apiKey";
+      final response = await _dio.get(url);
+      final data = response.data;
+      final placeId = data['results'][0]['place_id'];
+      return placeId;
     });
   }
 

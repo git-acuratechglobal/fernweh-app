@@ -6,9 +6,11 @@ import 'package:fernweh/utils/common/app_validation.dart';
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
+import 'package:fernweh/utils/widgets/loading_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/navigation/friends_list/model/friends.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/all_friends_notifier.dart';
+import 'package:fernweh/view/navigation/itinerary/notifier/full_address_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/trip_notifier/create_trip_notifier.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/trip_notifier/trip_notifier.dart';
@@ -499,7 +501,6 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                 Tab(child: Text("My Curated List")),
                 Tab(child: Text("Following")),
                 Tab(child: Text("Shared List")),
-
               ],
             ),
             Expanded(
@@ -817,13 +818,13 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                   ),
                   // SharedListTab(isMapView: mapView),
 
-                RefreshIndicator(
-                    color: const Color(0xffCF5253),
-                    edgeOffset: 10,
-                    onRefresh: ()async{
-                      ref.invalidate(followingNotifierProvider);
-                    },
-                    child: const  FollowingList()),
+                  RefreshIndicator(
+                      color: const Color(0xffCF5253),
+                      edgeOffset: 10,
+                      onRefresh: () async {
+                        ref.invalidate(followingNotifierProvider);
+                      },
+                      child: const FollowingList()),
                   const AllFriends(),
                 ],
               ),
@@ -913,166 +914,181 @@ class _CreateItineraryState extends ConsumerState<CreateItinerary>
   Widget build(BuildContext context) {
     final validation = ref.watch(validatorsProvider);
     final state = ref.watch(userItineraryNotifierProvider);
-    return Form(
-      key: fkey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return AsyncDataWidgetB(
+        dataProvider: fullAddressNotifierProvider,
+        dataBuilder: (data) {
+          return Form(
+            key: fkey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: const Icon(Icons.clear),
-                ),
-                Text(
-                  'Add to My Itinerary',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1B28),
-                    fontSize: 20,
-                    fontVariations: FVariations.w700,
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        icon: const Icon(Icons.clear),
+                      ),
+                      Text(
+                        'Add to My Itinerary',
+                        style: TextStyle(
+                          color: const Color(0xFF1A1B28),
+                          fontSize: 20,
+                          fontVariations: FVariations.w700,
+                        ),
+                      ),
+                      const SizedBox.square(dimension: 40)
+                    ],
                   ),
                 ),
-                const SizedBox.square(dimension: 40)
-              ],
-            ),
-          ),
-          const Divider(height: 0),
-          Padding(
-            padding: const EdgeInsets.only(top: 16, left: 24, right: 24),
-            child: Text(
-              "Create a new itinerary",
-              style: TextStyle(
-                fontVariations: FVariations.w700,
-              ),
-            ),
-          ),
-          Padding(
-            padding:
-                const EdgeInsets.only(top: 12, left: 24, bottom: 8, right: 24),
-            child: SearchPlacesWidget(
-              hintText: "Search Country,State or City",
-              searchController: _searchCountryController,
-              validator: (val) {
-                if (val!.isEmpty) {
-                  return "Please select country";
-                }
-                return null;
-              },
-              onSaved: (val) {
-                ref
-                    .read(userItineraryNotifierProvider.notifier)
-                    .updateForm('location', val);
-              },
-            ),
-          ),
-          Padding(
-            padding:
-                const EdgeInsets.only(top: 12, left: 24, bottom: 8, right: 24),
-            child: TextFormField(
-              // controller: itineraryController,
-              decoration: const InputDecoration(
-                hintText: "Enter name",
-              ),
-              onSaved: (val) {
-                ref
-                    .read(userItineraryNotifierProvider.notifier)
-                    .updateForm('name', val);
-              },
-              validator: (val) => validation.itineraryName(val),
-            ),
-          ),
-          Padding(
-            padding:
-                const EdgeInsets.only(top: 5, left: 24, right: 24, bottom: 10),
-            child: Text(
-              "Upload Photo",
-              style: TextStyle(
-                fontVariations: FVariations.w700,
-              ),
-            ),
-          ),
-          Padding(
-            padding:
-                const EdgeInsets.only(top: 5, left: 24, right: 24, bottom: 10),
-            child: GestureDetector(
-              onTap: () async {
-                final pickedImage = await showDialog(
-                  context: context,
-                  builder: (context) {
-                    return const ImagePickerOptions();
-                  },
-                );
-                if (pickedImage != null) {
-                  setState(() {
-                    file = pickedImage;
-                  });
-                  ref
-                      .read(userItineraryNotifierProvider.notifier)
-                      .updateForm('image', pickedImage);
-                }
-              },
-              child: Container(
-                  height: 100,
-                  width: 100,
-                  decoration:
-                      BoxDecoration(border: Border.all(color: Colors.black12)),
-                  child: switch (file) {
-                    XFile image => Image.file(
-                        File(image.path),
-                        fit: BoxFit.cover,
+                const Divider(height: 0),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16, left: 24, right: 24),
+                  child: Text(
+                    "Create a new itinerary",
+                    style: TextStyle(
+                      fontVariations: FVariations.w700,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 12, left: 24, bottom: 8, right: 24),
+                  child: SearchPlacesWidget(
+                    hintText: "Search Country,State or City",
+                    searchController: _searchCountryController,
+                    validator: (val) {
+                      if (val!.isEmpty) {
+                        return "Please select country";
+                      }
+                      return null;
+                    },
+                    onSaved: (val) {
+                      // ref
+                      //     .read(userItineraryNotifierProvider.notifier)
+                      //     .updateForm('location', val);
+                    },
+                    onTap: (val) {
+                      ref
+                          .read(fullAddressNotifierProvider.notifier)
+                          .getFullAddress(placeId: val ?? "");
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 12, left: 24, bottom: 8, right: 24),
+                  child: TextFormField(
+                    // controller: itineraryController,
+                    decoration: const InputDecoration(
+                      hintText: "Enter name",
+                    ),
+                    onSaved: (val) {
+                      ref
+                          .read(userItineraryNotifierProvider.notifier)
+                          .updateForm('name', val);
+                    },
+                    validator: (val) => validation.itineraryName(val),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 5, left: 24, right: 24, bottom: 10),
+                  child: Text(
+                    "Upload Photo",
+                    style: TextStyle(
+                      fontVariations: FVariations.w700,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 5, left: 24, right: 24, bottom: 10),
+                  child: GestureDetector(
+                    onTap: () async {
+                      final pickedImage = await showDialog(
+                        context: context,
+                        builder: (context) {
+                          return const ImagePickerOptions();
+                        },
+                      );
+                      if (pickedImage != null) {
+                        setState(() {
+                          file = pickedImage;
+                        });
+                        ref
+                            .read(userItineraryNotifierProvider.notifier)
+                            .updateForm('image', pickedImage);
+                      }
+                    },
+                    child: Container(
+                        height: 100,
+                        width: 100,
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black12)),
+                        child: switch (file) {
+                          XFile image => Image.file(
+                              File(image.path),
+                              fit: BoxFit.cover,
+                            ),
+                          null => const Icon(Icons.add),
+                        }),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    children: [
+                      Image.asset('assets/images/global.png'),
+                      const SizedBox(width: 12.0),
+                      DropdownButton(
+                        value: type,
+                        underline: const SizedBox.shrink(),
+                        items: typeList.map((e) {
+                          return DropdownMenuItem(
+                            value: e.$2,
+                            child: Text(e.$1.toString()),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            type = value!;
+                          });
+                        },
                       ),
-                    null => const Icon(Icons.add),
-                  }),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              children: [
-                Image.asset('assets/images/global.png'),
-                const SizedBox(width: 12.0),
-                DropdownButton(
-                  value: type,
-                  underline: const SizedBox.shrink(),
-                  items: typeList.map((e) {
-                    return DropdownMenuItem(
-                      value: e.$2,
-                      child: Text(e.$1.toString()),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      type = value!;
-                    });
-                  },
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: AppButton(
+                      isLoading: state is UserItineraryLoading,
+                      onTap: () {
+                        if (validateAndSave()) {
+                          ref
+                              .read(userItineraryNotifierProvider.notifier)
+                              .updateForm('type', type);
+                          ref
+                              .read(userItineraryNotifierProvider.notifier)
+                              .updateForm('location', data);
+                          ref
+                              .read(userItineraryNotifierProvider.notifier)
+                              .createItinerary();
+                        }
+                      },
+                      child: const Text("Create Itinerary")),
                 ),
               ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: AppButton(
-                isLoading: state is UserItineraryLoading,
-                onTap: () {
-                  if (validateAndSave()) {
-                    ref
-                        .read(userItineraryNotifierProvider.notifier)
-                        .updateForm('type', type);
-                    ref
-                        .read(userItineraryNotifierProvider.notifier)
-                        .createItinerary();
-                  }
-                },
-                child: const Text("Create Itinerary")),
-          ),
-        ],
-      ),
-    );
+          );
+        },
+        errorBuilder: (error, st) => Center(
+              child: Text(error.toString()),
+            ));
   }
 }
 
@@ -1095,7 +1111,7 @@ class _AllFriendsState extends ConsumerState<AllFriends> {
       dataProvider: allFriendsNotifierProvider,
       dataBuilder: (data) {
         List<Country> countries =
-        convertItinerariesToHierarchy(data.friendsList);
+            convertItinerariesToHierarchy(data.friendsList);
         return data.friendsList.isEmpty
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1119,7 +1135,7 @@ class _AllFriendsState extends ConsumerState<AllFriends> {
                   ),
                 ],
               )
-            : followingWidget(countries, data.itineraryPhotos??{});
+            : followingWidget(countries, data.itineraryPhotos ?? {});
         // ListView.separated(
         //         padding: const EdgeInsets.all(24),
         //         itemCount: data.friendsList.length,
@@ -1459,6 +1475,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
               height: 10,
             ),
             SearchPlacesWidget(
+              onTap: (val) {},
               hintText: "Search Country,State or City",
               searchController: _tripFieldController,
               validator: (val) {
@@ -1467,9 +1484,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                 }
                 return null;
               },
-              onSaved: (val){
-
-              },
+              onSaved: (val) {},
             ),
             const SizedBox(
               height: 10,
@@ -1650,26 +1665,27 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                         builder: (context) {
                                           return ViewFriends(
                                             friends: friends
-                                                .map((e) =>
-                                                  Friends.fromJson({
-                                                    "id":e.userId,
-                                                    "image":
-                                                    e.friendImage == null
-                                                        ? ""
-                                                        : e.friendImage
-                                                        .toString(),
-                                                    "firstname": e.friendFirstName,
-                                                    "lastname": e.friendLastName
-                                                  }))
+                                                .map((e) => Friends.fromJson({
+                                                      "id": e.userId,
+                                                      "image":
+                                                          e.friendImage == null
+                                                              ? ""
+                                                              : e.friendImage
+                                                                  .toString(),
+                                                      "firstname":
+                                                          e.friendFirstName,
+                                                      "lastname":
+                                                          e.friendLastName
+                                                    }))
                                                 .toList(),
                                           );
                                         },
                                       );
                                     },
                                     child: Row(
-                                      children: friends!.isEmpty? [const Text("No friends match")]
-                                          :
-                                      friends.map((friend) {
+                                      children: friends!.isEmpty
+                                          ? [const Text("No friends match")]
+                                          : friends.map((friend) {
                                               return Align(
                                                 widthFactor: 0.75,
                                                 child: Container(
@@ -1691,7 +1707,8 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                                   .friendImage ==
                                                               null
                                                           ? UserInitials(
-                                                              name:friend.fullName,
+                                                              name: friend
+                                                                  .fullName,
                                                               fontSize: 14,
                                                             )
                                                           : ImageWidget(
@@ -1811,12 +1828,21 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                         ),
                                                         builder: (context) {
                                                           return ViewFriends(
-                                                            friends: friends.map((e)=>Friends.fromJson({
-                                                              "id":int.parse(e['id'].toString()),
-                                                              "firstname":e['firstName'],
-                                                              "lastname":e['lastName'],
-                                                              "image":e['image'],
-                                                            })).toList(),
+                                                            friends: friends
+                                                                .map((e) =>
+                                                                    Friends
+                                                                        .fromJson({
+                                                                      "id": int.parse(
+                                                                          e['id']
+                                                                              .toString()),
+                                                                      "firstname":
+                                                                          e['firstName'],
+                                                                      "lastname":
+                                                                          e['lastName'],
+                                                                      "image": e[
+                                                                          'image'],
+                                                                    }))
+                                                                .toList(),
                                                           );
                                                         },
                                                       );
@@ -1857,8 +1883,8 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                                     ? UserInitials(
                                                                         fontSize:
                                                                             14,
-                                                                        name: friend["fullName"]??""
-                                                                      )
+                                                                        name: friend["fullName"] ??
+                                                                            "")
                                                                     : ImageWidget(
                                                                         url:
                                                                             "http://fernweh.acublock.in/public/$image")),
@@ -1977,7 +2003,7 @@ class _ViewFriendsState extends ConsumerState<ViewFriends> {
                           "No result found for ${searchController.text.trim()} "));
                 }
                 return ListTile(
-                  onTap: (){
+                  onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => FriendDetailScreen(
@@ -1991,14 +2017,9 @@ class _ViewFriendsState extends ConsumerState<ViewFriends> {
                     width: 40,
                     child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
-                        child: friend.imageUrl==null
-                            ? UserInitials(
-                                fontSize: 14,
-                                name: friend.fullName
-                              )
-                            : ImageWidget(
-                                url:
-                                    friend.imageUrl??"")),
+                        child: friend.imageUrl == null
+                            ? UserInitials(fontSize: 14, name: friend.fullName)
+                            : ImageWidget(url: friend.imageUrl ?? "")),
                   ),
                   title: Text(friend.fullName),
                 );
@@ -2060,7 +2081,3 @@ final friendViewProvider =
     StateNotifierProvider<FriendsVieNotifier, FriendState>((ref) {
   return FriendsVieNotifier();
 });
-
-
-
-
