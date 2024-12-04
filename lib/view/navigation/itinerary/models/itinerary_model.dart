@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../widgets/following_list/model/following_model.dart';
+
 part 'itinerary_model.g.dart';
 
 @JsonSerializable()
@@ -120,6 +122,7 @@ class Itinerary {
     required this.shareUrl,
     required this.location,
      this.placesCount,
+    this.places
   });
 
   final int? id;
@@ -150,6 +153,8 @@ class Itinerary {
   final String? shareUrl;
   final String? location;
   final int ?placesCount;
+  @JsonKey(name: 'places')
+  final List<Place>? places;
 
   factory Itinerary.fromJson(Map<String, dynamic> json) =>
       _$ItineraryFromJson(json);
@@ -162,6 +167,13 @@ class Itinerary {
     } else {
       return "http://fernweh.acublock.in/public/$image";
     }
+  }
+
+  List<String> get placesUrls{
+    if(places!= null){
+      return places!.map((place) => place.photo??"").toList();
+    }
+    return [];
   }
 }
 

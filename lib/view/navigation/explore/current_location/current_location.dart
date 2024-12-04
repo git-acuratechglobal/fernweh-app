@@ -55,6 +55,9 @@ class _CurrentLocationState extends ConsumerState<CurrentLocation> {
                         ),
                       ),
                       GooglePlaceAutoCompleteTextField(
+                        boxDecoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xffE2E2E2)),
+                            borderRadius: BorderRadius.circular(8.0)),
                         textEditingController: locationController,
                         googleAPIKey: 'AIzaSyCG4YZMnrZwDGA2sXcUF4XLQdddSL4tz5Y',
                         inputDecoration: const InputDecoration(
@@ -91,7 +94,7 @@ class _CurrentLocationState extends ConsumerState<CurrentLocation> {
                         },
                         seperatedBuilder: const Divider(),
                         itemBuilder: (context, index, Prediction prediction) {
-                          return Text(prediction.description ?? "");
+                          return ListTile(title: Text(prediction.description ?? ""),);
                         },
                       )
                     ],

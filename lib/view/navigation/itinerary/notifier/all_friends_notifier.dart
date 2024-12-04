@@ -19,7 +19,8 @@ class AllFriendsNotifier extends _$AllFriendsNotifier {
     state = const AsyncLoading();
     final result = await AsyncValue.guard(() async {
       final Map<int, List<String>> itineraryPhotos = {};
-      if(friendsItineraryList!.isNotEmpty){
+
+      if(friendsItineraryList!=null&&friendsItineraryList.isNotEmpty){
         for (var itinerary in friendsItineraryList) {
           final int itineraryId = itinerary.id ?? 0;
           if ((itinerary.placesCount ?? 0) > 0) {
@@ -32,11 +33,7 @@ class AllFriendsNotifier extends _$AllFriendsNotifier {
                 .toList();
             itineraryPhotos[itineraryId] = photoUrls;
           }
-        }
-      }
-
-
-
+        }}
       return AllFriendsState(friendsList: friendsItineraryList??[],itineraryPhotos: itineraryPhotos );
     });
     state = result;

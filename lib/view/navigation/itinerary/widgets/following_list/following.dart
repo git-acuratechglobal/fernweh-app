@@ -3,6 +3,7 @@ import 'package:fernweh/view/navigation/itinerary/widgets/following_list/notifie
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../my_curated_list/curated_list_item_view/itenary_details_screen.dart';
 import '../my_curated_list/my_curated_list.dart';
 import 'model/following_model.dart';
 
@@ -151,13 +152,29 @@ Widget followingWidget(
                               ),
                               if (city.isExpanded)
                                 ...city.itineraries.map((itinerary) {
-                                  return MyCreatedItinerary(
-                                    isEditAccess: false,
-                                    placeCount: itinerary.placesCount ?? 0,
-                                    itinary: itinerary,
-                                    editList: const [],
-                                    viewOnly: const [],
-                                    placeUrls: itineraryPhotos[itinerary.id],
+                                  return InkWell(
+                                    onTap: (){
+                                      Navigator.of(context)
+                                          .push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ItenaryDetailsScreen(
+                                                title: itinerary.name??"",
+                                                itineraryId:
+                                                itinerary.id ??
+                                                    0,
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                    child: MyCreatedItinerary(
+                                      isEditAccess: false,
+                                      placeCount: itinerary.placesCount ?? 0,
+                                      itinary: itinerary,
+                                      editList: const [],
+                                      viewOnly: const [],
+                                      placeUrls: itinerary.placesUrls,
+                                    ),
                                   );
                                 }),
                             ],

@@ -10,10 +10,12 @@ class FullAddressNotifier extends _$FullAddressNotifier {
     return null;
   }
 
-  Future<void> getFullAddress({required String placeId}) async {
+  Future<String?> getFullAddress({required String placeId}) async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
+   final address=  await AsyncValue.guard(() async {
       return ref.watch(apiServiceProvider).getFullAdress(placeId: placeId);
     });
+   state=address;
+   return address.value;
   }
 }

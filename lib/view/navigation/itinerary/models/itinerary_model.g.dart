@@ -75,6 +75,9 @@ Itinerary _$ItineraryFromJson(Map<String, dynamic> json) => Itinerary(
       shareUrl: json['shareUrl'] as String?,
       location: json['location'] as String?,
       placesCount: (json['placesCount'] as num?)?.toInt(),
+      places: (json['places'] as List<dynamic>?)
+          ?.map((e) => Place.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$ItineraryToJson(Itinerary instance) => <String, dynamic>{
@@ -92,4 +95,5 @@ Map<String, dynamic> _$ItineraryToJson(Itinerary instance) => <String, dynamic>{
       'shareUrl': instance.shareUrl,
       'location': instance.location,
       'placesCount': instance.placesCount,
+      'places': instance.places,
     };

@@ -438,7 +438,13 @@ class ApiService {
       final String? country = addressComponents.firstWhere(
           (entry) => entry['types'].contains('country'),
           orElse: () => null)?['long_name'];
-      return "$city,$state,$country";
+      final String? town = addressComponents.firstWhere(
+              (entry) => entry['types'].contains('postal_town'),
+          orElse: () => null)?['long_name'];
+      final String? state2 = addressComponents.firstWhere(
+              (entry) => entry['types'].contains('administrative_area_level_2'),
+          orElse: () => null)?['long_name'];
+      return "${city??town},${state??state2},$country";
     });
   }
 

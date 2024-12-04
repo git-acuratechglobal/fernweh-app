@@ -68,7 +68,7 @@ class AuthNotifier extends _$AuthNotifier {
       state = Loading();
       final user = await ref.watch(authServiceProvider).updateUser(_formData);
       final data = await ref.watch(apiServiceProvider).createUserItinerary(
-          {'name': "Default list", 'type': 1, "location": adress});
+          {'name': "Default list", 'type': 1,});
       final List<String> placeId = [
         "ChIJmQJIxlVYwokRLgeuocVOGVU",
         "ChIJCewJkL2LGGAR3Qmk0vCTGkg",
@@ -79,6 +79,9 @@ class AuthNotifier extends _$AuthNotifier {
       ];
       for (var id in placeId) {
         ref.read(myItineraryNotifierProvider.notifier).updateForm('type', 1);
+        ref
+            .read(myItineraryNotifierProvider.notifier)
+            .updateForm('location', adress);
         ref
             .read(myItineraryNotifierProvider.notifier)
             .updateForm('userId', data.userId);

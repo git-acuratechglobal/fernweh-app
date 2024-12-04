@@ -33,7 +33,7 @@ class LocationService {
     if (permission == LocationPermission.deniedForever) {
       await Geolocator.openAppSettings();
       return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+          'Location permissions are permanently denied');
     }
     _isLocationPermissionGranted = true;
     final position = await Geolocator.getCurrentPosition();

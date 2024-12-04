@@ -6,7 +6,6 @@ import 'package:fernweh/utils/common/app_validation.dart';
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
-import 'package:fernweh/utils/widgets/loading_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/navigation/friends_list/model/friends.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/all_friends_notifier.dart';
@@ -33,7 +32,6 @@ import '../../friends_list/friend_details/friend_detail_screen.dart';
 import '../../profile/profile.dart';
 import '../models/itinerary_model.dart';
 import '../models/states/itinerary_state.dart';
-import 'following_list/model/following_model.dart';
 import 'my_curated_list/curated_list_item_view/itenary_details_screen.dart';
 import 'my_curated_list/my_curated_list.dart';
 
@@ -479,7 +477,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
               height: 20,
             ),
             TabBar(
-              tabAlignment: TabAlignment.start,
+              tabAlignment: TabAlignment.center,
               isScrollable: true,
               controller: tabController,
               labelColor: Theme.of(context).colorScheme.secondary,
@@ -500,7 +498,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
               tabs: const [
                 Tab(child: Text("My Curated List")),
                 Tab(child: Text("Following")),
-                Tab(child: Text("Shared List")),
+                 Tab(child: Text("Shared List")),
               ],
             ),
             Expanded(
@@ -825,7 +823,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                         ref.invalidate(followingNotifierProvider);
                       },
                       child: const FollowingList()),
-                  const AllFriends(),
+                   const AllFriends(),
                 ],
               ),
             ),
@@ -893,7 +891,6 @@ class _CreateItineraryState extends ConsumerState<CreateItinerary>
     ("Private", 0),
     ("Public", 1),
   ];
-  final _searchCountryController = TextEditingController();
 
   @override
   void initState() {
@@ -955,30 +952,30 @@ class _CreateItineraryState extends ConsumerState<CreateItinerary>
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 12, left: 24, bottom: 8, right: 24),
-                  child: SearchPlacesWidget(
-                    hintText: "Search Country,State or City",
-                    searchController: _searchCountryController,
-                    validator: (val) {
-                      if (val!.isEmpty) {
-                        return "Please select country";
-                      }
-                      return null;
-                    },
-                    onSaved: (val) {
-                      // ref
-                      //     .read(userItineraryNotifierProvider.notifier)
-                      //     .updateForm('location', val);
-                    },
-                    onTap: (val) {
-                      ref
-                          .read(fullAddressNotifierProvider.notifier)
-                          .getFullAddress(placeId: val ?? "");
-                    },
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(
+                //       top: 12, left: 24, bottom: 8, right: 24),
+                //   child: SearchPlacesWidget(
+                //     hintText: "Search Country,State or City",
+                //     searchController: _searchCountryController,
+                //     validator: (val) {
+                //       if (val!.isEmpty) {
+                //         return "Please select country";
+                //       }
+                //       return null;
+                //     },
+                //     onSaved: (val) {
+                //       // ref
+                //       //     .read(userItineraryNotifierProvider.notifier)
+                //       //     .updateForm('location', val);
+                //     },
+                //     onTap: (val) {
+                //       ref
+                //           .read(fullAddressNotifierProvider.notifier)
+                //           .getFullAddress(placeId: val ?? "");
+                //     },
+                //   ),
+                // ),
                 Padding(
                   padding: const EdgeInsets.only(
                       top: 12, left: 24, bottom: 8, right: 24),
@@ -1072,9 +1069,9 @@ class _CreateItineraryState extends ConsumerState<CreateItinerary>
                           ref
                               .read(userItineraryNotifierProvider.notifier)
                               .updateForm('type', type);
-                          ref
-                              .read(userItineraryNotifierProvider.notifier)
-                              .updateForm('location', data);
+                          // ref
+                          //     .read(userItineraryNotifierProvider.notifier)
+                          //     .updateForm('location', data);
                           ref
                               .read(userItineraryNotifierProvider.notifier)
                               .createItinerary();
@@ -1110,8 +1107,8 @@ class _AllFriendsState extends ConsumerState<AllFriends> {
     return AsyncDataWidgetB(
       dataProvider: allFriendsNotifierProvider,
       dataBuilder: (data) {
-        List<Country> countries =
-            convertItinerariesToHierarchy(data.friendsList);
+        // List<Country> countries =
+        //     convertItinerariesToHierarchy(data.friendsList);
         return data.friendsList.isEmpty
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1135,33 +1132,34 @@ class _AllFriendsState extends ConsumerState<AllFriends> {
                   ),
                 ],
               )
-            : followingWidget(countries, data.itineraryPhotos ?? {});
-        // ListView.separated(
-        //         padding: const EdgeInsets.all(24),
-        //         itemCount: data.friendsList.length,
-        //         itemBuilder: (context, index) {
-        //           return InkWell(
-        //             onTap: () {
-        //               Navigator.of(context).push(
-        //                 MaterialPageRoute(
-        //                   builder: (context) => ItenaryDetailsScreen(
-        //                     title: data.friendsList[index].name ?? "",
-        //                     itineraryId: data.friendsList[index].id ?? 0,
-        //                   ),
-        //                 ),
-        //               );
-        //             },
-        //             child: AllFriendsWidget(
-        //               itinary: data.friendsList[index],
-        //             ),
-        //           );
-        //         },
-        //         separatorBuilder: (BuildContext context, int index) {
-        //           return const SizedBox(
-        //             height: 10,
-        //           );
-        //         },
-        //       );
+            :
+        // followingWidget(countries, data.itineraryPhotos ?? {});
+        ListView.separated(
+                padding: const EdgeInsets.all(24),
+                itemCount: data.friendsList.length,
+                itemBuilder: (context, index) {
+                  return InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ItenaryDetailsScreen(
+                            title: data.friendsList[index].name ?? "",
+                            itineraryId: data.friendsList[index].id ?? 0,
+                          ),
+                        ),
+                      );
+                    },
+                    child: AllFriendsWidget(
+                      itinary: data.friendsList[index],
+                    ),
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return const SizedBox(
+                    height: 10,
+                  );
+                },
+              );
       },
       loadingBuilder: Skeletonizer(
           child: GridView.builder(

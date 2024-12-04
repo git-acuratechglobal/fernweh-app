@@ -22,6 +22,7 @@ import '../../../auth/login/login_screen.dart';
 import '../../../auth/signup/profile_setup/create_profile_screen.dart';
 import '../../explore/explore_screen.dart';
 import '../../itinerary/models/itinerary_model.dart';
+import '../../itinerary/notifier/full_address_notifier.dart';
 import '../../itinerary/widgets/my_curated_list/my_curated_list.dart';
 
 class RestaurantDetailScreen extends ConsumerWidget {
@@ -521,6 +522,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
           Expanded(
             child: SingleChildScrollView(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
@@ -567,8 +569,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                   const SizedBox(height: 16),
                   const Divider(height: 0),
                   Padding(
-                    padding:
-                        const EdgeInsets.only(top: 12, left: 24, bottom: 5),
+                    padding: const EdgeInsets.only(top: 12, left: 24, bottom: 5),
                     child: Text(
                       "My itinerary list",
                       style: TextStyle(
@@ -577,7 +578,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                   ),
                   AsyncDataWidgetB(
                     dataProvider: getUserItineraryProvider,
-                    dataBuilder: ( userItinerary) {
+                    dataBuilder: (userItinerary) {
                       List<Itenery> combinedItineraries = userItinerary
                           .userItinerary
                           .getCombinedItineraries(user?.id ?? 0);
@@ -647,8 +648,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                         height: 100,
                                         width: 100,
                                         decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10),
                                           border: Border.all(
                                               color: _isSelected
                                                   ? Colors.red
@@ -664,12 +664,10 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                 if (selectedItineraryId != null) {
                                   _selectedItinerary =
                                       combinedItineraries.indexWhere((e) =>
-                                          e.itinerary!.id ==
-                                          selectedItineraryId);
+                                          e.itinerary!.id == selectedItineraryId);
                                   itinerary = combinedItineraries.firstWhere(
                                       (e) =>
-                                          e.itinerary!.id ==
-                                          selectedItineraryId);
+                                          e.itinerary!.id == selectedItineraryId);
                                 }
                                 return GestureDetector(
                                   onTap: () {
@@ -681,15 +679,15 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                             _slectedItineraryId[0];
                                       });
                                     }
-
+            
                                     ref
                                         .read(localStorageServiceProvider)
                                         .setItineraryId(int.parse(
                                             itinary.itinerary!.id.toString()));
                                   },
                                   child: MyCuratedListTab(
-                                      placeUrls: userItinerary.itineraryPhotos[
-                                          itinary.itinerary?.id],
+                                      placeUrls: userItinerary
+                                          .itineraryPhotos[itinary.itinerary?.id],
                                       itinary: itinary.itinerary!,
                                       isEditing: false,
                                       isSelected: _slectedItineraryId.isNotEmpty
@@ -793,12 +791,11 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                 ),
                                 onSaved: (val) {
                                   ref
-                                      .read(userItineraryNotifierProvider
-                                          .notifier)
+                                      .read(
+                                          userItineraryNotifierProvider.notifier)
                                       .updateForm('name', val);
                                 },
-                                validator: (val) =>
-                                    validation.itineraryName(val),
+                                validator: (val) => validation.itineraryName(val),
                               ),
                             ),
                             Padding(
@@ -848,8 +845,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 24),
+                              padding: const EdgeInsets.symmetric(horizontal: 24),
                               child: Row(
                                 children: [
                                   Image.asset('assets/images/global.png'),
@@ -883,7 +879,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                       isLoading: _isSelected
                           ? state is UserItineraryLoading
                           : myItineraryState is MyItineraryLoading,
-                      onTap: () {
+                      onTap: () async {
                         if (_isSelected) {
                           if (validateAndSave()) {
                             ref
@@ -894,11 +890,17 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                 .createItinerary();
                           }
                         } else {
+                          final fullAddress = await ref
+                              .read(fullAddressNotifierProvider.notifier)
+                              .getFullAddress(placeId: widget.locationId ?? "");
                           if (_slectedItineraryId.isNotEmpty) {
                             for (var itineraryId in _slectedItineraryId) {
                               final itinerary = combinedList.firstWhere(
                                 (e) => e.itinerary!.id == itineraryId,
                               );
+                              ref
+                                  .read(myItineraryNotifierProvider.notifier)
+                                  .updateForm('location', fullAddress);
                               ref
                                   .read(myItineraryNotifierProvider.notifier)
                                   .updateForm('type', selectedOption);
@@ -920,6 +922,9 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                           } else {
                             ref
                                 .read(myItineraryNotifierProvider.notifier)
+                                .updateForm('location', fullAddress);
+                            ref
+                                .read(myItineraryNotifierProvider.notifier)
                                 .updateForm('type', selectedOption);
                             ref
                                 .read(myItineraryNotifierProvider.notifier)
@@ -927,8 +932,8 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                     'userId', itinerary?.itinerary!.userId);
                             ref
                                 .read(myItineraryNotifierProvider.notifier)
-                                .updateForm('intineraryListId',
-                                    itinerary?.itinerary!.id);
+                                .updateForm(
+                                    'intineraryListId', itinerary?.itinerary!.id);
                             ref
                                 .read(myItineraryNotifierProvider.notifier)
                                 .updateForm('locationId', widget.locationId);
@@ -947,7 +952,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );

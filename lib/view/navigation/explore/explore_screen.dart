@@ -305,6 +305,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               AsyncDataWidgetB(
                   dataProvider: friendsItineraryNotifierProvider,
                   dataBuilder: ( category) {
+
                     return category.isFilterApplied &&
                             category.filterCategories.isEmpty
                         ? const Center(child: Text("No Itinerary Found"))
@@ -357,6 +358,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                       walkingTime: convertMinutes(int.parse(
                                           data.walkingTime.toString())),
                                       distance: data.distance.toString(),
+                                      placeId: data.placeId,
                                     ),
                                   );
                                 },

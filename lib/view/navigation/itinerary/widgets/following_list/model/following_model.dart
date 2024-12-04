@@ -1,6 +1,48 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 import '../../../models/itinerary_model.dart';
+
+part 'following_model.g.dart';
+@JsonSerializable()
+class Place {
+  Place({
+    required this.id,
+    required this.userId,
+    required this.intineraryListId,
+    required this.location,
+    required this.locationId,
+    required this.type,
+    required this.isFavorite,
+    required this.isDeleted,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.photo,
+  });
+
+  final int? id;
+  final int? userId;
+  final int? intineraryListId;
+  final String? location;
+  final String? locationId;
+  final int? type;
+
+  @JsonKey(name: 'is_favorite')
+  final int? isFavorite;
+
+  @JsonKey(name: 'is_deleted')
+  final int? isDeleted;
+
+  @JsonKey(name: 'created_at')
+  final DateTime? createdAt;
+
+  @JsonKey(name: 'updated_at')
+  final DateTime? updatedAt;
+  final String? photo;
+
+  factory Place.fromJson(Map<String, dynamic> json) => _$PlaceFromJson(json);
+  Map<String, dynamic> toJson() => _$PlaceToJson(this);
+}
+
 
 class Country {
   final String name;
@@ -33,22 +75,28 @@ class City {
 }
 
 List<Country> convertItinerariesToHierarchy(List<Itinerary> itineraryList) {
+
   final Map<String, Map<String, Map<String, List<Itinerary>>>> hierarchy = {};
 
   for (var itinerary in itineraryList) {
-    if (itinerary.location != null && itinerary.location!.isNotEmpty) {
-      final parts =
-          itinerary.location!.split(',').map((e) => e.trim()).toList();
+    if (itinerary.places!.isNotEmpty) {
+      for (var place in itinerary.places!) {
+        if (place.location != null && place.location!.isNotEmpty) {
+          final parts = place.location!.split(',').map((e) => e.trim()).toList();
 
-      if (parts.length >= 3) {
-        final countryName = parts.last;
-        final stateName = parts[parts.length - 2];
-        final cityName = parts.first;
-
-        hierarchy.putIfAbsent(countryName, () => {});
-        hierarchy[countryName]!.putIfAbsent(stateName, () => {});
-        hierarchy[countryName]![stateName]!.putIfAbsent(cityName, () => []);
-        hierarchy[countryName]![stateName]![cityName]!.add(itinerary);
+          if (parts.length >= 3) {
+            final countryName = parts.last;
+            final stateName = parts[parts.length - 2];
+            final cityName = parts.first;
+            hierarchy.putIfAbsent(countryName, () => {});
+            hierarchy[countryName]!.putIfAbsent(stateName, () => {});
+            hierarchy[countryName]![stateName]!.putIfAbsent(cityName, () => []);
+            if (!hierarchy[countryName]![stateName]![cityName]!
+                .contains(itinerary)) {
+              hierarchy[countryName]![stateName]![cityName]!.add(itinerary);
+            }
+          }
+        }
       }
     }
   }
@@ -70,6 +118,7 @@ List<Country> convertItinerariesToHierarchy(List<Itinerary> itineraryList) {
     );
   }).toList();
 }
+
 
 class FollowingState {
   List<Itinerary> itineraries;

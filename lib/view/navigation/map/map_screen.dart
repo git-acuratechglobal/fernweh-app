@@ -206,8 +206,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           loadingBuilder: const Skeletonizer(
                             child: Text("this is dummy location"),
                           ),
-                          errorBuilder: (error, stack) => const Center(
-                            child: Text('Unable to load current location'),
+                          errorBuilder: (error, stack) =>  Center(
+                            child: Text(error.toString()),
                           ),
                         )
                       ],
@@ -350,7 +350,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     const SizedBox())),
                       ),
 
-                    ///*** here we show map of itinerary list when we press on itinerary list then marker show of itinerary
+                    ///   *** here we show map of itinerary list when we press on itinerary list then marker show of itinerary
 
                     if (mapViewState.itineraryView)
                       Padding(
