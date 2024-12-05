@@ -26,7 +26,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         final locationPermissionStatus = await Geolocator.checkPermission();
-
         if (locationPermissionStatus == LocationPermission.denied ||
             locationPermissionStatus == LocationPermission.deniedForever) {
           Future.delayed(const Duration(seconds: 3), () {
@@ -197,13 +196,11 @@ class _LocationPermissionScreenState
       ),
     );
   }
-  Future<void> _handleAppPermission(BuildContext context)async{
-    final permission = await Geolocator.checkPermission();
-    final serviceEnabled =
-        await Geolocator.isLocationServiceEnabled();
+  Future<void> _handleAppPermission(BuildContext context) async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      Common.showSnackBar(
-          context, "Location services are disabled.");
+      Common.showSnackBar(context, "Location services are disabled.");
       final shouldOpenSettings = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
@@ -222,17 +219,47 @@ class _LocationPermissionScreenState
           ],
         ),
       );
+
       if (shouldOpenSettings == true) {
         await openAppSettings();
       }
       return;
     }
 
-    if (permission == LocationPermission.deniedForever ||
-        permission == LocationPermission.denied) {
-      await openAppSettings();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        Common.showSnackBar(context, "Location permission is denied.");
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+
+      final shouldOpenSettings = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Enable Location Permission"),
+          content: const Text(
+            "The app requires location permission to function properly. "
+                "Please enable location permissions in the app settings.",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text("Open Settings"),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldOpenSettings == true) {
+
+        await openAppSettings();
+      }
       return;
     }
   }
+
 
 }
