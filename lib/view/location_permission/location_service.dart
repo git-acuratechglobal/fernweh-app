@@ -18,27 +18,25 @@ class LocationService {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      await Geolocator.openAppSettings();
-      return Future.error('Location services are disabled.');
+      throw Exception('Location services are disabled.');
     }
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied.');
+        throw Exception('Location permission denied.');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      await Geolocator.openAppSettings();
-      return Future.error(
-          'Location permissions are permanently denied');
+      throw Exception('Location permission permanently denied.');
     }
+
     _isLocationPermissionGranted = true;
-    final position = await Geolocator.getCurrentPosition();
-    return position;
+    return await Geolocator.getCurrentPosition();
   }
+
 
   Future<String> getAddressFromPosition(Position position) async {
     List<Placemark> placemarks = await placemarkFromCoordinates(
