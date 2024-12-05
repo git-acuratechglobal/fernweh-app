@@ -734,6 +734,9 @@ class _ItinerayItemState extends ConsumerState<ItinerayItem> {
                               ),
                             ),
                           ),
+                          const SizedBox(
+                            height: 04,
+                          ),
                           Row(
                             children: [
                               const Icon(
@@ -774,16 +777,16 @@ class _ItinerayItemState extends ConsumerState<ItinerayItem> {
                           // LocationRow(
                           //   address: widget.address ?? "",
                           // ),
-                          const Text(
-                            "Description:",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w600),
-                          ),
                           const SizedBox(
                             height: 05,
                           ),
-                          SizedBox(
-                            height: 30,
+                          const Text(
+                            "Address:",
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w600),
+                          ),
+
+                          Flexible(
                             child: Text(
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
@@ -795,9 +798,7 @@ class _ItinerayItemState extends ConsumerState<ItinerayItem> {
                           //   walkingTime: widget.walkTime ?? "",
                           //   distance: widget.distance ?? "",
                           // ),
-                          const SizedBox(
-                            height: 10,
-                          ),
+
                           const Text("Added by:",
                               style: TextStyle(
                                   fontSize: 15, fontWeight: FontWeight.w500)),

@@ -1,10 +1,18 @@
+import 'dart:async';
+
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/view/location_permission/location_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../services/local_storage_service/local_storage_service.dart';
+import '../../utils/common/common.dart';
 import '../../utils/common/config.dart';
+import '../auth/auth_provider/auth_provider.dart';
+import '../auth/login/login_screen.dart';
 import '../navigation/navigation_screen.dart';
+import '../onboarding/onboarding_screen.dart';
 
 class LocationPermissionScreen extends ConsumerStatefulWidget {
   const LocationPermissionScreen({super.key});
@@ -15,7 +23,59 @@ class LocationPermissionScreen extends ConsumerStatefulWidget {
 }
 
 class _LocationPermissionScreenState
-    extends ConsumerState<LocationPermissionScreen> {
+    extends ConsumerState<LocationPermissionScreen>  with WidgetsBindingObserver{
+  late Timer _locationPermissionTimer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+    _locationPermissionTimer =
+        Timer.periodic((const Duration(milliseconds: 300)), (timer) async {
+          final permission = await Geolocator.checkPermission();
+          if (permission == LocationPermission.whileInUse ||
+              permission == LocationPermission.always) {
+            _locationPermissionTimer.cancel();
+            await ref.read(currentPositionProvider.future);
+            final onBoarding =
+            ref.read(localStorageServiceProvider).getOnboarding();
+
+            final user = ref.read(localStorageServiceProvider).getUser();
+
+            final guest = ref.read(localStorageServiceProvider).getGuestLogin();
+
+            if (onBoarding == null) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+              );
+              return;
+            }
+            if (guest == true) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const NavigationScreen()),
+              );
+              return;
+            }
+            if (user == null) {
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => const LoginScreen()));
+              return;
+            }
+            ref.read(userDetailProvider.notifier).update((state) => user);
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const NavigationScreen()),
+            );
+          }
+        });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +107,7 @@ class _LocationPermissionScreenState
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 24),
                     child: Text(
-                      "This app requires that location services are turned on your device and for this app. You must enable them in settings before using this app.",
+                      Config.locationText,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Color.fromARGB(255, 90, 90, 90),
@@ -58,26 +118,11 @@ class _LocationPermissionScreenState
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: ElevatedButton(
-                      onPressed: () {
-                        ref.read(currentPositionProvider);
-                        ref
-                            .read(localStorageServiceProvider)
-                            .clearGuestSession();
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                              builder: (context) => const NavigationScreen()),
-                          (route) => false,
-                        );
+                      onPressed: () async {
+                        await  _handleAppPermission(context);
                       },
                       child: const Text("Allow"),
                     ),
-                  ),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      foregroundColor: const Color.fromARGB(255, 90, 90, 90),
-                    ),
-                    onPressed: () {},
-                    child: const Text("Maybe later"),
                   ),
                 ],
               ),
@@ -86,5 +131,69 @@ class _LocationPermissionScreenState
         ),
       ),
     );
+  }
+  Future<void> _handleAppPermission(BuildContext context) async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      Common.showSnackBar(context, "Location services are disabled.");
+      final shouldOpenSettings = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Location Services Disabled"),
+          content: const Text(
+              "Location services are required. Would you like to open settings to enable them?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text("Open Settings"),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldOpenSettings == true) {
+        await openAppSettings();
+      }
+      return;
+    }
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        Common.showSnackBar(context, "Location permission is denied.");
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+
+      final shouldOpenSettings = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Enable Location Permission"),
+          content: const Text(
+            "The app requires location permission to function properly. "
+                "Please enable location permissions in the app settings.",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text("Open Settings"),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldOpenSettings == true) {
+
+        await openAppSettings();
+      }
+      return;
+    }
   }
 }

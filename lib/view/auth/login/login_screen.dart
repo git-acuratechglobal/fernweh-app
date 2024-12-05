@@ -8,6 +8,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../../utils/common/common.dart';
 import '../../../utils/common/privacy_policy.dart';
 import '../../location_permission/location_screen.dart';
@@ -33,7 +34,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   void initState() {
-    ref.listenManual(authNotifierProvider, (previous, next) {
+    ref.listenManual(authNotifierProvider, (previous, next)async {
       switch (next) {
         case Verified(:final user) when previous is Loading:
           ref.read(userDetailProvider.notifier).update((state) => user);
@@ -50,15 +51,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           break;
         case UserUpdated(:final user) when previous is Loading:
           ref.read(userDetailProvider.notifier).update((state) => user);
-          final locationService = ref.watch(locationServiceProvider);
-          print(locationService.isLocationPermissionGranted);
-          if (!locationService.isLocationPermissionGranted) {
-            context.navigateAndRemoveUntil(const LocationPermissionScreen());
-            return;
-          } else {
             ref.read(localStorageServiceProvider).clearGuestSession();
             context.navigateAndRemoveUntil(const NavigationScreen());
-          }
           break;
         case Error(:final error):
           Common.showSnackBar(context, error.toString());

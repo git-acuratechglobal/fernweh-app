@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../utils/common/widgets.dart';
 import '../../../utils/widgets/loading_widget.dart';
+import '../../location_permission/location_screen.dart';
 import '../../location_permission/location_service.dart';
 import '../explore/current_location/current_location.dart';
 import '../explore/explore_screen.dart';
@@ -90,7 +91,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_)async {
+      final locationPermissionStatus = await Geolocator.checkPermission();
+      if (locationPermissionStatus == LocationPermission.denied ||
+          locationPermissionStatus == LocationPermission.deniedForever) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const LocationPermissionScreen(),
+            ),
+          );
+        return;
+      }
       ref.listenManual<Position?>(positionProvider, (previous, current) {
         if (current != null) {
           mapController.animateCamera(

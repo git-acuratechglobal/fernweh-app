@@ -271,6 +271,9 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                     child: AsyncDataWidgetB(
                       dataProvider: getTripProvider,
                       dataBuilder: (data) {
+                        data.sort((a,b)=>
+                          a.createdAt!.compareTo(b.createdAt!)
+                        );
                         return SingleChildScrollView(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,

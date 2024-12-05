@@ -16,7 +16,7 @@ abstract class Config {
       Color(0xffFBEBEC),
     ],
   );
-static const String locationText= 'To use this feature, you need to allow location access. If you have denied it permanently, please enable it in your phone settings.';
+static const String locationText= "This app requires that location services are turned on your device and for this app. You must enable them in settings before using this app.";
   static List<({String image, String title})> categories = [
     (image: 'assets/images/restaurant.png', title: "Restaurant"),
     (image: 'assets/images/bars.png', title: "Bars"),
