@@ -24,50 +24,57 @@ class LocationPermissionScreen extends ConsumerStatefulWidget {
 
 class _LocationPermissionScreenState
     extends ConsumerState<LocationPermissionScreen>  with WidgetsBindingObserver{
-  late Timer _locationPermissionTimer;
-
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addObserver(this);
-    _locationPermissionTimer =
-        Timer.periodic((const Duration(milliseconds: 300)), (timer) async {
-          final permission = await Geolocator.checkPermission();
-          if (permission == LocationPermission.whileInUse ||
-              permission == LocationPermission.always) {
-            _locationPermissionTimer.cancel();
-            await ref.read(currentPositionProvider.future);
-            final onBoarding =
-            ref.read(localStorageServiceProvider).getOnboarding();
+  }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkLocationPermission();
+    }
+  }
+  Future<void> _checkLocationPermission() async {
+    final permission = await Geolocator.checkPermission();
+    final _isGpsOn= await Geolocator.isLocationServiceEnabled();
+    if (permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always && _isGpsOn) {
+      await _navigateToNextScreen();
+    }
+  }
+  Future<void> _navigateToNextScreen()async{
+   Future.microtask(()async{
+     await ref.read(currentPositionProvider.future);
+   });
+    final onBoarding =
+    ref.read(localStorageServiceProvider).getOnboarding();
 
-            final user = ref.read(localStorageServiceProvider).getUser();
+    final user = ref.read(localStorageServiceProvider).getUser();
 
-            final guest = ref.read(localStorageServiceProvider).getGuestLogin();
+    final guest = ref.read(localStorageServiceProvider).getGuestLogin();
 
-            if (onBoarding == null) {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const OnboardingScreen()),
-              );
-              return;
-            }
-            if (guest == true) {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const NavigationScreen()),
-              );
-              return;
-            }
-            if (user == null) {
-              Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const LoginScreen()));
-              return;
-            }
-            ref.read(userDetailProvider.notifier).update((state) => user);
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const NavigationScreen()),
-            );
-          }
-        });
+    if (onBoarding == null) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+      );
+      return;
+    }
+    if (guest == true) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const NavigationScreen()),
+      );
+      return;
+    }
+    if (user == null) {
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const LoginScreen()));
+      return;
+    }
+    ref.read(userDetailProvider.notifier).update((state) => user);
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const NavigationScreen()),
+    );
   }
 
   @override
@@ -157,7 +164,7 @@ class _LocationPermissionScreenState
       );
 
       if (shouldOpenSettings == true) {
-        await openAppSettings();
+        await Geolocator.openLocationSettings();
       }
       return;
     }

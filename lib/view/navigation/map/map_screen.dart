@@ -93,8 +93,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     _scrollController = ScrollController();
     WidgetsBinding.instance.addPostFrameCallback((_)async {
       final locationPermissionStatus = await Geolocator.checkPermission();
+      final _isGpsOn= await Geolocator.isLocationServiceEnabled();
       if (locationPermissionStatus == LocationPermission.denied ||
-          locationPermissionStatus == LocationPermission.deniedForever) {
+          locationPermissionStatus == LocationPermission.deniedForever||!_isGpsOn) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => const LocationPermissionScreen(),
