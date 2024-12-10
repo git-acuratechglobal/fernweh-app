@@ -144,7 +144,7 @@ class _AddNotesSheetState extends ConsumerState<AddNotesSheet> {
                                       dimension: 30,
                                       child: user.imageUrl == null
                                           ? UserInitials(
-                                              name: user.userName!,
+                                              name: user.fullName,
                                             )
                                           : ImageWidget(url: user.imageUrl!),
                                     ),
@@ -152,7 +152,7 @@ class _AddNotesSheetState extends ConsumerState<AddNotesSheet> {
                                   const SizedBox(width: 16.0),
                                   Expanded(
                                     child: Text(
-                                      user.userName ?? "",
+                                      user.fullName ,
                                       style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 14,

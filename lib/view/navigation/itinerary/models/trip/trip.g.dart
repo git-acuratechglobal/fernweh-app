@@ -20,6 +20,15 @@ Trip _$TripFromJson(Map<String, dynamic> json) => Trip(
           ? null
           : DateTime.parse(json['created_at'] as String),
       id: (json['id'] as num?)?.toInt(),
+      address: json['address'] == null
+          ? null
+          : Address.fromJson(json['address'] as Map<String, dynamic>),
+    );
+
+Address _$AddressFromJson(Map<String, dynamic> json) => Address(
+      city: json['city'] as String?,
+      state: json['state'] as String?,
+      country: json['country'] as String?,
     );
 
 FriendsTrip _$FriendsTripFromJson(Map<String, dynamic> json) => FriendsTrip(

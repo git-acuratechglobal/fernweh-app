@@ -15,6 +15,7 @@ class Trip {
     required this.updatedAt,
     required this.createdAt,
     required this.id,
+    required this.address,
   });
 
   @JsonKey(name: 'user_id')
@@ -41,7 +42,7 @@ class Trip {
   @JsonKey(name: 'created_at')
   final DateTime? createdAt;
   final int? id;
-
+  final Address? address;
   factory Trip.fromJson(Map<String, dynamic> json) => _$TripFromJson(json);
 
   String get formattedDate {
@@ -50,10 +51,28 @@ class Trip {
     DateTime startDateTime = DateTime.parse(start);
     DateTime endDateTime = DateTime.parse(end);
     String formattedDate =
-        "${startDateTime.day.toString().padLeft(2, '0')}/${startDateTime.month.toString().padLeft(2, '0')}-${endDateTime.day.toString().padLeft(2, '0')}/${endDateTime.month.toString().padLeft(2, '0')}";
+        "${startDateTime.month.toString().padLeft(2, '0')}/${startDateTime.day.toString().padLeft(2, '0')}-${endDateTime.month.toString().padLeft(2, '0')}/${endDateTime.day.toString().padLeft(2, '0')}";
     return formattedDate;
   }
 }
+
+@JsonSerializable(createToJson: false)
+class Address {
+  Address({
+    required this.city,
+    required this.state,
+    required this.country,
+  });
+
+  final String? city;
+  final String? state;
+  final String? country;
+
+  factory Address.fromJson(Map<String, dynamic> json) => _$AddressFromJson(json);
+
+}
+
+
 
 @JsonSerializable(createToJson: false)
 class FriendsTrip {
@@ -95,7 +114,7 @@ class FriendsTrip {
 
   String get fullName {
     if ((friendFirstName == null || friendFirstName!.isEmpty) && (friendLastName == null || friendLastName!.isEmpty)) {
-      return ''; // Return empty if both firstname and lastname are missing or empty.
+      return '';
     }
 
     String capitalize(String name) {
@@ -110,9 +129,9 @@ class FriendsTrip {
         : '';
 
     if (formattedLastName.isEmpty) {
-      return formattedFirstName; // Return only firstname if lastname is missing or empty.
+      return formattedFirstName;
     } else {
-      return '$formattedFirstName $formattedLastName'; // Return both if available.
+      return '$formattedFirstName $formattedLastName';
     }
   }
 
@@ -131,7 +150,9 @@ class TripDetails {
   final List<FriendsTrip>? friendsTrips;
 
   factory TripDetails.fromJson(Map<String, dynamic> json) => _$TripDetailsFromJson(json);
-  Map<String, Map<String, List<Map<String, String>>>> get getDaysByMonthWithFriends {
+  Map<String, Map<String, List<Map<String, String>>>> getDaysByMonthWithFriends({
+     String? filterType,
+  }) {
     if (trip == null || friendsTrips == null) {
       return {};
     }
@@ -139,6 +160,9 @@ class TripDetails {
     final Map<String, Map<String, List<Map<String, String>>>> daysByMonth = {};
     final DateTime start = DateTime.parse(trip!.startDate);
     final DateTime end = DateTime.parse(trip!.endDate);
+
+    final mainTripState = trip?.address?.state ?? '';
+    final mainTripCity = trip?.address?.city ?? '';
 
     DateTime currentDate = start;
     while (currentDate.isBefore(end) || currentDate.isAtSameMomentAs(end)) {
@@ -148,18 +172,29 @@ class TripDetails {
       daysByMonth.putIfAbsent(monthName, () => {});
       daysByMonth[monthName]!.putIfAbsent(day, () => []);
 
-      // Check for matching friends
       for (final friendTrip in friendsTrips!) {
         final DateTime friendStart = DateTime.parse(friendTrip.startDate);
         final DateTime friendEnd = DateTime.parse(friendTrip.endDate);
 
-        if (!currentDate.isBefore(friendStart) && !currentDate.isAfter(friendEnd)) {
+        bool isWithinDateRange =
+            !currentDate.isBefore(friendStart) && !currentDate.isAfter(friendEnd);
+
+        bool matchesFilter = false;
+        if (filterType == 'state') {
+          matchesFilter = friendTrip.goingTo!.contains(mainTripState);
+        } else if (filterType == 'city') {
+          matchesFilter = friendTrip.goingTo!.contains(mainTripCity);
+        }
+
+        if (isWithinDateRange && matchesFilter) {
           daysByMonth[monthName]![day]!.add({
-            "id":friendTrip.userId.toString(),
-            'firstName': friendTrip.friendFirstName??"",
-            'lastName': friendTrip.friendLastName??"",
-            'image': friendTrip.friendImage ?? '',
-            "fullName": friendTrip.fullName
+            "id": friendTrip.userId.toString(),
+            'firstName': friendTrip.friendFirstName ?? "",
+            'lastName': friendTrip.friendLastName ?? "",
+            'image': friendTrip.friendImage ?? "",
+            "fullName": friendTrip.friendFirstName != null && friendTrip.friendLastName != null
+                ? '${friendTrip.friendFirstName} ${friendTrip.friendLastName}'
+                : (friendTrip.friendFirstName ?? friendTrip.friendLastName ?? ""),
           });
         }
       }
@@ -169,5 +204,7 @@ class TripDetails {
 
     return daysByMonth;
   }
+
+
 
 }

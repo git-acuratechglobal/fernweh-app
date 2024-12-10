@@ -8,7 +8,8 @@ class Notes {
       {required this.itineraryId,
       required this.userId,
       required this.notes,
-      required this.userName,
+      required this.firstName,
+        required this.lastName,
       required this.userImage,
       required this.createdAt});
 
@@ -18,7 +19,10 @@ class Notes {
   @JsonKey(name: 'user_id')
   final int? userId;
   final String? notes;
-  final String? userName;
+  @JsonKey(name: 'userfirstName')
+  final String? firstName;
+  @JsonKey(name: 'userlastName')
+  final String? lastName;
   final String? userImage;
   @JsonKey(name: 'created_at')
   final String createdAt;
@@ -30,6 +34,28 @@ class Notes {
       return "http://fernweh.acublock.in/public/$userImage";
     } else {
       return null;
+    }
+  }
+  String get fullName {
+    if ((firstName == null || firstName!.isEmpty) && (lastName == null || lastName!.isEmpty)) {
+      return ''; // Return empty if both firstname and lastname are missing or empty.
+    }
+
+    String capitalize(String name) {
+      return name[0].toUpperCase() + name.substring(1).toLowerCase();
+    }
+
+    String formattedFirstName = firstName != null && firstName!.isNotEmpty
+        ? capitalize(firstName!)
+        : '';
+    String formattedLastName = lastName != null && lastName!.isNotEmpty
+        ? capitalize(lastName!)
+        : '';
+
+    if (formattedLastName.isEmpty) {
+      return formattedFirstName; // Return only firstname if lastname is missing or empty.
+    } else {
+      return '$formattedFirstName $formattedLastName'; // Return both if available.
     }
   }
 }

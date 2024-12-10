@@ -271,9 +271,8 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                     child: AsyncDataWidgetB(
                       dataProvider: getTripProvider,
                       dataBuilder: (data) {
-                        data.sort((a,b)=>
-                          a.createdAt!.compareTo(b.createdAt!)
-                        );
+                        data.sort(
+                            (a, b) => a.createdAt!.compareTo(b.createdAt!));
                         return SingleChildScrollView(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           scrollDirection: Axis.horizontal,
@@ -501,7 +500,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
               tabs: const [
                 Tab(child: Text("My Curated List")),
                 Tab(child: Text("Following")),
-                 Tab(child: Text("Shared List")),
+                Tab(child: Text("Friend List")),
               ],
             ),
             Expanded(
@@ -826,7 +825,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                         ref.invalidate(followingNotifierProvider);
                       },
                       child: const FollowingList()),
-                   const AllFriends(),
+                  const AllFriends(),
                 ],
               ),
             ),
@@ -869,7 +868,7 @@ class AvatarList extends StatelessWidget {
                 child: avtar.imageUrl == null
                     ? UserInitials(
                         fontSize: 14,
-                        name: avtar.fullName ?? "",
+                        name: avtar.fullName ,
                       )
                     : ImageWidget(url: avtar.imageUrl!)),
           ),
@@ -1136,8 +1135,8 @@ class _AllFriendsState extends ConsumerState<AllFriends> {
                 ],
               )
             :
-        // followingWidget(countries, data.itineraryPhotos ?? {});
-        ListView.separated(
+            // followingWidget(countries, data.itineraryPhotos ?? {});
+            ListView.separated(
                 padding: const EdgeInsets.all(24),
                 itemCount: data.friendsList.length,
                 itemBuilder: (context, index) {
@@ -1562,22 +1561,7 @@ class ViewTripSheet extends ConsumerStatefulWidget {
 }
 
 class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
-  // Map<String, List<String>> getDaysByMonth(DateTime start, DateTime end) {
-  //   Map<String, List<String>> daysByMonth = {};
-  //
-  //   DateTime currentDate = start;
-  //   while (currentDate.isBefore(end) || currentDate.isAtSameMomentAs(end)) {
-  //     String monthName = DateFormat('MMM').format(currentDate);
-  //     String day = DateFormat('dd').format(currentDate);
-  //
-  //     daysByMonth.putIfAbsent(monthName, () => []);
-  //     daysByMonth[monthName]!.add(day);
-  //
-  //     currentDate = currentDate.add(const Duration(days: 1));
-  //   }
-  //
-  //   return daysByMonth;
-  // }
+  Map<String, Map<String, List<Map<String, String>>>>? tripModifiedData;
 
   @override
   void initState() {
@@ -1591,7 +1575,6 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
 
   @override
   Widget build(BuildContext context) {
-    // final daysByMonth = getDaysByMonth(trip.startDate, trip.endDate);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -1729,17 +1712,44 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                       const SizedBox(
                         height: 20,
                       ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: StateCityToggle(
+                            isSelected: (bool isStateSelected) {
+                              if (isStateSelected) {
+                                setState(() {
+                                  tripModifiedData =
+                                      tripData?.getDaysByMonthWithFriends(
+                                          filterType: 'state');
+                                });
+                              } else {
+                                setState(() {
+                                  tripModifiedData =
+                                      tripData?.getDaysByMonthWithFriends(
+                                          filterType: 'city');
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ),
                       Expanded(
                         child: ListView.separated(
                             padding: const EdgeInsets.only(left: 15),
                             shrinkWrap: true,
                             itemBuilder: (BuildContext context, int index) {
-                              final entry = tripData
-                                  .getDaysByMonthWithFriends.entries
-                                  .toList()[index];
-                              final monthName = entry.key;
-                              final days = entry.value;
-                              final stepperData = days.entries.map((e) {
+                              final entry = tripModifiedData == null
+                                  ? tripData
+                                      .getDaysByMonthWithFriends(
+                                          filterType: 'city')
+                                      .entries
+                                      .toList()[index]
+                                  : tripModifiedData?.entries.toList()[index];
+                              final monthName = entry?.key;
+                              final days = entry?.value;
+                              final stepperData = days?.entries.map((e) {
                                 final day = e.key;
                                 final friends = e.value;
                                 // print(friends);
@@ -1766,7 +1776,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                     height: 20,
                                   ),
                                   StepperListView(
-                                    stepperData: stepperData,
+                                    stepperData: stepperData ?? [],
                                     stepAvatar: (_, data) {
                                       final stepData = data as StepperItemData;
                                       final day =
@@ -1883,7 +1893,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                                         .isEmpty
                                                                     ? UserInitials(
                                                                         fontSize:
-                                                                            14,
+                                                                            10,
                                                                         name: friend["fullName"] ??
                                                                             "")
                                                                     : ImageWidget(
@@ -1918,7 +1928,9 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                               );
                             },
                             itemCount: tripData!
-                                .getDaysByMonthWithFriends.keys.length),
+                                .getDaysByMonthWithFriends()
+                                .keys
+                                .length),
                       )
                     ],
                   );
@@ -1928,6 +1940,82 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                     )),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class StateCityToggle extends StatefulWidget {
+  const StateCityToggle({super.key, required this.isSelected});
+
+  final Function(bool isStateSelected) isSelected;
+
+  @override
+  State<StateCityToggle> createState() => _StateCityToggleState();
+}
+
+class _StateCityToggleState extends State<StateCityToggle> {
+  bool _isStateSelected = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 170,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: Theme.of(context).colorScheme.secondary,width: 2)),
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _isStateSelected = !_isStateSelected;
+          });
+          widget.isSelected(_isStateSelected);
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              height: 40,
+              width: 82,
+              decoration: BoxDecoration(
+                color: _isStateSelected
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.secondary,
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(3),
+                    bottomLeft: Radius.circular(3)),
+              ),
+              child: Center(
+                  child: Text(
+                "City",
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    color: _isStateSelected ? Colors.black : Colors.white),
+              )),
+            ),
+            Container(
+              height: 40,
+              width: 83,
+              decoration: BoxDecoration(
+                color: _isStateSelected
+                    ? Theme.of(context).colorScheme.secondary
+                    : Colors.white,
+                borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(3),
+                    bottomRight: Radius.circular(3)),
+              ),
+              child: Center(
+                  child: Text(
+                "State",
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    color: _isStateSelected ? Colors.white : Colors.black),
+              )),
+            ),
+          ],
+        ),
       ),
     );
   }

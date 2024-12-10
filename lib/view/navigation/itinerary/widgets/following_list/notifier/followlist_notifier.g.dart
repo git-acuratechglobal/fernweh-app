@@ -6,7 +6,7 @@ part of 'followlist_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$followingNotifierHash() => r'ead8eb52e2f2200a0a3d0da624c943bb3edbcc1b';
+String _$followingNotifierHash() => r'bc1c47540a5cc92ce847913a1d36e5395cb24ad2';
 
 /// See also [FollowingNotifier].
 @ProviderFor(FollowingNotifier)

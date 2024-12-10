@@ -7,7 +7,7 @@ part of 'all_friends_notifier.dart';
 // **************************************************************************
 
 String _$allFriendsNotifierHash() =>
-    r'627faa4a983c4182a3f2dd20776d62612b2f6089';
+    r'315c16458a6dd9561a96fdaa3c67b0b6ee4468b1';
 
 /// See also [AllFriendsNotifier].
 @ProviderFor(AllFriendsNotifier)

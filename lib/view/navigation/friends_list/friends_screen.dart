@@ -159,8 +159,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
                       onRefresh: () async {
                         ref.invalidate(getFollowingFriendProvider);
                       },
-                      child:  const FollowList()),
-
+                      child: const FollowList()),
                 ]),
               )
             ],
@@ -515,7 +514,10 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                                             );
                                       },
                                       size: const Size(60, 40),
-                                      child: const Text("Accept"),
+                                      child: const Text(
+                                        "Accept",
+                                        style: TextStyle(fontSize: 14),
+                                      ),
                                     ),
                                   ),
 
@@ -640,6 +642,7 @@ class FollowList extends ConsumerStatefulWidget {
 class _FollowListState extends ConsumerState<FollowList> {
   List<int> loading = [];
   List<int> unfollowList = [];
+
   @override
   void initState() {
     super.initState();
@@ -661,6 +664,7 @@ class _FollowListState extends ConsumerState<FollowList> {
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return AsyncDataWidgetB(
@@ -668,102 +672,107 @@ class _FollowListState extends ConsumerState<FollowList> {
       dataBuilder: (data) {
         return data.isEmpty
             ? Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text("No following found"),
-              const SizedBox(
-                height: 10,
-              ),
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  minimumSize: const Size(60, 40),
-                ),
-                onPressed: () {
-                  ref.invalidate(getFollowingFriendProvider);
-                },
-                child: const Text(
-                  "Refresh",
-                  style: TextStyle(fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-        )
-            : ListView.separated(
-          padding: const EdgeInsets.all(24),
-          itemBuilder: (BuildContext context, int index) {
-            final user=data[index];
-            bool isloading=loading.contains(user.following);
-            bool isUnfollowed=unfollowList.contains(user.following);
-            return Container(
-              width: double.infinity,
-              height: 85,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xffE2E2E2)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(children: [
-                ClipOval(
-                  child: SizedBox.square(
-                      dimension: 50,
-                      child: user.imageUrl == null
-                          ? UserInitials(name: user.fullName)
-                          : ImageWidget(
-                          url: user.imageUrl.toString())),
-                ),
-                const SizedBox(width: 16),
-                SizedBox(
-                  width: 120,
-                  child: Text(
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    user.fullName ,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      fontVariations: FVariations.w700,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("No following found"),
+                    const SizedBox(
+                      height: 10,
                     ),
-                  ),
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        minimumSize: const Size(60, 40),
+                      ),
+                      onPressed: () {
+                        ref.invalidate(getFollowingFriendProvider);
+                      },
+                      child: const Text(
+                        "Refresh",
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
                 ),
-             CustomButton(
-               isFollow: !isUnfollowed,
-                    fixedSize: const Size(110, 40),
-                    isLoading: isloading,
-                    onTap:(){
-                      setState(() {
-                        loading.add(user.following??0);
-                      });
-                      ref
-                          .read(followFriendProvider.notifier)
-                          .followFriend(user.following ?? 0);
-                    },
-                    child: Text(
-                      isUnfollowed?"follow":"Following",
-                      style:  TextStyle(
-                          fontSize: 12,
-                          color:isUnfollowed? Colors.white:Colors.black,
-                          fontWeight: FontWeight.w900),
-                    )),
-              ],),
-            );
-          },
-          separatorBuilder: (BuildContext context, int index) {
-            return const SizedBox(height: 10,);
-          },
-          itemCount: data.length,
-        );
+              )
+            : ListView.separated(
+                padding: const EdgeInsets.all(24),
+                itemBuilder: (BuildContext context, int index) {
+                  final user = data[index];
+                  bool isloading = loading.contains(user.following);
+                  bool isUnfollowed = unfollowList.contains(user.following);
+                  return Container(
+                    width: double.infinity,
+                    height: 85,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xffE2E2E2)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        ClipOval(
+                          child: SizedBox.square(
+                              dimension: 50,
+                              child: user.imageUrl == null
+                                  ? UserInitials(name: user.fullName)
+                                  : ImageWidget(url: user.imageUrl.toString())),
+                        ),
+                        const SizedBox(width: 16),
+                        SizedBox(
+                          width: 120,
+                          child: Text(
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            user.fullName,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontVariations: FVariations.w700,
+                            ),
+                          ),
+                        ),
+                        CustomButton(
+                            isFollow: !isUnfollowed,
+                            fixedSize: const Size(110, 40),
+                            isLoading: isloading,
+                            onTap: () {
+                              setState(() {
+                                loading.add(user.following ?? 0);
+                              });
+                              ref
+                                  .read(followFriendProvider.notifier)
+                                  .followFriend(user.following ?? 0);
+                            },
+                            child: Text(
+                              isUnfollowed ? "follow" : "Following",
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: isUnfollowed
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontWeight: FontWeight.w900),
+                            )),
+                      ],
+                    ),
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return const SizedBox(
+                    height: 10,
+                  );
+                },
+                itemCount: data.length,
+              );
       },
       errorBuilder: (error, st) => Center(
         child: Text(error.toString()),
