@@ -106,7 +106,7 @@ class _WishListScreenState extends ConsumerState<WishListScreen> {
                 : Expanded(
                     child: ListView.separated(
                       itemCount: wishListData.wishList.length,
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(15),
                       separatorBuilder: (context, index) =>
                           const SizedBox(height: 12.0),
                       itemBuilder: (context, index) {
@@ -129,7 +129,7 @@ class _WishListScreenState extends ConsumerState<WishListScreen> {
                               ),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
-                            child: ListViewItems(
+                            child: ItinerayItem(
                               isSelected: wishListData.selectedItems.isNotEmpty,
                               placeType: wishList.type,
                               name: wishList.name,
@@ -140,6 +140,7 @@ class _WishListScreenState extends ConsumerState<WishListScreen> {
                               url: wishList.image,
                               selection: null,
                               walkTime: wishList.walkingTime,
+                              showingInWishList: true,
                             ),
                           ),
                         );

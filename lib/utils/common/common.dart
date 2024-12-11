@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 abstract class Common {
   static String baseUrl = "https://fernweh.acublock.in";
@@ -15,20 +16,32 @@ abstract class Common {
       ),
     );
   }
- static  Color getColorFromName(String name) {
-   final int hash = name.codeUnits.fold(0, (prev, element) => prev + element);
-   final List<Color> colors = [
-     Colors.red,
-     Colors.green,
-     Colors.blue,
-     Colors.orange,
-     Colors.purple,
-     Colors.pink,
-     Colors.teal,
-     Colors.cyan,
-     Colors.amber,
-     Colors.deepOrange,
-   ];
-   return colors[hash % colors.length];
- }
+
+  static void showToast({required BuildContext context,required String message}) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
+
+  static Color getColorFromName(String name) {
+    final int hash = name.codeUnits.fold(0, (prev, element) => prev + element);
+    final List<Color> colors = [
+      Colors.red,
+      Colors.green,
+      Colors.blue,
+      Colors.orange,
+      Colors.purple,
+      Colors.pink,
+      Colors.teal,
+      Colors.cyan,
+      Colors.amber,
+      Colors.deepOrange,
+    ];
+    return colors[hash % colors.length];
+  }
 }

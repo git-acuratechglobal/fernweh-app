@@ -492,6 +492,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: ItinerayItem(
+                          showingInWishList: false,
                           // isWishlist: false,
                           isSelected: itineraryState.selectedItems.isNotEmpty,
                           id: data.id,
@@ -532,6 +533,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
             padding: const EdgeInsets.symmetric(horizontal: 24),
             itemBuilder: (context, index) {
               return const ItinerayItem(
+                showingInWishList: false,
                 placeType: "kkklkk",
                 name: "data.name",
                 url:
@@ -580,6 +582,7 @@ class ItinerayItem extends ConsumerStatefulWidget {
   final int? id;
   final int? type;
   final bool isSelected;
+  final bool showingInWishList;
 
   const ItinerayItem(
       {super.key,
@@ -600,7 +603,8 @@ class ItinerayItem extends ConsumerStatefulWidget {
       this.userId,
       this.itineraryId,
       this.type,
-      this.isSelected = false});
+      this.isSelected = false,
+      required this.showingInWishList});
 
   @override
   ConsumerState<ItinerayItem> createState() => _ItinerayItemState();
@@ -621,56 +625,6 @@ class _ItinerayItemState extends ConsumerState<ItinerayItem> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Container(
-        //   width: widget.width ?? MediaQuery.sizeOf(context).width,
-        //   height: 30,
-        //   decoration: const BoxDecoration(
-        //     borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
-        //     color: Color(0xffF7F7F7),
-        //     border: Border(
-        //       top: BorderSide(color: Color(0xffE2E2E2)),
-        //       left: BorderSide(color: Color(0xffE2E2E2)),
-        //       right: BorderSide(color: Color(0xffE2E2E2)),
-        //     ),
-        //   ),
-        //   child: Padding(
-        //     padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        //     child: Row(
-        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //       children: List.generate(Config.selectionOptions.length, (index) {
-        //         final option = Config.selectionOptions[index].toUpperCase();
-        //         return InkWell(
-        //           onTap: () {
-        //             ref
-        //                 .read(myItineraryNotifierProvider.notifier)
-        //                 .updateForm("type", widget.type);
-        //             ref
-        //                 .read(myItineraryNotifierProvider.notifier)
-        //                 .updateForm("itinerary_id", widget.itineraryId);
-        //             ref
-        //                 .read(myItineraryNotifierProvider.notifier)
-        //                 .updateMyItinerary(id: widget.id ?? 0, form: {
-        //               "intineraryListId": widget.itineraryId,
-        //               "type": index + 1,
-        //               "locationId": widget.locationId,
-        //               "userId": widget.userId
-        //             });
-        //           },
-        //           child: Text(
-        //             option,
-        //             style: TextStyle(
-        //               fontSize: 12,
-        //               fontVariations: FVariations.w600,
-        //               color: widget.selection == option
-        //                   ? const Color(0xff12B347)
-        //                   : Colors.grey,
-        //             ),
-        //           ),
-        //         );
-        //       }),
-        //     ),
-        //   ),
-        // ),
         InkWell(
           onTap: () {
             if (widget.isSelected) {
@@ -799,40 +753,52 @@ class _ItinerayItemState extends ConsumerState<ItinerayItem> {
                           //   distance: widget.distance ?? "",
                           // ),
 
-                          const Text("Added by:",
-                              style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.w500)),
+                          widget.showingInWishList
+                              ? const SizedBox.shrink()
+                              : const Text("Added by:",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500)),
                           const SizedBox(
                             height: 5,
                           ),
-                          Expanded(
-                              child: ColoredDropdownButton(
-                            selectedType: selectedType ?? "",
-                            onChanged: (String? value) {
-                              setState(() {
-                                selectedType = value;
-                              });
-                              ref
-                                  .read(myItineraryNotifierProvider.notifier)
-                                  .updateForm("type", widget.type);
-                              ref
-                                  .read(myItineraryNotifierProvider.notifier)
-                                  .updateForm(
-                                      "itinerary_id", widget.itineraryId);
-                              ref
-                                  .read(myItineraryNotifierProvider.notifier)
-                                  .updateMyItinerary(id: widget.id ?? 0, form: {
-                                "intineraryListId": widget.itineraryId,
-                                "type": selectedType == "Want to visit"
-                                    ? 1
-                                    : selectedType == "Visited"
-                                        ? 2
-                                        : 3,
-                                "locationId": widget.locationId,
-                                "userId": widget.userId
-                              });
-                            },
-                          ))
+                          widget.showingInWishList
+                              ? const SizedBox.shrink()
+                              : Expanded(
+                                  child: ColoredDropdownButton(
+                                  selectedType: selectedType ?? "",
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      selectedType = value;
+                                    });
+                                    ref
+                                        .read(myItineraryNotifierProvider
+                                            .notifier)
+                                        .updateForm("type", widget.type);
+                                    ref
+                                        .read(myItineraryNotifierProvider
+                                            .notifier)
+                                        .updateForm(
+                                            "itinerary_id", widget.itineraryId);
+                                    ref
+                                        .read(myItineraryNotifierProvider
+                                            .notifier)
+                                        .updateMyItinerary(
+                                            id: widget.id ?? 0,
+                                            form: {
+                                          "intineraryListId":
+                                              widget.itineraryId,
+                                          "type":
+                                              selectedType == "Want to visit"
+                                                  ? 1
+                                                  : selectedType == "Visited"
+                                                      ? 2
+                                                      : 3,
+                                          "locationId": widget.locationId,
+                                          "userId": widget.userId
+                                        });
+                                  },
+                                ))
                         ],
                       ),
                     ),

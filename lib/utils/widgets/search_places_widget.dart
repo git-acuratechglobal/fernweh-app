@@ -11,14 +11,17 @@ class SearchPlacesWidget extends ConsumerStatefulWidget {
       required this.searchController,
       required this.validator,
       this.onSaved,
-        this.onTap,
-      this.hintText});
+      this.onTap,
+      this.hintText,
+      this.isEnabled = false});
 
+  final bool? isEnabled;
   final String? Function(String?)? validator;
   final TextEditingController searchController;
   final Function(String?)? onSaved;
   final String? hintText;
   final Function(String?)? onTap;
+
   @override
   ConsumerState<SearchPlacesWidget> createState() => _SearchPlacesWidgetState();
 }
@@ -115,13 +118,13 @@ class _SearchPlacesWidgetState extends ConsumerState<SearchPlacesWidget> {
       child: Column(
         children: [
           TextFormField(
+            readOnly: widget.isEnabled ?? false,
             validator: widget.validator,
             textInputAction: TextInputAction.search,
             controller: widget.searchController,
             focusNode: _focusNode,
             onTapOutside: (val) {
               _focusNode.unfocus();
-
             },
             onChanged: (val) {
               if (val.isNotEmpty) {
@@ -153,7 +156,8 @@ class _SearchPlacesWidgetState extends ConsumerState<SearchPlacesWidget> {
                   Icons.location_pin,
                   color: Colors.grey,
                 ),
-                suffixIcon: widget.searchController.text.trim().isNotEmpty
+                suffixIcon: widget.searchController.text.trim().isNotEmpty &&
+                        widget.isEnabled == false
                     ? GestureDetector(
                         onTap: () {
                           setState(() {
@@ -169,7 +173,6 @@ class _SearchPlacesWidgetState extends ConsumerState<SearchPlacesWidget> {
                         Icons.search,
                         color: Colors.grey,
                       )),
-
           ),
           const SizedBox(
             height: 10,

@@ -21,11 +21,24 @@ class CreateTripNotifier extends _$CreateTripNotifier {
           startDate: _startDate!, endDate: _endDate!, goingTo: _tripPlace!);
     });
   }
+  Future<void> editTrip({required int tripId}) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() {
+      return ref.watch(apiServiceProvider).editTrip(
+          startDate: _startDate!, endDate: _endDate!, id:tripId );
+    });
+  }
+  Future<void> deleteTrip({required int tripId}) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() {
+      return ref.watch(apiServiceProvider).deleteTrip(id: tripId);
+    });
+  }
 
   void updateForm(
       {required String startDate,
       required String endDate,
-      required String tripPlace}) {
+       String ?tripPlace}) {
     _startDate = startDate;
     _endDate = endDate;
     _tripPlace = tripPlace;

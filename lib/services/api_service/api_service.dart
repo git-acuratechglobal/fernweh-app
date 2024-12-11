@@ -408,7 +408,35 @@ class ApiService {
       return responseData;
     });
   }
-
+  Future<String> editTrip(
+      {required String startDate,
+        required String endDate,
+       required int id}) async {
+    return asyncGuard(() async {
+      final response = await _dio.post("edit-trip/$id",
+          data: {
+            "start_date": startDate,
+            "end_date": endDate,
+          },
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+          }));
+      final responseData = response.data['message'];
+      return responseData;
+    });
+  }
+  Future<String> deleteTrip(
+      {
+        required int id}) async {
+    return asyncGuard(() async {
+      final response = await _dio.post("delete-trip/$id",
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+          }));
+      final responseData = response.data['message'];
+      return responseData;
+    });
+  }
   Future<List<Trip>> getTrip() {
     return asyncGuard(() async {
       final response = await _dio.post('get-trips',

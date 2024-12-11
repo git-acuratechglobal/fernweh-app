@@ -6,6 +6,7 @@ import 'package:fernweh/utils/common/app_validation.dart';
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
+import 'package:fernweh/utils/widgets/loading_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/navigation/friends_list/model/friends.dart';
 import 'package:fernweh/view/navigation/itinerary/notifier/all_friends_notifier.dart';
@@ -32,6 +33,7 @@ import '../../friends_list/friend_details/friend_detail_screen.dart';
 import '../../profile/profile.dart';
 import '../models/itinerary_model.dart';
 import '../models/states/itinerary_state.dart';
+import '../models/trip/trip.dart';
 import 'my_curated_list/curated_list_item_view/itenary_details_screen.dart';
 import 'my_curated_list/my_curated_list.dart';
 
@@ -868,7 +870,7 @@ class AvatarList extends StatelessWidget {
                 child: avtar.imageUrl == null
                     ? UserInitials(
                         fontSize: 14,
-                        name: avtar.fullName ,
+                        name: avtar.fullName,
                       )
                     : ImageWidget(url: avtar.imageUrl!)),
           ),
@@ -902,7 +904,7 @@ class _CreateItineraryState extends ConsumerState<CreateItinerary>
           Navigator.pop(context);
           Common.showSnackBar(context, "UserItinerary created successfully");
         case UserItineraryError(:final error):
-          Common.showSnackBar(context, error.toString());
+          Common.showToast(context: context, message: error.toString());
         default:
       }
     });
@@ -1411,32 +1413,46 @@ class AllFriendsWidget extends StatelessWidget {
 }
 
 class AddTripSheet extends ConsumerStatefulWidget {
-  const AddTripSheet({super.key});
+  const AddTripSheet({super.key, this.trip});
+
+  final Trip? trip;
 
   @override
   ConsumerState<AddTripSheet> createState() => _AddTripSheetState();
 }
 
 class _AddTripSheetState extends ConsumerState<AddTripSheet> {
-  final TextEditingController _tripFieldController = TextEditingController();
+  late TextEditingController _tripFieldController = TextEditingController();
   final FocusNode focusNode = FocusNode();
-  final calendarController = CleanCalendarController(
-    minDate: DateTime.now(),
-    maxDate: DateTime.now().add(const Duration(days: 182)),
-    weekdayStart: DateTime.monday,
-  );
+  late CleanCalendarController calendarController;
   final _fkey = GlobalKey<FormState>();
 
   @override
   void initState() {
+    _tripFieldController = TextEditingController(
+      text: widget.trip?.goingTo,
+    );
+    calendarController = widget.trip != null
+        ? CleanCalendarController(
+            initialFocusDate: DateTime.parse(widget.trip?.startDate),
+            minDate: DateTime.now(),
+            maxDate: DateTime.now().add(const Duration(days: 182)),
+            weekdayStart: DateTime.monday,
+            initialDateSelected: DateTime.parse(widget.trip?.startDate),
+            endDateSelected: DateTime.parse(widget.trip?.endDate))
+        : CleanCalendarController(
+            minDate: DateTime.now(),
+            maxDate: DateTime.now().add(const Duration(days: 182)),
+            weekdayStart: DateTime.monday,
+          );
     ref.listenManual(createTripNotifierProvider, (previous, next) {
       switch (next) {
         case AsyncData<String?> d when d.value != null:
           ref.invalidate(getTripProvider);
           Navigator.of(context).pop(next);
-          Common.showSnackBar(context, d.value.toString());
+          Common.showToast(context: context, message: d.value.toString());
         case AsyncError e:
-          Common.showSnackBar(context, e.toString());
+          Common.showToast(context: context, message: e.error.toString());
       }
     });
     super.initState();
@@ -1445,6 +1461,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   @override
   Widget build(BuildContext context) {
     final loading = ref.watch(createTripNotifierProvider);
+    final isEditing = widget.trip != null;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Form(
@@ -1461,7 +1478,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                   icon: const Icon(Icons.clear),
                 ),
                 Text(
-                  'Add your Trip',
+                  isEditing ? 'Edit Trip' : 'Add your Trip',
                   style: TextStyle(
                     color: const Color(0xFF1A1B28),
                     fontSize: 20,
@@ -1475,6 +1492,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
               height: 10,
             ),
             SearchPlacesWidget(
+              isEnabled: isEditing,
               onTap: (val) {},
               hintText: "Search Country,State or City",
               searchController: _tripFieldController,
@@ -1530,12 +1548,18 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                                         .first,
                                     tripPlace:
                                         _tripFieldController.text.trim());
-                            ref
-                                .read(createTripNotifierProvider.notifier)
-                                .createTrip();
+                            if (isEditing) {
+                              ref
+                                  .read(createTripNotifierProvider.notifier)
+                                  .editTrip(tripId: widget.trip?.id ?? 0);
+                            } else {
+                              ref
+                                  .read(createTripNotifierProvider.notifier)
+                                  .createTrip();
+                            }
                           }
                         },
-                        child: const Text("Add new Trip")))
+                        child: Text(isEditing ? "Edit Trip" : "Add new Trip")))
               ],
             ),
             const SizedBox(
@@ -1570,35 +1594,144 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
       Future.microtask(() {
         ref.read(tripDetailProvider.notifier).getTripDetails(widget.tripId);
       });
+      ref.listenManual(createTripNotifierProvider, (previous, next) {
+        switch (next) {
+          case AsyncData<String?> d when d.value != null:
+            if (d.value!.contains("Trip deleted successfully")) {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+              ref.invalidate(getTripProvider);
+
+              Common.showToast(context: context, message: d.value.toString());
+            }
+          case AsyncError e:
+            Common.showToast(context: context, message: e.error.toString());
+        }
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final trip = ref.watch(tripDetailProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                icon: const Icon(Icons.clear),
-              ),
-              Text(
-                'See your Trip',
-                style: TextStyle(
-                  color: const Color(0xFF1A1B28),
-                  fontSize: 20,
-                  fontVariations: FVariations.w700,
+          Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.clear),
                 ),
-              ),
-              const SizedBox.square(dimension: 40)
-            ],
+                Text(
+                  'See your Trip',
+                  style: TextStyle(
+                    color: const Color(0xFF1A1B28),
+                    fontSize: 20,
+                    fontVariations: FVariations.w700,
+                  ),
+                ),
+                PopupMenuButton(
+                  icon: const Icon(Icons.more_vert_outlined),
+                  itemBuilder: (BuildContext context) {
+                    return [
+                      'Edit Trip',
+                      'Delete Trip',
+                    ].map((String choice) {
+                      return PopupMenuItem<String>(
+                        value: choice,
+                        child: Text(
+                          choice,
+                          style: const TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.w500),
+                        ),
+                      );
+                    }).toList();
+                  },
+                  onSelected: (value) {
+                    trip.maybeWhen(
+                        data: (trip) async {
+                          switch (value) {
+                            case "Edit Trip":
+                              final data = await showModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.white,
+                                isScrollControlled: true,
+                                constraints: BoxConstraints.tightFor(
+                                  height:
+                                      MediaQuery.sizeOf(context).height * 0.8,
+                                ),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(20)),
+                                ),
+                                builder: (context) {
+                                  return AddTripSheet(
+                                    trip: trip?.trip,
+                                  );
+                                },
+                              );
+                              if (data != null) {
+                                Navigator.pop(context);
+                              }
+
+                            case "Delete Trip":
+                              showDialog<bool>(
+                                  context: context,
+                                  builder: (context) => StatefulBuilder(
+                                          builder: (context, setState) {
+                                            final isLoading=ref.watch(createTripNotifierProvider).isLoading;
+                                            print(isLoading);
+                                        return AlertDialog(
+                                          title: const Text('Are you sure?'),
+                                          content: const Text(
+                                              'Do you want to delete the Trip?'),
+                                          actions: <Widget>[
+                                            if (isLoading)
+                                              const Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: LoadingWidget(),
+                                              )
+                                            else ...[ TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context)
+                                                      .pop(false),
+                                              child: const Text('No'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                setState((){
+                                               ref
+                                                   .read(
+                                                   createTripNotifierProvider
+                                                       .notifier)
+                                                   .deleteTrip(
+                                                   tripId:
+                                                   trip?.trip?.id ??
+                                                       0);
+                                             });
+                                              },
+                                              child: const Text('Yes'),
+                                            ),]
+                                          ],
+                                        );
+                                      }));
+
+                            default:
+                          }
+                        },
+                        orElse: () => null);
+                  },
+                ),
+              ],
+            ),
           ),
           Expanded(
             child: AsyncDataWidgetB(
@@ -1963,7 +2096,8 @@ class _StateCityToggleState extends State<StateCityToggle> {
       width: 170,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: Theme.of(context).colorScheme.secondary,width: 2)),
+          border: Border.all(
+              color: Theme.of(context).colorScheme.secondary, width: 2)),
       child: GestureDetector(
         onTap: () {
           setState(() {
@@ -1979,8 +2113,8 @@ class _StateCityToggleState extends State<StateCityToggle> {
               width: 82,
               decoration: BoxDecoration(
                 color: _isStateSelected
-                    ? Colors.white
-                    : Theme.of(context).colorScheme.secondary,
+                    ? Theme.of(context).colorScheme.secondary
+                    : Colors.white,
                 borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(3),
                     bottomLeft: Radius.circular(3)),
@@ -1991,7 +2125,7 @@ class _StateCityToggleState extends State<StateCityToggle> {
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
-                    color: _isStateSelected ? Colors.black : Colors.white),
+                    color: _isStateSelected ? Colors.white : Colors.black),
               )),
             ),
             Container(
@@ -1999,8 +2133,8 @@ class _StateCityToggleState extends State<StateCityToggle> {
               width: 83,
               decoration: BoxDecoration(
                 color: _isStateSelected
-                    ? Theme.of(context).colorScheme.secondary
-                    : Colors.white,
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.secondary,
                 borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(3),
                     bottomRight: Radius.circular(3)),
@@ -2011,7 +2145,7 @@ class _StateCityToggleState extends State<StateCityToggle> {
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
-                    color: _isStateSelected ? Colors.white : Colors.black),
+                    color: _isStateSelected ? Colors.black : Colors.white),
               )),
             ),
           ],
