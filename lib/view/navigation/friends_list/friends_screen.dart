@@ -701,68 +701,85 @@ class _FollowListState extends ConsumerState<FollowList> {
                   final user = data[index];
                   bool isloading = loading.contains(user.following);
                   bool isUnfollowed = unfollowList.contains(user.following);
-                  return Container(
-                    width: double.infinity,
-                    height: 85,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xffE2E2E2)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        ClipOval(
-                          child: SizedBox.square(
-                              dimension: 50,
-                              child: user.imageUrl == null
-                                  ? UserInitials(name: user.fullName)
-                                  : ImageWidget(url: user.imageUrl.toString())),
-                        ),
-                        const SizedBox(width: 16),
-                        SizedBox(
-                          width: 120,
-                          child: Text(
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            user.fullName,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontVariations: FVariations.w700,
-                            ),
+                  return InkWell(
+                    onTap: (){
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => FriendDetailScreen(
+                            friends:Friends.fromJson({
+                              "id": user.following,
+                              "firstname": user.firstname,
+                              "lastname":user.lastname,
+                              "email": user.email,
+                              "image": user.image,
+                            }),
                           ),
                         ),
-                        CustomButton(
-                            isFollow: !isUnfollowed,
-                            fixedSize: const Size(110, 40),
-                            isLoading: isloading,
-                            onTap: () {
-                              setState(() {
-                                loading.add(user.following ?? 0);
-                              });
-                              ref
-                                  .read(followFriendProvider.notifier)
-                                  .followFriend(user.following ?? 0);
-                            },
+                      );
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 85,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xffE2E2E2)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          ClipOval(
+                            child: SizedBox.square(
+                                dimension: 50,
+                                child: user.imageUrl == null
+                                    ? UserInitials(name: user.fullName)
+                                    : ImageWidget(url: user.imageUrl.toString())),
+                          ),
+                          const SizedBox(width: 16),
+                          SizedBox(
+                            width: 120,
                             child: Text(
-                              isUnfollowed ? "follow" : "Following",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              user.fullName,
                               style: TextStyle(
-                                  fontSize: 12,
-                                  color: isUnfollowed
-                                      ? Colors.white
-                                      : Colors.black,
-                                  fontWeight: FontWeight.w900),
-                            )),
-                      ],
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontVariations: FVariations.w700,
+                              ),
+                            ),
+                          ),
+                          CustomButton(
+                              isFollow: !isUnfollowed,
+                              fixedSize: const Size(110, 40),
+                              isLoading: isloading,
+                              onTap: () {
+                                setState(() {
+                                  loading.add(user.following ?? 0);
+                                });
+                                ref
+                                    .read(followFriendProvider.notifier)
+                                    .followFriend(user.following ?? 0);
+                              },
+                              child: Text(
+                                isUnfollowed ? "follow" : "Following",
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: isUnfollowed
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontWeight: FontWeight.w900),
+                              )),
+                        ],
+                      ),
                     ),
                   );
                 },

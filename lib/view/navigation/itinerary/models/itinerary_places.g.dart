@@ -10,6 +10,7 @@ ItineraryPlaces _$ItineraryPlacesFromJson(Map<String, dynamic> json) =>
     ItineraryPlaces(
       id: (json['id'] as num?)?.toInt(),
       userId: (json['userId'] as num?)?.toInt(),
+      addedBy: json['added_by'] as String?,
       intineraryListId: (json['intineraryListId'] as num?)?.toInt(),
       locationId: json['locationId'] as String?,
       type: (json['type'] as num?)?.toInt(),

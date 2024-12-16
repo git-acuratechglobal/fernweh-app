@@ -20,7 +20,7 @@ abstract class Common {
   static void showToast({required BuildContext context,required String message}) {
     Fluttertoast.showToast(
         msg: message,
-        toastLength: Toast.LENGTH_SHORT,
+        toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 1,
         backgroundColor: Theme.of(context).colorScheme.secondary,

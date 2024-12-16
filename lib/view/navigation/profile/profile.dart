@@ -65,7 +65,6 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
     final user = ref.watch(userDetailProvider);
     final authState = ref.watch(authNotifierProvider);
     final validation = ref.watch(validatorsProvider);
-
     return Stack(
       children: [
         Scaffold(
@@ -177,7 +176,8 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                       initialValue: user?.firstname,
                       onSaved: (val) => ref
                           .read(authNotifierProvider.notifier)
-                          .updateFormData("name", val),
+                          .updateFormData("firstname", val),
+                      onTapOutside: (val)=>FocusScope.of(context).unfocus(),
                     ),
                   ),
                   const SizedBox(height: 16.0),
@@ -188,7 +188,8 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                       initialValue: user?.lastname,
                       onSaved: (val) => ref
                           .read(authNotifierProvider.notifier)
-                          .updateFormData("name", val),
+                          .updateFormData("lastname", val),
+                      onTapOutside: (val)=>FocusScope.of(context).unfocus(),
                     ),
                   ),
                   const SizedBox(height: 16.0),
@@ -239,7 +240,9 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                         ],
                         onSaved: (val) => ref
                             .read(authNotifierProvider.notifier)
-                            .updateFormData("phone", val)),
+                            .updateFormData("phone", val),
+                      onTapOutside: (val)=>FocusScope.of(context).unfocus(),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Padding(

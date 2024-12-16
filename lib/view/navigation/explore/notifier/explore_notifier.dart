@@ -79,7 +79,7 @@ class FriendsItineraryNotifier extends _$FriendsItineraryNotifier {
     final List<ItineraryPlaces> filterList =
         list!.placesList.where((e) => e.placeTypes == type).toList();
     final List<Category> filteredCategories =
-        list.categories.where((e) => e.type![0] == type).toList();
+        list.categories.where((e) => e.type!.contains(type.toLowerCase())).toList();
     state = AsyncData(state.value!.copyWith(
         filterList: filterList,
         filterCategories: filteredCategories,

@@ -99,6 +99,7 @@ class MyItineraryNotifier extends _$MyItineraryNotifier {
       {required int id, required Map<String, dynamic> form}) async {
     try {
       state = MyItineraryLoading();
+      print(form);
       await ref.watch(apiServiceProvider).updateMyItinerary(form, id);
 
       ///after update itinerary here get updated itinerary using id and type*********

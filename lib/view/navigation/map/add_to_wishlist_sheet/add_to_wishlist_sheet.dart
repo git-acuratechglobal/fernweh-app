@@ -28,7 +28,7 @@ class _AddToWishlistSheetState extends ConsumerState<AddToWishlistSheet> {
       showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Added to wish list'),
+          title: const Text('Added to Quick Save'),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
@@ -60,7 +60,7 @@ class _AddToWishlistSheetState extends ConsumerState<AddToWishlistSheet> {
                 icon: const Icon(Icons.clear),
               ),
               Text(
-                'My Wish List',
+                'Quick Save List',
                 style: TextStyle(
                   color: const Color(0xFF1A1B28),
                   fontSize: 20,

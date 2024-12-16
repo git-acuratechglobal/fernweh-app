@@ -21,7 +21,7 @@ class ExploreScreen extends ConsumerStatefulWidget {
 
 class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   int? selectedCategory;
-
+String? selectedType;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -192,12 +192,14 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                         setState(() {
                           if (selectedCategory == index) {
                             selectedCategory = null;
+                            selectedType=null;
                             ref
                                 .read(
                                     friendsItineraryNotifierProvider.notifier)
                                 .resetFilter();
                           } else {
                             selectedCategory = index;
+                            selectedType=category.title;
                             ref
                                 .read(
                                     friendsItineraryNotifierProvider.notifier)
@@ -349,7 +351,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                     child: RecommendedItem(
                                       address: data.vicinity.toString(),
                                       type: formatCategory(
-                                          data.type ?? ["All"]),
+                                          data.type ?? ["All"],selectedType),
                                       image: data.photoUrls!.isEmpty
                                           ? ""
                                           : data.photoUrls?[0],
@@ -664,7 +666,19 @@ String convertMinutes(int minutes) {
   return '$hours hr${hours != 1 ? 's' : ''} and $remainingMinutes min${remainingMinutes != 1 ? 's' : ''}';
 }
 
-String formatCategory(List<String> categories) {
+String formatCategory(List<String> categories,[String ?selectedType]) {
+  if(selectedType!=null){
+    if (categories.contains(selectedType.toLowerCase())) {
+      String formattedType = selectedType.replaceAll('_', ' ');
+      formattedType = formattedType
+          .split(' ')
+          .map((word) => word[0].toUpperCase() + word.substring(1))
+          .join(' ');
+      return formattedType;
+    }else{
+      return selectedType;
+    }
+  }
   String firstName = categories[0];
 
   firstName = firstName.replaceAll('_', ' ');
@@ -673,6 +687,5 @@ String formatCategory(List<String> categories) {
       .split(' ')
       .map((word) => word[0].toUpperCase() + word.substring(1))
       .join(' ');
-
   return firstName;
 }

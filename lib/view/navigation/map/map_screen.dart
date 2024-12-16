@@ -980,7 +980,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                             placeId: data.placeId,
                                             address: data.vicinity ?? "",
                                             type: formatCategory(
-                                                data.type ?? ["All"]),
+                                                data.type ?? ["All"],mapViewState
+                                                .selectedCategory),
                                             image: data.photoUrls!.isEmpty
                                                 ? ""
                                                 : data.photoUrls?[0],
@@ -1097,7 +1098,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                       address:
                                                           data.vicinity ?? "",
                                                       type: formatCategory(
-                                                          data.type ?? ["All"]),
+                                                          data.type ?? ["All"],mapViewState
+                                                          .selectedCategory),
                                                       image: data.photoUrls!
                                                               .isEmpty
                                                           ? ""

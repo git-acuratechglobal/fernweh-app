@@ -524,9 +524,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                 userItinerary.userItinerary.userIteneries ??
                                     []);
                         final List<Itenery> filteredList =
-                            localStorageItinerary!
-                                .where((e) => e.placesCount != 0)
-                                .toList();
+                            localStorageItinerary!;
                         List<Itenery>? sharedIteneries = userItinerary
                             .userItinerary.sharedIteneries
                             ?.where((e) =>
@@ -1492,7 +1490,6 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
               height: 10,
             ),
             SearchPlacesWidget(
-              isEnabled: isEditing,
               onTap: (val) {},
               hintText: "Search Country,State or City",
               searchController: _tripFieldController,

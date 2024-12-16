@@ -7,6 +7,7 @@ class ItineraryPlaces {
   ItineraryPlaces({
     required this.id,
     required this.userId,
+    required this.addedBy,
     required this.intineraryListId,
     required this.locationId,
     required this.type,
@@ -28,6 +29,8 @@ class ItineraryPlaces {
 
   final int? id;
   final int? userId;
+  @JsonKey(name: 'added_by')
+  final String? addedBy;
   final int? intineraryListId;
   final String? locationId;
   final int? type;
@@ -61,4 +64,18 @@ class ItineraryPlaces {
 
   factory ItineraryPlaces.fromJson(Map<String, dynamic> json) =>
       _$ItineraryPlacesFromJson(json);
+  String get addedByName {
+    if (addedBy == null || addedBy!.isEmpty) {
+      return '';
+    }
+
+    final parts = addedBy?.split(' ');
+
+    final firstName = parts!.isNotEmpty ? parts.first : '';
+
+    final lastNameInitial = (parts.length > 1 && parts.last.isNotEmpty)
+        ? parts.last[0].toUpperCase()
+        : '';
+    return lastNameInitial.isNotEmpty ? '$firstName $lastNameInitial' : firstName;
+  }
 }

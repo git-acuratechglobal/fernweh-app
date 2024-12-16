@@ -35,7 +35,7 @@ class _WishListScreenState extends ConsumerState<WishListScreen> {
                 },
               ),
               title: Text(
-                "Wish List",
+                "Quick Save",
                 style: TextStyle(
                   fontVariations: FVariations.w700,
                   color: const Color(0xFF1A1B28),

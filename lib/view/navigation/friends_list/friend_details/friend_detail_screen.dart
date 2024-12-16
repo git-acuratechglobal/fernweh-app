@@ -27,6 +27,7 @@ class FriendDetailScreen extends ConsumerStatefulWidget {
 class _FriendDetailScreenState extends ConsumerState<FriendDetailScreen> {
   @override
   Widget build(BuildContext context) {
+    print(widget.friends.fullName);
     return Scaffold(
       body: Container(
         constraints: const BoxConstraints.expand(),

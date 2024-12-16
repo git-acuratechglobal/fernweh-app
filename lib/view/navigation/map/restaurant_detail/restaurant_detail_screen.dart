@@ -432,7 +432,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
   ];
   int? type = 0;
   int? _selectedItinerary;
-  List<int> _slectedItineraryId = [];
+  final List<int> _slectedItineraryId = [];
 
   XFile? file;
   final itineraryController = TextEditingController();
@@ -468,7 +468,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
           });
           Common.showSnackBar(context, "UserItinerary created successfully");
         case UserItineraryError(:final error):
-          Common.showSnackBar(context, error.toString());
+          Common.showToast(context: context, message: error.toString());
         default:
       }
     });
@@ -479,7 +479,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
           Common.showSnackBar(context, "Place added in itinerary successfully");
           Navigator.pop(context);
         case MyItineraryErrorState(:final error):
-          Common.showSnackBar(context, error.toString());
+          Common.showToast(context: context, message: error.toString());
         default:
       }
     });
@@ -618,7 +618,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                 )
                               ],
                             )
-                          : GridView.builder(
+                          : GridView.builder( 
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               padding: const EdgeInsets.all(10),

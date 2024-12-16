@@ -191,7 +191,6 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
                   return Tab(text: e);
                 }).toList(),
               ),
-              const SizedBox(height: 12),
               Expanded(
                 child: Stack(
                   children: [
@@ -471,8 +470,10 @@ class _DetailPageState extends ConsumerState<DetailPage> {
               : ListView.separated(
                   shrinkWrap: true,
                   itemCount: itineraryState.itineraryPlaces.length,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
+                  padding:  const EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    bottom: 80,
                   ),
                   itemBuilder: (context, index) {
                     final data = itineraryState.itineraryPlaces[index];
@@ -492,6 +493,7 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: ItinerayItem(
+                          addedBy: data.addedByName,
                           showingInWishList: false,
                           // isWishlist: false,
                           isSelected: itineraryState.selectedItems.isNotEmpty,
@@ -583,6 +585,7 @@ class ItinerayItem extends ConsumerStatefulWidget {
   final int? type;
   final bool isSelected;
   final bool showingInWishList;
+  final String? addedBy;
 
   const ItinerayItem(
       {super.key,
@@ -604,7 +607,7 @@ class ItinerayItem extends ConsumerStatefulWidget {
       this.itineraryId,
       this.type,
       this.isSelected = false,
-      required this.showingInWishList});
+      required this.showingInWishList,this.addedBy});
 
   @override
   ConsumerState<ItinerayItem> createState() => _ItinerayItemState();
@@ -755,8 +758,11 @@ class _ItinerayItemState extends ConsumerState<ItinerayItem> {
 
                           widget.showingInWishList
                               ? const SizedBox.shrink()
-                              : const Text("Added by:",
-                                  style: TextStyle(
+                              :  Text(
+                            maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              "Added by: ${widget.addedBy}",
+                                  style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w500)),
                           const SizedBox(
@@ -1142,6 +1148,7 @@ class ListViewItems extends ConsumerStatefulWidget {
   final int? type;
   final bool isSelected;
   final bool isWishlist;
+  final String? addedBy;
 
   const ListViewItems({
     super.key,
@@ -1164,6 +1171,7 @@ class ListViewItems extends ConsumerStatefulWidget {
     this.isSelected = false,
     this.type,
     this.isWishlist = true,
+    this.addedBy
   });
 
   @override

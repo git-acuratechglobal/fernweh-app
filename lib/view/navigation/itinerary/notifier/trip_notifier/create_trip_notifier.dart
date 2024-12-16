@@ -25,7 +25,7 @@ class CreateTripNotifier extends _$CreateTripNotifier {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() {
       return ref.watch(apiServiceProvider).editTrip(
-          startDate: _startDate!, endDate: _endDate!, id:tripId );
+          startDate: _startDate!, endDate: _endDate!, id:tripId,goingTo: _tripPlace! );
     });
   }
   Future<void> deleteTrip({required int tripId}) async {

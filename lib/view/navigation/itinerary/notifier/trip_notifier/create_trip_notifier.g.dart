@@ -7,7 +7,7 @@ part of 'create_trip_notifier.dart';
 // **************************************************************************
 
 String _$createTripNotifierHash() =>
-    r'f2a869cbd9efa53e7485d1b06265e5ff9b3b2dc3';
+    r'c1c6c8abc665e9f660a80153c219fa0e9d7bc7c1';
 
 /// See also [CreateTripNotifier].
 @ProviderFor(CreateTripNotifier)

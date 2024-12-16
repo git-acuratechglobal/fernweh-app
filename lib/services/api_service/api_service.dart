@@ -411,12 +411,15 @@ class ApiService {
   Future<String> editTrip(
       {required String startDate,
         required String endDate,
-       required int id}) async {
+       required int id,
+        required String goingTo
+      }) async {
     return asyncGuard(() async {
       final response = await _dio.post("edit-trip/$id",
           data: {
             "start_date": startDate,
             "end_date": endDate,
+            "location": goingTo
           },
           options: Options(headers: {
             'Authorization': "Bearer $_token",
