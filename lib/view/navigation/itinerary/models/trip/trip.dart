@@ -54,6 +54,7 @@ class Trip {
         "${startDateTime.month.toString().padLeft(2, '0')}/${startDateTime.day.toString().padLeft(2, '0')}-${endDateTime.month.toString().padLeft(2, '0')}/${endDateTime.day.toString().padLeft(2, '0')}";
     return formattedDate;
   }
+  
 }
 
 @JsonSerializable(createToJson: false)
@@ -69,7 +70,13 @@ class Address {
   final String? country;
 
   factory Address.fromJson(Map<String, dynamic> json) => _$AddressFromJson(json);
-
+  String get addressFormat {
+    return [
+      if (city != null && city!.isNotEmpty) city,
+      if (state != null && state!.isNotEmpty) state,
+      if (country != null && country!.isNotEmpty) country,
+    ].join(', ');
+  }
 }
 
 

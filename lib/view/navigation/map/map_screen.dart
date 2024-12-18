@@ -197,6 +197,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         AsyncDataWidgetB(
                           dataProvider: addressProvider,
                           dataBuilder: (data) {
+
                             return Row(
                               children: [
                                 ConstrainedBox(

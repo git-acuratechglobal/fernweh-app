@@ -40,6 +40,8 @@ class ApiService {
   Future<List<Category>> getCategory(String? latitude, String? longitude,
       {required Map<String, dynamic> filter}) async {
     return asyncGuard(() async {
+      print(latitude);
+      print(longitude);
       final response = await _dio.post(
         'attractions',
         data: filter['input'] == null
@@ -408,12 +410,12 @@ class ApiService {
       return responseData;
     });
   }
+
   Future<String> editTrip(
       {required String startDate,
-        required String endDate,
-       required int id,
-        required String goingTo
-      }) async {
+      required String endDate,
+      required int id,
+      required String goingTo}) async {
     return asyncGuard(() async {
       final response = await _dio.post("edit-trip/$id",
           data: {
@@ -428,9 +430,8 @@ class ApiService {
       return responseData;
     });
   }
-  Future<String> deleteTrip(
-      {
-        required int id}) async {
+
+  Future<String> deleteTrip({required int id}) async {
     return asyncGuard(() async {
       final response = await _dio.post("delete-trip/$id",
           options: Options(headers: {
@@ -440,16 +441,21 @@ class ApiService {
       return responseData;
     });
   }
-  Future<List<Trip>> getTrip() {
-    return asyncGuard(() async {
-      final response = await _dio.post('get-trips',
-          options: Options(headers: {
-            'Authorization': "Bearer $_token",
-          }));
-      final List<dynamic> jsonTripData = response.data['trips'];
-      final tripData = jsonTripData.map((trip) => Trip.fromJson(trip)).toList();
-      return tripData;
-    });
+
+  Future<List<Trip>?> getTrip() async{
+    try {
+      final response = await _dio.post(
+        'get-trips',
+        options: Options(headers: {
+          'Authorization': "Bearer $_token",
+        }),
+      );
+      final List<dynamic>? jsonTripData = response.data['trips'];
+      return jsonTripData?.map((trip) => Trip.fromJson(trip)).toList() ?? [];
+    } catch (error) {
+      print('Error fetching trips: $error');
+      return [];
+    }
   }
 
   Future<String> getFullAdress({required String placeId}) {
@@ -470,12 +476,12 @@ class ApiService {
           (entry) => entry['types'].contains('country'),
           orElse: () => null)?['long_name'];
       final String? town = addressComponents.firstWhere(
-              (entry) => entry['types'].contains('postal_town'),
+          (entry) => entry['types'].contains('postal_town'),
           orElse: () => null)?['long_name'];
       final String? state2 = addressComponents.firstWhere(
-              (entry) => entry['types'].contains('administrative_area_level_2'),
+          (entry) => entry['types'].contains('administrative_area_level_2'),
           orElse: () => null)?['long_name'];
-      return "${city??town},${state??state2},$country";
+      return "${city ?? town},${state ?? state2},$country";
     });
   }
 
@@ -499,6 +505,25 @@ class ApiService {
             'Authorization': "Bearer $_token",
           }));
       final tripJson = response.data['trip'];
+      final List<dynamic> friendTripsJson = response.data['friends_trips'];
+      final trip = Trip.fromJson(tripJson);
+      final friendsTrips =
+          friendTripsJson.map((e) => FriendsTrip.fromJson(e)).toList();
+      return TripDetails(trip: trip, friendsTrips: friendsTrips);
+    });
+  }
+
+  Future<TripDetails> getTripDetailsByLocation(
+      {required String address}) async {
+    return asyncGuard(() async {
+      final response = await _dio.get('get-trip-location',
+          options: Options(
+            headers: {
+              'Authorization': "Bearer $_token",
+            },
+          ),
+          queryParameters: {"location": address});
+      final tripJson = response.data['trips'];
       final List<dynamic> friendTripsJson = response.data['friends_trips'];
       final trip = Trip.fromJson(tripJson);
       final friendsTrips =

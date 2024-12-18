@@ -72,7 +72,7 @@ class AuthNotifier extends _$AuthNotifier {
       final List<String> placeId = [
         "ChIJmQJIxlVYwokRLgeuocVOGVU",
         "ChIJCewJkL2LGGAR3Qmk0vCTGkg",
-        "ChIJwRSfq3btDzkRqpSJixUrNtY",
+        "ChIJLU7jZClu5kcR4PcOOO6p3I0",
         "ChIJRRBkmSulwoARC9tR7sO6xg0",
         "ChIJbf8C1yFxdDkR3n12P4DkKt0",
         "ChIJxRO7WVEDdkgRrGM1fCYoHqY"

@@ -327,31 +327,56 @@ class RestaurantDetailScreen extends ConsumerWidget {
                           Padding(
                             padding: const EdgeInsets.all(16),
                             child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Expanded(
                                   child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'Mon-Sat',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontVariations: FVariations.w700,
-                                        ),
-                                      ),
-                                      const Text(
-                                        '08:00pm - 09:00pm',
-                                        style: TextStyle(
-                                          color: Color(0xFF505050),
-                                          fontSize: 16,
-                                        ),
+                                      // Text(
+                                      //   'Mon-Sat',
+                                      //   style: TextStyle(
+                                      //     color: Colors.black,
+                                      //     fontSize: 16,
+                                      //     fontVariations: FVariations.w700,
+                                      //   ),
+                                      // ),
+                                      // const Text(
+                                      //   '08:00pm - 09:00pm',
+                                      //   style: TextStyle(
+                                      //     color: Color(0xFF505050),
+                                      //     fontSize: 16,
+                                      //   ),
+                                      // ),
+
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            width: 16,
+                                            height: 16,
+                                            child: Image.asset(
+                                              'assets/images/location.png',
+                                              color: const Color(0xFF505050),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6.0),
+                                          Expanded(
+                                            child: Text(
+                                              maxLines: 4,
+                                              overflow: TextOverflow.ellipsis,
+                                              address ?? "",
+                                              style: const TextStyle(
+                                                color: Color(0xFF505050),
+                                                fontSize: 15,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                       const SizedBox(height: 8),
-                                      LocationRow(
-                                        address: address ?? "",
-                                      ),
                                       DistanceRow(
                                         distance: distance,
                                         walkingTime: walkingTime,
@@ -430,7 +455,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
     ("Private", 0),
     ("Public", 1),
   ];
-  int? type = 0;
+  int? type = 1;
   int? _selectedItinerary;
   final List<int> _slectedItineraryId = [];
 
@@ -569,7 +594,8 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                   const SizedBox(height: 16),
                   const Divider(height: 0),
                   Padding(
-                    padding: const EdgeInsets.only(top: 12, left: 24, bottom: 5),
+                    padding:
+                        const EdgeInsets.only(top: 12, left: 24, bottom: 5),
                     child: Text(
                       "My itinerary list",
                       style: TextStyle(
@@ -618,7 +644,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                 )
                               ],
                             )
-                          : GridView.builder( 
+                          : GridView.builder(
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               padding: const EdgeInsets.all(10),
@@ -648,7 +674,8 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                         height: 100,
                                         width: 100,
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                           border: Border.all(
                                               color: _isSelected
                                                   ? Colors.red
@@ -664,10 +691,12 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                 if (selectedItineraryId != null) {
                                   _selectedItinerary =
                                       combinedItineraries.indexWhere((e) =>
-                                          e.itinerary!.id == selectedItineraryId);
+                                          e.itinerary!.id ==
+                                          selectedItineraryId);
                                   itinerary = combinedItineraries.firstWhere(
                                       (e) =>
-                                          e.itinerary!.id == selectedItineraryId);
+                                          e.itinerary!.id ==
+                                          selectedItineraryId);
                                 }
                                 return GestureDetector(
                                   onTap: () {
@@ -679,15 +708,15 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                             _slectedItineraryId[0];
                                       });
                                     }
-            
+
                                     ref
                                         .read(localStorageServiceProvider)
                                         .setItineraryId(int.parse(
                                             itinary.itinerary!.id.toString()));
                                   },
                                   child: MyCuratedListTab(
-                                      placeUrls: userItinerary
-                                          .itineraryPhotos[itinary.itinerary?.id],
+                                      placeUrls: userItinerary.itineraryPhotos[
+                                          itinary.itinerary?.id],
                                       itinary: itinary.itinerary!,
                                       isEditing: false,
                                       isSelected: _slectedItineraryId.isNotEmpty
@@ -791,11 +820,12 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                 ),
                                 onSaved: (val) {
                                   ref
-                                      .read(
-                                          userItineraryNotifierProvider.notifier)
+                                      .read(userItineraryNotifierProvider
+                                          .notifier)
                                       .updateForm('name', val);
                                 },
-                                validator: (val) => validation.itineraryName(val),
+                                validator: (val) =>
+                                    validation.itineraryName(val),
                               ),
                             ),
                             Padding(
@@ -845,7 +875,8 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 24),
                               child: Row(
                                 children: [
                                   Image.asset('assets/images/global.png'),
@@ -932,8 +963,8 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                                     'userId', itinerary?.itinerary!.userId);
                             ref
                                 .read(myItineraryNotifierProvider.notifier)
-                                .updateForm(
-                                    'intineraryListId', itinerary?.itinerary!.id);
+                                .updateForm('intineraryListId',
+                                    itinerary?.itinerary!.id);
                             ref
                                 .read(myItineraryNotifierProvider.notifier)
                                 .updateForm('locationId', widget.locationId);

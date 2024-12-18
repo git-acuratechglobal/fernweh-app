@@ -24,11 +24,13 @@ import 'package:scrollable_clean_calendar/scrollable_clean_calendar.dart';
 import 'package:scrollable_clean_calendar/utils/enums.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:stepper_list_view/stepper_list_view.dart';
+import '../../../../services/api_service/api_service.dart';
 import '../../../../utils/common/app_button.dart';
 import '../../../../utils/common/common.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/widgets/search_places_widget.dart';
 import '../../../auth/signup/profile_setup/create_profile_screen.dart';
+import '../../../location_permission/location_service.dart';
 import '../../friends_list/friend_details/friend_detail_screen.dart';
 import '../../profile/profile.dart';
 import '../models/itinerary_model.dart';
@@ -285,33 +287,31 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
 
                               if (index == 0) {
                                 return GestureDetector(
-                                  onTap: () {
-                                    // setState(() {
-                                    //   if (selectedTabIndex == index) {
-                                    //     selectedTabIndex = null;
-                                    //   } else {
-                                    //     selectedTabIndex = index;
-                                    //     showModalBottomSheet(
-                                    //       context: context,
-                                    //       backgroundColor: Colors.white,
-                                    //       isScrollControlled: true,
-                                    //       constraints: BoxConstraints.tightFor(
-                                    //         height:
-                                    //         MediaQuery
-                                    //             .sizeOf(context)
-                                    //             .height *
-                                    //             0.8,
-                                    //       ),
-                                    //       shape: const RoundedRectangleBorder(
-                                    //         borderRadius: BorderRadius.vertical(
-                                    //             top: Radius.circular(20)),
-                                    //       ),
-                                    //       builder: (context) {
-                                    //         return  ViewTripSheet(Trip:tripList ,);
-                                    //       },
-                                    //     );
-                                    //   }
-                                    // });
+                                  onTap: ()  {
+                                    setState(()  {
+                                        selectedTabIndex = index;
+                                        showModalBottomSheet(
+                                          context: context,
+                                          backgroundColor: Colors.white,
+                                          isScrollControlled: true,
+                                          constraints: BoxConstraints.tightFor(
+                                            height: MediaQuery.sizeOf(context)
+                                                    .height *
+                                                0.8,
+                                          ),
+                                          shape: const RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.vertical(
+                                                top: Radius.circular(20)),
+                                          ),
+                                          builder: (context) {
+                                            return const ViewTripSheet(
+                                              tripId: null,
+                                            );
+                                          },
+                                        ).then((val) => setState(() {
+                                              selectedTabIndex = null;
+                                            }));
+                                    });
                                   },
                                   child: Container(
                                       height: 55,
@@ -342,9 +342,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                   GestureDetector(
                                     onTap: () {
                                       setState(() {
-                                        if (selectedTabIndex == index) {
-                                          selectedTabIndex = null;
-                                        } else {
+
                                           selectedTabIndex = index;
                                           showModalBottomSheet(
                                             context: context,
@@ -369,7 +367,6 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                           ).then((val) => setState(() {
                                                 selectedTabIndex = null;
                                               }));
-                                        }
                                       });
                                     },
                                     child: Container(
@@ -888,7 +885,7 @@ class CreateItinerary extends ConsumerStatefulWidget {
 class _CreateItineraryState extends ConsumerState<CreateItinerary>
     with FormUtilsMixin {
   XFile? file;
-  int? type = 0;
+  int? type = 1;
   List<(String? name, int? type)> typeList = [
     ("Private", 0),
     ("Public", 1),
@@ -1572,10 +1569,10 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
 class ViewTripSheet extends ConsumerStatefulWidget {
   const ViewTripSheet({
     super.key,
-    required this.tripId,
+    this.tripId,
   });
 
-  final int tripId;
+  final int? tripId;
 
   @override
   ConsumerState<ViewTripSheet> createState() => _ViewTripSheetState();
@@ -1589,7 +1586,11 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.microtask(() {
-        ref.read(tripDetailProvider.notifier).getTripDetails(widget.tripId);
+        if (widget.tripId != null) {
+          ref.read(tripDetailProvider.notifier).getTripDetails(widget.tripId!);
+        } else {
+          ref.read(tripDetailProvider.notifier).getTripDetailsByLocation();
+        }
       });
       ref.listenManual(createTripNotifierProvider, (previous, next) {
         switch (next) {
@@ -1635,98 +1636,102 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                     fontVariations: FVariations.w700,
                   ),
                 ),
-                PopupMenuButton(
-                  icon: const Icon(Icons.more_vert_outlined),
-                  itemBuilder: (BuildContext context) {
-                    return [
-                      'Edit Trip',
-                      'Delete Trip',
-                    ].map((String choice) {
-                      return PopupMenuItem<String>(
-                        value: choice,
-                        child: Text(
-                          choice,
-                          style: const TextStyle(
-                              fontSize: 17, fontWeight: FontWeight.w500),
-                        ),
-                      );
-                    }).toList();
-                  },
-                  onSelected: (value) {
-                    trip.maybeWhen(
-                        data: (trip) async {
-                          switch (value) {
-                            case "Edit Trip":
-                              final data = await showModalBottomSheet(
-                                context: context,
-                                backgroundColor: Colors.white,
-                                isScrollControlled: true,
-                                constraints: BoxConstraints.tightFor(
-                                  height:
-                                      MediaQuery.sizeOf(context).height * 0.8,
-                                ),
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                      top: Radius.circular(20)),
-                                ),
-                                builder: (context) {
-                                  return AddTripSheet(
-                                    trip: trip?.trip,
-                                  );
-                                },
-                              );
-                              if (data != null) {
-                                Navigator.pop(context);
-                              }
-
-                            case "Delete Trip":
-                              showDialog<bool>(
+                if (widget.tripId != null)
+                  PopupMenuButton(
+                    icon: const Icon(Icons.more_vert_outlined),
+                    itemBuilder: (BuildContext context) {
+                      return [
+                        'Edit Trip',
+                        'Delete Trip',
+                      ].map((String choice) {
+                        return PopupMenuItem<String>(
+                          value: choice,
+                          child: Text(
+                            choice,
+                            style: const TextStyle(
+                                fontSize: 17, fontWeight: FontWeight.w500),
+                          ),
+                        );
+                      }).toList();
+                    },
+                    onSelected: (value) {
+                      trip.maybeWhen(
+                          data: (trip) async {
+                            switch (value) {
+                              case "Edit Trip":
+                                final data = await showModalBottomSheet(
                                   context: context,
-                                  builder: (context) => StatefulBuilder(
-                                          builder: (context, setState) {
-                                            final isLoading=ref.watch(createTripNotifierProvider).isLoading;
-                                            print(isLoading);
-                                        return AlertDialog(
-                                          title: const Text('Are you sure?'),
-                                          content: const Text(
-                                              'Do you want to delete the Trip?'),
-                                          actions: <Widget>[
-                                            if (isLoading)
-                                              const Padding(
-                                                padding: EdgeInsets.all(8.0),
-                                                child: LoadingWidget(),
-                                              )
-                                            else ...[ TextButton(
-                                              onPressed: () =>
-                                                  Navigator.of(context)
-                                                      .pop(false),
-                                              child: const Text('No'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                setState((){
-                                               ref
-                                                   .read(
-                                                   createTripNotifierProvider
-                                                       .notifier)
-                                                   .deleteTrip(
-                                                   tripId:
-                                                   trip?.trip?.id ??
-                                                       0);
-                                             });
-                                              },
-                                              child: const Text('Yes'),
-                                            ),]
-                                          ],
-                                        );
-                                      }));
+                                  backgroundColor: Colors.white,
+                                  isScrollControlled: true,
+                                  constraints: BoxConstraints.tightFor(
+                                    height:
+                                        MediaQuery.sizeOf(context).height * 0.8,
+                                  ),
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(20)),
+                                  ),
+                                  builder: (context) {
+                                    return AddTripSheet(
+                                      trip: trip?.trip,
+                                    );
+                                  },
+                                );
+                                if (data != null) {
+                                  Navigator.pop(context);
+                                }
 
-                            default:
-                          }
-                        },
-                        orElse: () => null);
-                  },
-                ),
+                              case "Delete Trip":
+                                showDialog<bool>(
+                                    context: context,
+                                    builder: (context) => StatefulBuilder(
+                                            builder: (context, setState) {
+                                          final isLoading = ref
+                                              .watch(createTripNotifierProvider)
+                                              .isLoading;
+                                          return AlertDialog(
+                                            title: const Text('Are you sure?'),
+                                            content: const Text(
+                                                'Do you want to delete the Trip?'),
+                                            actions: <Widget>[
+                                              if (isLoading)
+                                                const Padding(
+                                                  padding: EdgeInsets.all(8.0),
+                                                  child: LoadingWidget(),
+                                                )
+                                              else ...[
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(false),
+                                                  child: const Text('No'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      ref
+                                                          .read(
+                                                              createTripNotifierProvider
+                                                                  .notifier)
+                                                          .deleteTrip(
+                                                              tripId: trip?.trip
+                                                                      ?.id ??
+                                                                  0);
+                                                    });
+                                                  },
+                                                  child: const Text('Yes'),
+                                                ),
+                                              ]
+                                            ],
+                                          );
+                                        }));
+
+                              default:
+                            }
+                          },
+                          orElse: () => null);
+                    },
+                  ),
               ],
             ),
           ),
@@ -1750,12 +1755,20 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  "Based in ${tripData?.trip?.goingTo}",
-                                  style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600),
-                                ),
+                                if (tripData?.trip?.goingTo == null)
+                                  Text(
+                                    "Based in ${tripData?.trip?.address?.addressFormat}",
+                                    style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600),
+                                  )
+                                else
+                                  Text(
+                                    "Based in ${tripData?.trip?.goingTo}",
+                                    style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600),
+                                  ),
                                 const SizedBox(
                                   height: 10,
                                 ),

@@ -468,7 +468,7 @@ class _FriendListState extends ConsumerState<FriendList> {
               : category.placesList.isEmpty
                   ? const Center(child: Text("No Itinerary Found"))
                   : SizedBox.fromSize(
-                      size: Size.fromHeight(height * 0.31),
+                      size: Size.fromHeight(height * 0.32),
                       child: ListView.separated(
                         itemCount: category.isFilterApplied
                             ? category.filterList.length
@@ -565,7 +565,7 @@ class LocationRow extends StatelessWidget {
         const SizedBox(width: 6.0),
         Expanded(
           child: Text(
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             address,
             style: const TextStyle(
