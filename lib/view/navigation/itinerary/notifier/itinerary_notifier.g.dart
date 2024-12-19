@@ -41,7 +41,7 @@ final userItineraryNotifierProvider = AutoDisposeNotifierProvider<
 
 typedef _$UserItineraryNotifier = AutoDisposeNotifier<UserItineraryState>;
 String _$myItineraryNotifierHash() =>
-    r'd284d334ae3e49dd323d77997c29fe4a36b0cc08';
+    r'958ea9c4888d59e76e1e06578cd5e5029c70ade3';
 
 /// See also [MyItineraryNotifier].
 @ProviderFor(MyItineraryNotifier)

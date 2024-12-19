@@ -29,6 +29,7 @@ Address _$AddressFromJson(Map<String, dynamic> json) => Address(
       city: json['city'] as String?,
       state: json['state'] as String?,
       country: json['country'] as String?,
+      stateCode: json['stateCode'] as String?,
     );
 
 FriendsTrip _$FriendsTripFromJson(Map<String, dynamic> json) => FriendsTrip(
@@ -40,6 +41,8 @@ FriendsTrip _$FriendsTripFromJson(Map<String, dynamic> json) => FriendsTrip(
       friendFirstName: json['friend_firstname'] as String?,
       friendLastName: json['friend_lastname'] as String?,
       friendImage: json['friend_image'],
+      friendAddress:
+          Address.fromJson(json['friend_address'] as Map<String, dynamic>),
     );
 
 TripDetails _$TripDetailsFromJson(Map<String, dynamic> json) => TripDetails(

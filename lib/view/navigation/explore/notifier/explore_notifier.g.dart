@@ -7,7 +7,7 @@ part of 'explore_notifier.dart';
 // **************************************************************************
 
 String _$friendsItineraryNotifierHash() =>
-    r'eaacfc6d5a273c72104d0f4350eb18c88f357a30';
+    r'a3d44f50246ddd25d6fd9f66daef0b2571e5b2ac';
 
 /// See also [FriendsItineraryNotifier].
 @ProviderFor(FriendsItineraryNotifier)

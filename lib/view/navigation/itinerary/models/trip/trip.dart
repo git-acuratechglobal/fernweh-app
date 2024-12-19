@@ -63,11 +63,13 @@ class Address {
     required this.city,
     required this.state,
     required this.country,
+    required this.stateCode,
   });
 
   final String? city;
   final String? state;
   final String? country;
+  final String? stateCode;
 
   factory Address.fromJson(Map<String, dynamic> json) => _$AddressFromJson(json);
   String get addressFormat {
@@ -92,6 +94,7 @@ class FriendsTrip {
     required this.friendFirstName,
     required this.friendLastName,
     required this.friendImage,
+    required this.friendAddress,
   });
 
   @JsonKey(name: 'trip_id')
@@ -116,6 +119,8 @@ class FriendsTrip {
 
   @JsonKey(name: 'friend_image')
   final dynamic friendImage;
+  @JsonKey(name: 'friend_address')
+  final Address friendAddress;
 
   factory FriendsTrip.fromJson(Map<String, dynamic> json) => _$FriendsTripFromJson(json);
 
@@ -157,6 +162,10 @@ class TripDetails {
   final List<FriendsTrip>? friendsTrips;
 
   factory TripDetails.fromJson(Map<String, dynamic> json) => _$TripDetailsFromJson(json);
+
+
+
+
   Map<String, Map<String, List<Map<String, String>>>> getDaysByMonthWithFriends({
      String? filterType,
   }) {
@@ -170,7 +179,7 @@ class TripDetails {
 
     final mainTripState = trip?.address?.state ?? '';
     final mainTripCity = trip?.address?.city ?? '';
-
+    final mainTripStateCode = trip?.address?.stateCode ?? '';
     DateTime currentDate = start;
     while (currentDate.isBefore(end) || currentDate.isAtSameMomentAs(end)) {
       final String monthName = DateFormat('MMM').format(currentDate);
@@ -185,12 +194,15 @@ class TripDetails {
 
         bool isWithinDateRange =
             !currentDate.isBefore(friendStart) && !currentDate.isAfter(friendEnd);
-
+        final friendAddress = friendTrip.friendAddress;
+        final friendState = friendAddress.state ?? '';
+        final friendStateCode = friendAddress.stateCode ?? '';
+        final friendCity = friendAddress.city ?? '';
         bool matchesFilter = false;
         if (filterType == 'state') {
-          matchesFilter = friendTrip.goingTo!.contains(mainTripState);
+          matchesFilter = friendState==mainTripState|| friendStateCode == mainTripStateCode;
         } else if (filterType == 'city') {
-          matchesFilter = friendTrip.goingTo!.contains(mainTripCity);
+          matchesFilter = friendCity == mainTripCity;
         }
 
         if (isWithinDateRange && matchesFilter) {

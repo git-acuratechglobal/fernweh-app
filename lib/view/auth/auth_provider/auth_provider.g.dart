@@ -36,7 +36,7 @@ final userDetailProvider = NotifierProvider<UserDetail, User?>.internal(
 );
 
 typedef _$UserDetail = Notifier<User?>;
-String _$authNotifierHash() => r'b3b2e13bfb4f4284b97759e14a9f914c9a37cbcf';
+String _$authNotifierHash() => r'948250d1b3f22259f78224ec315c25044ee2f176';
 
 /// See also [AuthNotifier].
 @ProviderFor(AuthNotifier)
