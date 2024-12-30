@@ -55,3 +55,57 @@ class AsyncDataWidgetB<T> extends ConsumerWidget {
     );
   }
 }
+class ErrorCustomWidget extends ConsumerWidget {
+  final Object error;
+  final VoidCallback? onRetry;
+  final double height;
+  const ErrorCustomWidget({
+    required this.error,
+    required this.onRetry,
+    this.height = 200,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      key: UniqueKey(),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      child: SizedBox(
+        width: 200,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              error.toString(),
+              maxLines: 6,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 40,
+              width: 100,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 12),
+                  minimumSize: const Size(60, 40),
+                ),
+                onPressed: onRetry,
+                child: const Text(
+                  "Refresh",
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -205,6 +205,7 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: TextFormField(
+                      validator: (val)=>validation.validateMobile(val),
                         initialValue: user?.phone,
                         keyboardType: TextInputType.phone,
                         decoration: InputDecoration(

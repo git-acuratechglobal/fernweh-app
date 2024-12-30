@@ -231,7 +231,7 @@ class _FriendsListState extends ConsumerState<FriendsList> {
                     Expanded(
                       child: Text(
                         overflow: TextOverflow.fade,
-                        user.fullName ?? "",
+                        user.fullName ,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 18,
@@ -466,22 +466,6 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                                 ),
                               ),
                             ),
-                            // Expanded(
-                            //   child: Column(
-                            //     crossAxisAlignment: CrossAxisAlignment.start,
-                            //     mainAxisAlignment:
-                            //         MainAxisAlignment.spaceEvenly,
-                            //     children: [
-                            //
-                            //       // const Text(
-                            //       //   '5 Itinerary',
-                            //       //   style: TextStyle(
-                            //       //     color: Color(0xFF505050),
-                            //       //   ),
-                            //       // ),
-                            //     ],
-                            //   ),
-                            // ),
                             isSelected
                                 ? OutlinedButton(
                                     style: OutlinedButton.styleFrom(
@@ -702,14 +686,14 @@ class _FollowListState extends ConsumerState<FollowList> {
                   bool isloading = loading.contains(user.following);
                   bool isUnfollowed = unfollowList.contains(user.following);
                   return InkWell(
-                    onTap: (){
+                    onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => FriendDetailScreen(
-                            friends:Friends.fromJson({
+                            friends: Friends.fromJson({
                               "id": user.following,
                               "firstname": user.firstname,
-                              "lastname":user.lastname,
+                              "lastname": user.lastname,
                               "email": user.email,
                               "image": user.image,
                             }),
@@ -741,7 +725,8 @@ class _FollowListState extends ConsumerState<FollowList> {
                                 dimension: 50,
                                 child: user.imageUrl == null
                                     ? UserInitials(name: user.fullName)
-                                    : ImageWidget(url: user.imageUrl.toString())),
+                                    : ImageWidget(
+                                        url: user.imageUrl.toString())),
                           ),
                           const SizedBox(width: 16),
                           SizedBox(
@@ -770,7 +755,7 @@ class _FollowListState extends ConsumerState<FollowList> {
                                     .followFriend(user.following ?? 0);
                               },
                               child: Text(
-                                isUnfollowed ? "follow" : "Following",
+                                isUnfollowed ? "Follow" : "Following",
                                 style: TextStyle(
                                     fontSize: 12,
                                     color: isUnfollowed

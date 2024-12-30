@@ -9,9 +9,6 @@ import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
-import 'package:fernweh/view/navigation/itinerary/models/states/itinerary_state.dart';
-import 'package:fernweh/view/navigation/itinerary/models/states/my_itinerary_state.dart';
-import 'package:fernweh/view/navigation/itinerary/notifier/itinerary_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,10 +17,13 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../services/local_storage_service/local_storage_service.dart';
 import '../../../auth/login/login_screen.dart';
 import '../../../auth/signup/profile_setup/create_profile_screen.dart';
+import '../../collections/models/itinerary_model.dart';
+import '../../collections/models/states/itinerary_state.dart';
+import '../../collections/models/states/my_itinerary_state.dart';
+import '../../collections/notifier/full_address_notifier.dart';
+import '../../collections/notifier/itinerary_notifier.dart';
+import '../../collections/widgets/my_curated_list/my_curated_list.dart';
 import '../../explore/explore_screen.dart';
-import '../../itinerary/models/itinerary_model.dart';
-import '../../itinerary/notifier/full_address_notifier.dart';
-import '../../itinerary/widgets/my_curated_list/my_curated_list.dart';
 
 class RestaurantDetailScreen extends ConsumerWidget {
   const RestaurantDetailScreen({

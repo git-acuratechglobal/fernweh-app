@@ -1,4 +1,4 @@
-import '../../itinerary/models/itinerary_places.dart';
+import '../../collections/models/itinerary_places.dart';
 import '../model/category.dart';
 import 'map_filter.dart';
 

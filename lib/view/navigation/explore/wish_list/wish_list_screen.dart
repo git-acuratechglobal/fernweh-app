@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/common/extensions.dart';
-import '../../itinerary/widgets/my_curated_list/curated_list_item_view/itenary_details_screen.dart';
+import '../../collections/widgets/my_curated_list/curated_list_item_view/itenary_details_screen.dart';
 import '../../map/restaurant_detail/restaurant_detail_screen.dart';
 import '../explore_screen.dart';
 

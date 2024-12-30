@@ -1,8 +1,8 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../itinerary/models/itinerary_model.dart';
-import '../../itinerary/widgets/following_list/model/following_model.dart';
+import '../../collections/models/itinerary_model.dart';
+
 
 part 'following_friends.g.dart';
 

@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../view/auth/model/user_model.dart';
-import '../../view/navigation/itinerary/models/itinerary_model.dart';
+import '../../view/navigation/collections/models/itinerary_model.dart';
 
 part 'local_storage_service.g.dart';
 

@@ -3,21 +3,21 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:fernweh/view/navigation/friends_list/controller/follow_friend_notifier.dart';
 import 'package:fernweh/view/navigation/friends_list/model/following_friends.dart';
-import 'package:fernweh/view/navigation/friends_list/model/friends_itinerary.dart';
-import 'package:fernweh/view/navigation/itinerary/models/itinerary_model.dart';
-import 'package:fernweh/view/navigation/itinerary/models/trip/trip.dart';
-import 'package:fernweh/view/navigation/itinerary/widgets/shared_list/add_notes/model/notes_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../view/navigation/collections/models/create_itinerary_model.dart';
+import '../../view/navigation/collections/models/itinerary_model.dart';
+import '../../view/navigation/collections/models/itinerary_places.dart';
+import '../../view/navigation/collections/models/my_itinerary.dart';
+import '../../view/navigation/collections/models/trip/trip.dart';
+import '../../view/navigation/collections/widgets/following_list/model/following_model.dart';
+import '../../view/navigation/collections/widgets/shared_list/add_notes/model/notes_model.dart';
 import '../../view/navigation/explore/categories_model/categories_model.dart';
 import '../../view/navigation/explore/search_filter/model/search_result.dart';
 import '../../view/navigation/friends_list/controller/friends_notifier.dart';
 import '../../view/navigation/friends_list/model/friends.dart';
-import '../../view/navigation/itinerary/models/create_itinerary_model.dart';
-import '../../view/navigation/itinerary/models/itinerary_places.dart';
-import '../../view/navigation/itinerary/models/my_itinerary.dart';
 import '../../view/navigation/map/model/category.dart';
 import '../auth_service/auth_service.dart';
 import '../dio_service/dio_service.dart';
@@ -304,6 +304,72 @@ class ApiService {
     });
   }
 
+  Future<FollowingState> getFollowingItinerary() async {
+    return asyncGuard(() async {
+      final response = await _dio.get('get-follow-iternary',
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+          }));
+      final List<dynamic> jsonList = response.data['followings'];
+
+      final List<dynamic> itineraryFollowList =
+          response.data['follow_itinerary'];
+
+      final List<dynamic> followingFriendsItineraries =
+          jsonList.expand((e) => e["itineraries"]).toList();
+
+      final List<dynamic> followingItineraries =
+          itineraryFollowList.expand((e) => e["itineraries"]).toList();
+
+      final followingFriendItineraryList = followingFriendsItineraries
+          .map((friend) => Itinerary.fromJson(friend))
+          .toList();
+
+      final followItineraryList =
+          followingItineraries.map((e) => Itinerary.fromJson(e)).toList();
+
+      return FollowingState(
+          followingFriendsItineraries: followingFriendItineraryList,
+          followingItineraries: followItineraryList);
+    });
+  }
+
+  Future<List<Itinerary>> getFriendListItinerary() async {
+    return asyncGuard(() async {
+      final response = await _dio.post('user-management/friend-iternary-list',
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+          }));
+      final List<dynamic> jsonList = response.data['data'];
+      final friendListItinerary =
+          jsonList.expand((friend) => friend['itineraries']).toList();
+
+      return friendListItinerary.map((e) => Itinerary.fromJson(e)).toList();
+    });
+  }
+  Future<List<String>> getFollowItinerary() async {
+    try{
+      final response = await _dio.get('get-user-itineraries',
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+          }));
+      final List<dynamic> itineraries = response.data["itineraries"];
+      return itineraries.map((e)=>e.toString()).toList();
+    }catch(e){
+      return [];
+    }
+  }
+  Future<String> followItinerary(int? userId, int? itineraryId) async {
+    return asyncGuard(() async {
+      final response = await _dio.post('follow-iternary',
+          data: {"iternary_owner_id": userId, "iternary_id": itineraryId},
+          options: Options(headers: {
+            'Authorization': "Bearer $_token",
+          }));
+      return response.data["message"];
+    });
+  }
+
   Future<List<Friends>> searchFriends(String? search) async {
     final response = await _dio.post('user-management',
         data: {'search': search},
@@ -442,7 +508,7 @@ class ApiService {
     });
   }
 
-  Future<List<Trip>?> getTrip() async{
+  Future<List<Trip>?> getTrip() async {
     try {
       final response = await _dio.post(
         'get-trips',

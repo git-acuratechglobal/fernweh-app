@@ -1,13 +1,12 @@
 import 'package:fernweh/view/navigation/friends_list/controller/friends_notifier.dart';
-import 'package:fernweh/view/navigation/itinerary/notifier/all_friends_notifier.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../services/api_service/api_service.dart';
 import '../../../location_permission/location_service.dart';
+import '../../collections/models/itinerary_model.dart';
+import '../../collections/models/itinerary_places.dart';
+import '../../collections/notifier/all_friends_notifier.dart';
 import '../../friends_list/model/friends.dart';
-import '../../friends_list/model/friends_itinerary.dart';
-import '../../itinerary/models/itinerary_model.dart';
-import '../../itinerary/models/itinerary_places.dart';
 import '../../map/model/category.dart';
 
 part 'explore_notifier.g.dart';
@@ -17,29 +16,20 @@ class FriendsItineraryNotifier extends _$FriendsItineraryNotifier {
   @override
   FutureOr<FriendsPlacesState> build() async {
     final position = await ref.read(currentPositionProvider.future);
-    final PaginationResponse<Friends> friendsList =
-        await ref.watch(friendListProvider.notifier).loadAllData();
-    final List<int> friendsId =
-        friendsList.data.map((friend) => friend.id ?? 0).toList();
-    final List<Itinerary> friendItineray = [];
-    for (int friendId in friendsId) {
-      try {
-        final List<Itinerary> friendItinerary =
-            await ref.watch(apiServiceProvider).getFriendsItinerary(friendId);
-        List<Itinerary> filteredList =
-            friendItinerary.where((e) => e.type == "1").toList();
-        friendItineray.addAll(filteredList);
-      } catch (e) {
-        print(
-            'Failed to fetch itinerary for friend ID $friendId: ${e.toString()}');
-      }
+
+
+    List<Itinerary> filteredList=[];
+    try {
+      final List<Itinerary> friendItinerary =
+      await ref.watch(apiServiceProvider).getFriendListItinerary();
+      filteredList =
+      friendItinerary.where((e) => e.type == "1").toList();
+    } catch (e) {
+     throw Exception(e);
     }
 
-    await ref
-        .watch(allFriendsNotifierProvider.notifier)
-        .getFriendsItineraries(friendsItineraryList: friendItineray);
     final List<int> itineraryIds =
-        friendItineray.map((e) => e.id ?? 0).toList();
+    filteredList.map((e) => e.id ?? 0).toList();
     final List<ItineraryPlaces> category = [];
     const double maxDistance = 30000;
     for (var id in itineraryIds) {

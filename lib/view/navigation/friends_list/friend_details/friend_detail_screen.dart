@@ -6,12 +6,10 @@ import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/widgets/async_widget.dart';
 import '../../../../utils/widgets/image_widget.dart';
-import '../../itinerary/models/itinerary_model.dart';
-import '../../itinerary/notifier/itinerary_notifier.dart';
-import '../../itinerary/widgets/my_curated_list/curated_list_item_view/itenary_details_screen.dart';
+import '../../collections/models/itinerary_model.dart';
+import '../../collections/widgets/my_curated_list/curated_list_item_view/itenary_details_screen.dart';
 import '../../profile/profile.dart';
 import '../model/friends.dart';
-import '../model/friends_itinerary.dart';
 
 class FriendDetailScreen extends ConsumerStatefulWidget {
   final bool isAddFriend;
@@ -137,6 +135,7 @@ class _FriendDetailScreenState extends ConsumerState<FriendDetailScreen> {
                                     MaterialPageRoute(
                                       builder: (context) =>
                                           ItenaryDetailsScreen(
+                                            userId: filteredList[index].userId??0,
                                         title: filteredList[index].name ?? "",
                                         itineraryId:
                                             filteredList[index].id ?? 0,

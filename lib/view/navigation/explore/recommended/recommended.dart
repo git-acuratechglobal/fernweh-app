@@ -159,7 +159,7 @@ class RecommendedItem extends StatelessWidget {
                       walkingTime: walkingTime,
                       distance: distance,
                     ),
-                    const PeopleRow(),
+                    // const PeopleRow(),
                   ],
                 ),
               ),

@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/auth_service/auth_service.dart';
+import 'collections/widgets/my_itenary_screen.dart';
 import 'explore/explore_screen.dart';
 import 'friends_list/friends_screen.dart';
-import 'itinerary/widgets/my_itenary_screen.dart';
 import 'map/map_screen.dart';
 
 class NavigationScreen extends ConsumerStatefulWidget {
@@ -89,6 +89,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
               selectedItemColor: Colors.black,
               selectedLabelStyle: TextStyle(
                 fontVariations: FVariations.w700,
+                fontSize: 13
               ),
               items: [
                 BottomNavigationBarItem(
@@ -112,8 +113,8 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
                     'assets/images/fav.png',
                     color: const Color(0xff1A72FF),
                   ),
-                  label: "Itinerary",
-                  tooltip: "Itinerary",
+                  label: "Collections",
+                  tooltip: "Collections",
                 ),
                 BottomNavigationBarItem(
                   icon: Image.asset(

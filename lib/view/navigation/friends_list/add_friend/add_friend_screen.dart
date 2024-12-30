@@ -7,9 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/common/extensions.dart';
-import '../../itinerary/widgets/my_curated_list/share_your_itinerary/invite_friend/invite_friend_sheet.dart';
+import '../../collections/widgets/my_curated_list/share_your_itinerary/invite_friend/invite_friend_sheet.dart';
 import '../../profile/profile.dart';
 import '../controller/friends_notifier.dart';
+import '../friend_details/friend_detail_screen.dart';
 import '../model/friends.dart';
 import '../model/friends_state.dart';
 
@@ -179,29 +180,40 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
                     bool followPressed = followed.contains(users.id);
                     bool isFollowing = users.userFollowed == "Yes" ||
                         followList.contains(users.id);
-                    return FriendListItem(
-                      isloading: isLoading[users.id] == true,
-                      user: users,
-                      isSelected: isSelected,
-                      addFriend: () {
-                        setState(() {
-                          isLoading[users.id ?? 0] = true;
-                          usesrId.add(users.id ?? 0);
-                        });
-                        ref
-                            .read(friendsNotifierProvider.notifier)
-                            .sendRequest(users.id ?? 0, 1);
+                    return GestureDetector(
+                      onTap: (){
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => FriendDetailScreen(
+                              friends: users,
+                            ),
+                          ),
+                        );
                       },
-                      isFollowing: isFollowing,
-                      followFriend: () {
-                        setState(() {
-                          followed.add(users.id ?? 0);
-                        });
-                        ref
-                            .read(followFriendProvider.notifier)
-                            .followFriend(users.id ?? 0);
-                      },
-                      followLoading: followPressed,
+                      child: FriendListItem(
+                        isloading: isLoading[users.id] == true,
+                        user: users,
+                        isSelected: isSelected,
+                        addFriend: () {
+                          setState(() {
+                            isLoading[users.id ?? 0] = true;
+                            usesrId.add(users.id ?? 0);
+                          });
+                          ref
+                              .read(friendsNotifierProvider.notifier)
+                              .sendRequest(users.id ?? 0, 1);
+                        },
+                        isFollowing: isFollowing,
+                        followFriend: () {
+                          setState(() {
+                            followed.add(users.id ?? 0);
+                          });
+                          ref
+                              .read(followFriendProvider.notifier)
+                              .followFriend(users.id ?? 0);
+                        },
+                        followLoading: followPressed,
+                      ),
                     );
                   },
                 );

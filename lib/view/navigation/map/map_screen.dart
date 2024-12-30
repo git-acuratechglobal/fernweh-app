@@ -11,13 +11,13 @@ import '../../../utils/common/widgets.dart';
 import '../../../utils/widgets/loading_widget.dart';
 import '../../location_permission/location_screen.dart';
 import '../../location_permission/location_service.dart';
+import '../collections/models/itinerary_model.dart';
+import '../collections/models/itinerary_places.dart';
+import '../collections/notifier/itinerary_notifier.dart';
 import '../explore/current_location/current_location.dart';
 import '../explore/explore_screen.dart';
 import '../explore/recommended/recommended.dart';
 import '../explore/search_filter/search_and_filter_widget.dart';
-import '../itinerary/models/itinerary_model.dart';
-import '../itinerary/models/itinerary_places.dart';
-import '../itinerary/notifier/itinerary_notifier.dart';
 import 'model/category.dart';
 import 'restaurant_detail/restaurant_detail_screen.dart';
 

@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../services/api_service/api_service.dart';
 import '../../../services/auth_service/auth_service.dart';
 import '../../location_permission/location_service.dart';
-import '../../navigation/itinerary/notifier/itinerary_notifier.dart';
+import '../../navigation/collections/notifier/itinerary_notifier.dart';
 import '../model/user_model.dart';
 
 part 'auth_provider.g.dart';
