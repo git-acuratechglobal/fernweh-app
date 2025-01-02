@@ -13,6 +13,7 @@ class SearchPlacesWidget extends ConsumerStatefulWidget {
       this.onSaved,
       this.onTap,
       this.hintText,
+        this.initialValue,
       this.isEnabled = false});
 
   final bool? isEnabled;
@@ -21,6 +22,7 @@ class SearchPlacesWidget extends ConsumerStatefulWidget {
   final Function(String?)? onSaved;
   final String? hintText;
   final Function(String?)? onTap;
+  final String? initialValue;
 
   @override
   ConsumerState<SearchPlacesWidget> createState() => _SearchPlacesWidgetState();
@@ -76,7 +78,7 @@ class _SearchPlacesWidgetState extends ConsumerState<SearchPlacesWidget> {
                               itemBuilder: (context, index) {
                                 return ListTile(
                                   onTap: () {
-                                    widget.onTap!(data[index].placeId!);
+                                    widget.onTap!(data[index].placeId);
                                     widget.searchController.text =
                                         data[index].description!;
                                     _removeOverlay();
@@ -103,6 +105,13 @@ class _SearchPlacesWidgetState extends ConsumerState<SearchPlacesWidget> {
     }
     return null;
   }
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialValue != null) {
+      widget.searchController.text = widget.initialValue!;
+    }
+  }
 
   @override
   void dispose() {
@@ -118,6 +127,7 @@ class _SearchPlacesWidgetState extends ConsumerState<SearchPlacesWidget> {
       child: Column(
         children: [
           TextFormField(
+            // initialValue: widget.initialValue,
             readOnly: widget.isEnabled ?? false,
             validator: widget.validator,
             textInputAction: TextInputAction.search,
@@ -125,6 +135,7 @@ class _SearchPlacesWidgetState extends ConsumerState<SearchPlacesWidget> {
             focusNode: _focusNode,
             onTapOutside: (val) {
               _focusNode.unfocus();
+              // _removeOverlay();
             },
             onChanged: (val) {
               if (val.isNotEmpty) {
@@ -174,9 +185,9 @@ class _SearchPlacesWidgetState extends ConsumerState<SearchPlacesWidget> {
                         color: Colors.grey,
                       )),
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          // const SizedBox(
+          //   height: 10,
+          // ),
         ],
       ),
     );

@@ -18,7 +18,9 @@ import '../../../utils/common/extensions.dart';
 import '../../../utils/widgets/gender_form_field.dart';
 import '../../../utils/widgets/loading_widget.dart';
 import '../../../utils/widgets/picker_form_field.dart';
+import '../../../utils/widgets/search_places_widget.dart';
 import '../../auth/signup/profile_setup/create_profile_screen.dart';
+import '../collections/notifier/full_address_notifier.dart';
 import '../map/notifier/category_notifier.dart';
 
 class Profile extends ConsumerStatefulWidget {
@@ -31,32 +33,34 @@ class Profile extends ConsumerStatefulWidget {
 class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
   String countryCode = "1";
   XFile? file;
-
+final searchController=TextEditingController();
   @override
   void initState() {
     super.initState();
-    ref.listenManual(authNotifierProvider, (previous, next) async {
-      switch (next) {
-        case Verified(:final user) when previous is Loading:
-          ref.read(userDetailProvider.notifier).update((state) => user);
-        case UserUpdated(:final user) when previous is Loading:
-          ref.read(userDetailProvider.notifier).update((state) => user);
-          Common.showSnackBar(context, "Profile updated successfully");
-        case Logout(:final message) when previous is LogoutLoading:
-          await ref.read(localStorageServiceProvider).clearSession();
-          ref.invalidate(filtersProvider);
-          ref.invalidate(mapViewStateProvider);
-          Common.showSnackBar(context, message);
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
-            (Route<dynamic> route) => false,
-          );
-          ref.invalidate(localStorageServiceProvider);
-        case Error(:final error):
-          Common.showSnackBar(context, error.toString());
-        default:
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.listenManual(authNotifierProvider, (previous, next) async {
+        switch (next) {
+          case Verified(:final user) when previous is Loading:
+            ref.read(userDetailProvider.notifier).update((state) => user);
+          case UserUpdated(:final user) when previous is Loading:
+            ref.read(userDetailProvider.notifier).update((state) => user);
+            Common.showSnackBar(context, "Profile updated successfully");
+          case Logout(:final message) when previous is LogoutLoading:
+            await ref.read(localStorageServiceProvider).clearSession();
+            ref.invalidate(filtersProvider);
+            ref.invalidate(mapViewStateProvider);
+            Common.showSnackBar(context, message);
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+              (Route<dynamic> route) => false,
+            );
+            ref.invalidate(localStorageServiceProvider);
+          case Error(:final error):
+            Common.showSnackBar(context, error.toString());
+          default:
+        }
+      });
     });
   }
 
@@ -65,6 +69,7 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
     final user = ref.watch(userDetailProvider);
     final authState = ref.watch(authNotifierProvider);
     final validation = ref.watch(validatorsProvider);
+
     return Stack(
       children: [
         Scaffold(
@@ -170,6 +175,32 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                   ),
                   const SizedBox().setHeight(16.0),
                   Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: SearchPlacesWidget(
+                        initialValue: user?.homeLocation,
+                        onTap: (val) async {
+                          final fullAddress = await ref
+                              .read(fullAddressNotifierProvider.notifier)
+                              .getFullAddress(placeId: val ?? "");
+                          if (fullAddress != null) {
+                            ref
+                                .read(authNotifierProvider.notifier)
+                                .updateFormData('full_address', fullAddress);
+                          }
+                        },
+                        hintText: "Add your home location",
+                        searchController:searchController,
+                        validator: (val) {
+                          return null;
+                        },
+                        onSaved: (val) {
+                          ref
+                              .read(authNotifierProvider.notifier)
+                              .updateFormData('home_location', val);
+                        },
+                      )),
+                  const SizedBox().setHeight(16.0),
+                  Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: TextFormField(
                       validator: (val) => validation.validateName(val),
@@ -177,7 +208,7 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                       onSaved: (val) => ref
                           .read(authNotifierProvider.notifier)
                           .updateFormData("firstname", val),
-                      onTapOutside: (val)=>FocusScope.of(context).unfocus(),
+                      onTapOutside: (val) => FocusScope.of(context).unfocus(),
                     ),
                   ),
                   const SizedBox(height: 16.0),
@@ -189,7 +220,7 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                       onSaved: (val) => ref
                           .read(authNotifierProvider.notifier)
                           .updateFormData("lastname", val),
-                      onTapOutside: (val)=>FocusScope.of(context).unfocus(),
+                      onTapOutside: (val) => FocusScope.of(context).unfocus(),
                     ),
                   ),
                   const SizedBox(height: 16.0),
@@ -205,44 +236,44 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: TextFormField(
-                      validator: (val)=>validation.validateMobile(val),
-                        initialValue: user?.phone,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                          hintText: "Phone number",
-                          counterText: "",
-                          prefixIcon: InkWell(
-                            onTap: () async {
-                              countryCodePicker(context, (code) {
-                                setState(() {
-                                  countryCode = code.phoneCode;
-                                });
+                      validator: (val) => validation.validateMobile(val),
+                      initialValue: user?.phone,
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                        hintText: "Phone number",
+                        counterText: "",
+                        prefixIcon: InkWell(
+                          onTap: () async {
+                            countryCodePicker(context, (code) {
+                              setState(() {
+                                countryCode = code.phoneCode;
                               });
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "+$countryCode",
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Icon(Icons.arrow_drop_down_outlined)
-                                ],
-                              ),
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "+$countryCode",
+                                ),
+                                const SizedBox(width: 8),
+                                const Icon(Icons.arrow_drop_down_outlined)
+                              ],
                             ),
                           ),
                         ),
-                        maxLength: 10,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        onSaved: (val) => ref
-                            .read(authNotifierProvider.notifier)
-                            .updateFormData("phone", val),
-                      onTapOutside: (val)=>FocusScope.of(context).unfocus(),
+                      ),
+                      maxLength: 10,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                      onSaved: (val) => ref
+                          .read(authNotifierProvider.notifier)
+                          .updateFormData("phone", val),
+                      onTapOutside: (val) => FocusScope.of(context).unfocus(),
                     ),
                   ),
                   const SizedBox(height: 16),

@@ -17,13 +17,13 @@ abstract class Common {
     );
   }
 
-  static void showToast({required BuildContext context,required String message}) {
+  static void showToast({required String message}) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 1,
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: const Color(0xffCF5253),
         textColor: Colors.white,
         fontSize: 16.0);
   }

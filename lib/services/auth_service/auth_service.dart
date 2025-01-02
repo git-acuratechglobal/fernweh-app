@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:fernweh/view/auth/signup/profile_setup/profile_step/model/intrestedin_category.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../view/auth/model/user_model.dart';
@@ -123,8 +124,11 @@ Future<T> asyncGuard<T>(Future<T> Function() future) async {
     return await future();
   } on DioException catch (e) {
     throw e.message ?? e.error.toString();
-  } on FormatException catch (_) {
-    throw "Unable to process data from server";
+  } on CheckedFromJsonException catch (e) {
+    throw "Something went wrong! ${e.toString()}"
+        .replaceAll("CheckedFromJsonException", "");
+  } on FormatException catch (e) {
+    throw "Unable to process data from server. reason: ${e.message}";
   } catch (e) {
     rethrow;
   }

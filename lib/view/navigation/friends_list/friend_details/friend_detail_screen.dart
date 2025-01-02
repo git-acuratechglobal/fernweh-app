@@ -90,7 +90,7 @@ class _FriendDetailScreenState extends ConsumerState<FriendDetailScreen> {
                 child: AsyncDataWidgetB(
                   dataProvider:
                       getFriendsItineraryListProvider(widget.friends.id ?? 0),
-                  dataBuilder: ( itinerary) {
+                  dataBuilder: (itinerary) {
                     List<Itinerary> filteredList =
                         itinerary.where((e) => e.type == "1").toList();
                     return itinerary.isEmpty
@@ -135,7 +135,7 @@ class _FriendDetailScreenState extends ConsumerState<FriendDetailScreen> {
                                     MaterialPageRoute(
                                       builder: (context) =>
                                           ItenaryDetailsScreen(
-                                            userId: filteredList[index].userId??0,
+                                        userId: filteredList[index].userId ?? 0,
                                         title: filteredList[index].name ?? "",
                                         itineraryId:
                                             filteredList[index].id ?? 0,
@@ -260,11 +260,36 @@ class FriendItineraryList extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: AspectRatio(
-              aspectRatio: 1,
-              child: ClipRRect(
+                aspectRatio: 1,
+                child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: ImageWidget(url: itinary.imageUrl)),
-            )),
+                  child: GridView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      itemCount: 4,
+                      shrinkWrap: true,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 4.0,
+                        crossAxisSpacing: 4.0,
+                      ),
+                      itemBuilder: (context, index) {
+                        if (itinary.placesUrls.isEmpty) {
+                          return Container(
+                            color: Colors.grey[300],
+                          );
+                        } else {
+                          if (index < itinary.placesUrls.length) {
+                            return ImageWidget(url: itinary.placesUrls[index]);
+                          } else {
+                            return Container(
+                              color: Colors.grey[300],
+                            );
+                          }
+                        }
+                      }),
+                ))),
         const SizedBox(
           height: 5,
         ),

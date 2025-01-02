@@ -193,7 +193,6 @@ import 'notifier/followlist_notifier.dart';
 //   });
 // }
 
-
 class FollowingList extends ConsumerStatefulWidget {
   const FollowingList({super.key});
 
@@ -204,152 +203,164 @@ class FollowingList extends ConsumerStatefulWidget {
 class _FollowingListState extends ConsumerState<FollowingList> {
   @override
   Widget build(BuildContext context) {
-    return AsyncDataWidgetB(dataProvider: followingNotifierProvider, dataBuilder: (data){
-      return ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          ExpansionTile(
-              shape: const Border(),
-              initiallyExpanded: true,
-              tilePadding: const EdgeInsets.symmetric(
-                  horizontal: 20, vertical: 0),
-              title: const Text(
-                "Following Itinerary List",
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600),
+    return AsyncDataWidgetB(
+        dataProvider: followingNotifierProvider,
+        dataBuilder: (data) {
+          if (data.followingItineraries.isEmpty &&
+              data.followingFriendsItineraries.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("No itineraries found!"),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      minimumSize: const Size(60, 40),
+                    ),
+                    onPressed: () {
+                      ref.invalidate(followingNotifierProvider);
+                    },
+                    child: const Text(
+                      "Refresh",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ),
+                ],
               ),
-              children: [
-                ListView.builder(
-                  physics:
-                  const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(24),
-                  shrinkWrap: true,
-                  itemCount: data.followingItineraries.length,
-                  itemBuilder: (context, index) {
-                    final itinary =
-                        data.followingItineraries[index];
-                    return Column(
-                      key: ValueKey(
-                          '${itinary.id ?? 'no-id'}-$index'),
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            Navigator.of(context)
-                                .push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    ItenaryDetailsScreen(
-                                      userId: itinary.userId??0,
-                                      title: itinary
-                                          .name ??
-                                          "",
-                                      itineraryId:
-                                      itinary.id ??
-                                          0,
-                                    ),
-                              ),
-                            );
-                          },
-                          child: MyCreatedItinerary(
-                            isEditAccess: false,
-                            placeCount:
-                            itinary
-                                .placesCount ??
-                                0,
-                            itinary: itinary,
-                            editList:const [],
-                            viewOnly:const []
-                           ,
-                            placeUrls:itinary.placesUrls,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    );
-                  },
-                  // separatorBuilder:
-                  //     (BuildContext context, int index) {
-                  //   return const SizedBox(
-                  //     height: 10,
-                  //   );
-                  // },
-                ),
-              ]),
-          ExpansionTile(
-              shape: const Border(),
-              initiallyExpanded: true,
-              tilePadding: const EdgeInsets.symmetric(
-                  horizontal: 20, vertical: 0),
-              title: const Text(
-                "Following Friends Itinerary List",
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600),
-              ),
-              children: [
-                ListView.builder(
-                  physics:
-                  const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(24),
-                  shrinkWrap: true,
-                  itemCount: data.followingFriendsItineraries.length,
-                  itemBuilder: (context, index) {
-                    final itinary =
-                    data.followingFriendsItineraries[index];
-                    return Column(
-                      key: ValueKey(
-                          '${itinary.id ?? 'no-id'}-$index'),
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            Navigator.of(context)
-                                .push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    ItenaryDetailsScreen(
-                                      userId: itinary.userId??0,
-                                      title: itinary
-                                          .name ??
-                                          "",
-                                      itineraryId:
-                                      itinary.id ??
-                                          0,
-                                    ),
-                              ),
-                            );
-                          },
-                          child: MyCreatedItinerary(
-                            isEditAccess: false,
-                            placeCount:
-                            itinary
-                                .placesCount ??
-                                0,
-                            itinary: itinary,
-                            editList:const [],
-                            viewOnly:const []
-                            ,
-                            placeUrls:itinary.placesUrls,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    );
-                  },
-                  // separatorBuilder:
-                  //     (BuildContext context, int index) {
-                  //   return const SizedBox(
-                  //     height: 10,
-                  //   );
-                  // },
-                ),
-              ]),
-        ],
-      );
-    }, errorBuilder: (error,st)=>Center(child: ErrorCustomWidget(
+            );
+          }
 
-      error: error, onRetry: () {
-      ref.invalidate(followingNotifierProvider);
-    },),));
+          return ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              if (data.followingItineraries.isNotEmpty)
+                ExpansionTile(
+                    shape: const Border(),
+                    initiallyExpanded: true,
+                    tilePadding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                    title: const Text(
+                      "Following Itinerary List",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                    children: [
+                      ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(24),
+                        shrinkWrap: true,
+                        itemCount: data.followingItineraries.length,
+                        itemBuilder: (context, index) {
+                          final itinary = data.followingItineraries[index];
+                          return Column(
+                            key: ValueKey('${itinary.id ?? 'no-id'}-$index'),
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ItenaryDetailsScreen(
+                                        userId: itinary.userId ?? 0,
+                                        title: itinary.name ?? "",
+                                        itineraryId: itinary.id ?? 0,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: MyCreatedItinerary(
+                                  ownerName: itinary.ownerFullName,
+                                  isEditAccess: false,
+                                  placeCount: itinary.placesCount ?? 0,
+                                  itinary: itinary,
+                                  editList: const [],
+                                  viewOnly: const [],
+                                  placeUrls: itinary.placesUrls,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+                          );
+                        },
+                        // separatorBuilder:
+                        //     (BuildContext context, int index) {
+                        //   return const SizedBox(
+                        //     height: 10,
+                        //   );
+                        // },
+                      ),
+                    ]),
+              if (data.followingFriendsItineraries.isNotEmpty)
+                ExpansionTile(
+                    shape: const Border(),
+                    initiallyExpanded: true,
+                    tilePadding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                    title: const Text(
+                      "Following Friends Itinerary List",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                    children: [
+                      ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(24),
+                        shrinkWrap: true,
+                        itemCount: data.followingFriendsItineraries.length,
+                        itemBuilder: (context, index) {
+                          final itinary =
+                              data.followingFriendsItineraries[index];
+                          return Column(
+                            key: ValueKey('${itinary.id ?? 'no-id'}-$index'),
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ItenaryDetailsScreen(
+                                        userId: itinary.userId ?? 0,
+                                        title: itinary.name ?? "",
+                                        itineraryId: itinary.id ?? 0,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: MyCreatedItinerary(
+                                  isEditAccess: false,
+                                  placeCount: itinary.placesCount ?? 0,
+                                  itinary: itinary,
+                                  editList: const [],
+                                  viewOnly: const [],
+                                  placeUrls: itinary.placesUrls,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+                          );
+                        },
+                        // separatorBuilder:
+                        //     (BuildContext context, int index) {
+                        //   return const SizedBox(
+                        //     height: 10,
+                        //   );
+                        // },
+                      ),
+                    ]),
+            ],
+          );
+        },
+        errorBuilder: (error, st) => Center(
+              child: ErrorCustomWidget(
+                error: error,
+                onRetry: () {
+                  ref.invalidate(followingNotifierProvider);
+                },
+              ),
+            ));
   }
 }

@@ -769,26 +769,13 @@ class _ItinerayItemState extends ConsumerState<ItinerayItem> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    InkWell(
-                      onTap: () async {
-                        String googleUrl =
-                            'https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${widget.placeId}';
-                        if (await canLaunchUrl(Uri.parse(googleUrl))) {
-                          await launchUrl(Uri.parse(googleUrl));
-                        } else {
-                          return Common.showToast(
-                              context: context,
-                              message: "Could not open the place details.");
-                        }
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: AspectRatio(
-                            aspectRatio: 0.85,
-                            child: ImageWidget(
-                              url: widget.url ?? "",
-                            )),
-                      ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: AspectRatio(
+                          aspectRatio: 0.85,
+                          child: ImageWidget(
+                            url: widget.url ?? "",
+                          )),
                     ),
                     const SizedBox(width: 8.0),
                     Expanded(
@@ -1246,300 +1233,300 @@ class _DetailItemState extends ConsumerState<DetailItem> {
   }
 }
 
-class ListViewItems extends ConsumerStatefulWidget {
-  final double? width;
-  final String? url;
-  final String? name;
-  final String? address;
-  final String? rating;
-  final String? walkTime;
-  final String? distance;
-  final String placeType;
-  final String? selection;
-  final double? latitude;
-  final double? longitude;
-  final String? placeId;
-  final int? itineraryId;
-  final int? userId;
-  final String? locationId;
-  final int? id;
-  final int? type;
-  final bool isSelected;
-  final bool isWishlist;
-  final String? addedBy;
-
-  const ListViewItems(
-      {super.key,
-      this.width,
-      this.url,
-      this.name,
-      this.address,
-      this.rating,
-      this.walkTime,
-      this.distance,
-      required this.placeType,
-      this.selection,
-      this.latitude,
-      this.placeId,
-      this.longitude,
-      this.id,
-      this.locationId,
-      this.userId,
-      this.itineraryId,
-      this.isSelected = false,
-      this.type,
-      this.isWishlist = true,
-      this.addedBy});
-
-  @override
-  ConsumerState<ListViewItems> createState() => _ListViewItemsState();
-}
-
-class _ListViewItemsState extends ConsumerState<ListViewItems> {
-  String? selectedType;
-
-  @override
-  void initState() {
-    setState(() {
-      selectedType = widget.selection;
-    });
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: widget.width ?? MediaQuery.sizeOf(context).width,
-          height: 35,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
-            color: Color(0xffF7F7F7),
-            border: Border(
-              top: BorderSide(color: Color(0xffE2E2E2)),
-              left: BorderSide(color: Color(0xffE2E2E2)),
-              right: BorderSide(color: Color(0xffE2E2E2)),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(Config.selectionOptions.length, (index) {
-                final option = Config.selectionOptions[index].toUpperCase();
-                return InkWell(
-                  onTap: () {
-                    // setState(() {
-                    //   selectedType= option;
-                    // });
-                    if (selectedType != null) {
-                      ref
-                          .read(myItineraryNotifierProvider.notifier)
-                          .updateForm("type", widget.type);
-                      ref
-                          .read(myItineraryNotifierProvider.notifier)
-                          .updateForm("itinerary_id", widget.itineraryId);
-                      ref
-                          .read(myItineraryNotifierProvider.notifier)
-                          .updateMyItinerary(id: widget.id ?? 0, form: {
-                        "intineraryListId": widget.itineraryId,
-                        "type": index + 1,
-                        "locationId": widget.locationId,
-                        "userId": widget.userId
-                      });
-                    }
-                  },
-                  child: Text(
-                    option,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontVariations: FVariations.w600,
-                      color: selectedType == option
-                          ? const Color(0xff12B347)
-                          : Colors.grey,
-                    ),
-                  ),
-                );
-              }),
-            ),
-          ),
-        ),
-        InkWell(
-          onTap: () {
-            if (widget.isSelected) {
-              // Choose the correct provider based on `isWishlist`
-              if (widget.isWishlist) {
-                ref
-                    .read(wishListProvider.notifier)
-                    .toggleSelection(widget.placeId!);
-              } else {
-                ref
-                    .read(itineraryLocalListProvider.notifier)
-                    .toggleSelection(widget.id ?? 0);
-              }
-            } else {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => RestaurantDetailScreen(
-                    locationId: widget.placeId,
-                    latitude: widget.latitude,
-                    longitude: widget.longitude,
-                    types: const [],
-                    image: widget.url ?? "",
-                    name: widget.name,
-                    rating: widget.rating,
-                    walkingTime: widget.walkTime,
-                    distance: widget.distance,
-                    address: widget.address,
-                  ),
-                ),
-              );
-            }
-          },
-          child: Container(
-            width: widget.width ?? MediaQuery.sizeOf(context).width,
-            padding:
-                const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 8),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
-              border: Border(
-                bottom: BorderSide(color: Color(0xffE2E2E2)),
-                left: BorderSide(color: Color(0xffE2E2E2)),
-                right: BorderSide(color: Color(0xffE2E2E2)),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: AspectRatio(
-                          aspectRatio: 1.7,
-                          child: ImageWidget(
-                            url: widget.url ?? "",
-                          )),
-                    ),
-                    Positioned(
-                      top: 12,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: const BoxDecoration(
-                          color: Color(0xffFFE9E9),
-                          borderRadius: BorderRadius.horizontal(
-                            right: Radius.circular(6.0),
-                          ),
-                        ),
-                        child: Text(
-                          widget.placeType,
-                          style: TextStyle(
-                            color: const Color(0xFFCF5253),
-                            fontSize: 11,
-                            fontVariations: FVariations.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                        top: 12,
-                        right: 10,
-                        child: FavButton(
-                          placeId: widget.placeId,
-                          name: widget.name,
-                          image: widget.url,
-                          type: widget.placeType,
-                          distance: widget.distance,
-                          rating: widget.rating,
-                          address: widget.address,
-                          walkingTime: widget.walkTime,
-                        )),
-                  ],
-                ),
-                const SizedBox(height: 8.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      widget.name ?? "",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontVariations: FVariations.w700,
-                        color: const Color(0xFF1A1B28),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.star_rounded,
-                          size: 18,
-                          color: Color(0xffF4CA12),
-                        ),
-                        Text(
-                          widget.rating ?? "0",
-                          style: const TextStyle(fontSize: 12),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-
-                // InkWell(
-                //   onTap: () {
-                //     showModalBottomSheet(
-                //       context: context,
-                //       backgroundColor: Colors.white,
-                //       isScrollControlled: true,
-                //       constraints: BoxConstraints.tightFor(
-                //         height: MediaQuery.sizeOf(context).height * 0.6,
-                //       ),
-                //       shape: const RoundedRectangleBorder(
-                //         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                //       ),
-                //       builder: (context) {
-                //         return const AddToItineraySheet();
-                //       },
-                //     );
-                //   },
-                //   child: Container(
-                //     width: 35,
-                //     height: 35,
-                //     decoration: BoxDecoration(
-                //       color: Colors.white,
-                //       shape: BoxShape.circle,
-                //       border: Border.all(color: const Color(0xffE2E2E2)),
-                //     ),
-                //     child: Padding(
-                //       padding: const EdgeInsets.all(6.0),
-                //       child: Image.asset(
-                //         'assets/images/un_heart.png',
-                //       ),
-                //     ),
-                //   ),
-                // ),
-                const SizedBox(height: 8.0),
-                LocationRow(
-                  address: widget.address ?? "",
-                ),
-                const SizedBox(height: 8.0),
-                DistanceRow(
-                  walkingTime: widget.walkTime ?? "",
-                  distance: widget.distance ?? "",
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
+// class ListViewItems extends ConsumerStatefulWidget {
+//   final double? width;
+//   final String? url;
+//   final String? name;
+//   final String? address;
+//   final String? rating;
+//   final String? walkTime;
+//   final String? distance;
+//   final String placeType;
+//   final String? selection;
+//   final double? latitude;
+//   final double? longitude;
+//   final String? placeId;
+//   final int? itineraryId;
+//   final int? userId;
+//   final String? locationId;
+//   final int? id;
+//   final int? type;
+//   final bool isSelected;
+//   final bool isWishlist;
+//   final String? addedBy;
+//
+//   const ListViewItems(
+//       {super.key,
+//       this.width,
+//       this.url,
+//       this.name,
+//       this.address,
+//       this.rating,
+//       this.walkTime,
+//       this.distance,
+//       required this.placeType,
+//       this.selection,
+//       this.latitude,
+//       this.placeId,
+//       this.longitude,
+//       this.id,
+//       this.locationId,
+//       this.userId,
+//       this.itineraryId,
+//       this.isSelected = false,
+//       this.type,
+//       this.isWishlist = true,
+//       this.addedBy});
+//
+//   @override
+//   ConsumerState<ListViewItems> createState() => _ListViewItemsState();
+// }
+//
+// class _ListViewItemsState extends ConsumerState<ListViewItems> {
+//   String? selectedType;
+//
+//   @override
+//   void initState() {
+//     setState(() {
+//       selectedType = widget.selection;
+//     });
+//     super.initState();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       children: [
+//         Container(
+//           width: widget.width ?? MediaQuery.sizeOf(context).width,
+//           height: 35,
+//           decoration: const BoxDecoration(
+//             borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+//             color: Color(0xffF7F7F7),
+//             border: Border(
+//               top: BorderSide(color: Color(0xffE2E2E2)),
+//               left: BorderSide(color: Color(0xffE2E2E2)),
+//               right: BorderSide(color: Color(0xffE2E2E2)),
+//             ),
+//           ),
+//           child: Padding(
+//             padding: const EdgeInsets.symmetric(horizontal: 12.0),
+//             child: Row(
+//               crossAxisAlignment: CrossAxisAlignment.center,
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: List.generate(Config.selectionOptions.length, (index) {
+//                 final option = Config.selectionOptions[index].toUpperCase();
+//                 return InkWell(
+//                   onTap: () {
+//                     // setState(() {
+//                     //   selectedType= option;
+//                     // });
+//                     if (selectedType != null) {
+//                       ref
+//                           .read(myItineraryNotifierProvider.notifier)
+//                           .updateForm("type", widget.type);
+//                       ref
+//                           .read(myItineraryNotifierProvider.notifier)
+//                           .updateForm("itinerary_id", widget.itineraryId);
+//                       ref
+//                           .read(myItineraryNotifierProvider.notifier)
+//                           .updateMyItinerary(id: widget.id ?? 0, form: {
+//                         "intineraryListId": widget.itineraryId,
+//                         "type": index + 1,
+//                         "locationId": widget.locationId,
+//                         "userId": widget.userId
+//                       });
+//                     }
+//                   },
+//                   child: Text(
+//                     option,
+//                     style: TextStyle(
+//                       fontSize: 12,
+//                       fontVariations: FVariations.w600,
+//                       color: selectedType == option
+//                           ? const Color(0xff12B347)
+//                           : Colors.grey,
+//                     ),
+//                   ),
+//                 );
+//               }),
+//             ),
+//           ),
+//         ),
+//         InkWell(
+//           onTap: () {
+//             if (widget.isSelected) {
+//               // Choose the correct provider based on `isWishlist`
+//               if (widget.isWishlist) {
+//                 ref
+//                     .read(wishListProvider.notifier)
+//                     .toggleSelection(widget.placeId!);
+//               } else {
+//                 ref
+//                     .read(itineraryLocalListProvider.notifier)
+//                     .toggleSelection(widget.id ?? 0);
+//               }
+//             } else {
+//               Navigator.of(context).push(
+//                 MaterialPageRoute(
+//                   builder: (context) => RestaurantDetailScreen(
+//                     locationId: widget.placeId,
+//                     latitude: widget.latitude,
+//                     longitude: widget.longitude,
+//                     types: const [],
+//                     image: widget.url ?? "",
+//                     name: widget.name,
+//                     rating: widget.rating,
+//                     walkingTime: widget.walkTime,
+//                     distance: widget.distance,
+//                     address: widget.address,
+//                   ),
+//                 ),
+//               );
+//             }
+//           },
+//           child: Container(
+//             width: widget.width ?? MediaQuery.sizeOf(context).width,
+//             padding:
+//                 const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 8),
+//             decoration: const BoxDecoration(
+//               color: Colors.white,
+//               borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
+//               border: Border(
+//                 bottom: BorderSide(color: Color(0xffE2E2E2)),
+//                 left: BorderSide(color: Color(0xffE2E2E2)),
+//                 right: BorderSide(color: Color(0xffE2E2E2)),
+//               ),
+//             ),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Stack(
+//                   children: [
+//                     ClipRRect(
+//                       borderRadius: BorderRadius.circular(8),
+//                       child: AspectRatio(
+//                           aspectRatio: 1.7,
+//                           child: ImageWidget(
+//                             url: widget.url ?? "",
+//                           )),
+//                     ),
+//                     Positioned(
+//                       top: 12,
+//                       child: Container(
+//                         padding: const EdgeInsets.symmetric(
+//                             horizontal: 8, vertical: 4),
+//                         decoration: const BoxDecoration(
+//                           color: Color(0xffFFE9E9),
+//                           borderRadius: BorderRadius.horizontal(
+//                             right: Radius.circular(6.0),
+//                           ),
+//                         ),
+//                         child: Text(
+//                           widget.placeType,
+//                           style: TextStyle(
+//                             color: const Color(0xFFCF5253),
+//                             fontSize: 11,
+//                             fontVariations: FVariations.w700,
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                     Positioned(
+//                         top: 12,
+//                         right: 10,
+//                         child: FavButton(
+//                           placeId: widget.placeId,
+//                           name: widget.name,
+//                           image: widget.url,
+//                           type: widget.placeType,
+//                           distance: widget.distance,
+//                           rating: widget.rating,
+//                           address: widget.address,
+//                           walkingTime: widget.walkTime,
+//                         )),
+//                   ],
+//                 ),
+//                 const SizedBox(height: 8.0),
+//                 Row(
+//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                   children: [
+//                     Text(
+//                       overflow: TextOverflow.ellipsis,
+//                       maxLines: 1,
+//                       widget.name ?? "",
+//                       style: TextStyle(
+//                         fontSize: 15,
+//                         fontVariations: FVariations.w700,
+//                         color: const Color(0xFF1A1B28),
+//                       ),
+//                     ),
+//                     Row(
+//                       children: [
+//                         const Icon(
+//                           Icons.star_rounded,
+//                           size: 18,
+//                           color: Color(0xffF4CA12),
+//                         ),
+//                         Text(
+//                           widget.rating ?? "0",
+//                           style: const TextStyle(fontSize: 12),
+//                         )
+//                       ],
+//                     ),
+//                   ],
+//                 ),
+//
+//                 // InkWell(
+//                 //   onTap: () {
+//                 //     showModalBottomSheet(
+//                 //       context: context,
+//                 //       backgroundColor: Colors.white,
+//                 //       isScrollControlled: true,
+//                 //       constraints: BoxConstraints.tightFor(
+//                 //         height: MediaQuery.sizeOf(context).height * 0.6,
+//                 //       ),
+//                 //       shape: const RoundedRectangleBorder(
+//                 //         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+//                 //       ),
+//                 //       builder: (context) {
+//                 //         return const AddToItineraySheet();
+//                 //       },
+//                 //     );
+//                 //   },
+//                 //   child: Container(
+//                 //     width: 35,
+//                 //     height: 35,
+//                 //     decoration: BoxDecoration(
+//                 //       color: Colors.white,
+//                 //       shape: BoxShape.circle,
+//                 //       border: Border.all(color: const Color(0xffE2E2E2)),
+//                 //     ),
+//                 //     child: Padding(
+//                 //       padding: const EdgeInsets.all(6.0),
+//                 //       child: Image.asset(
+//                 //         'assets/images/un_heart.png',
+//                 //       ),
+//                 //     ),
+//                 //   ),
+//                 // ),
+//                 const SizedBox(height: 8.0),
+//                 LocationRow(
+//                   address: widget.address ?? "",
+//                 ),
+//                 const SizedBox(height: 8.0),
+//                 DistanceRow(
+//                   walkingTime: widget.walkTime ?? "",
+//                   distance: widget.distance ?? "",
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
 
 class ItineraryMarkersInfo extends StatelessWidget {
   const ItineraryMarkersInfo({super.key, required this.data});

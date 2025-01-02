@@ -87,10 +87,8 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
               type: BottomNavigationBarType.fixed,
               backgroundColor: Colors.white,
               selectedItemColor: Colors.black,
-              selectedLabelStyle: TextStyle(
-                fontVariations: FVariations.w700,
-                fontSize: 13
-              ),
+              selectedLabelStyle:
+                  TextStyle(fontVariations: FVariations.w700, fontSize: 13),
               items: [
                 BottomNavigationBarItem(
                   icon: Image.asset(
@@ -156,6 +154,3 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
             )));
   }
 }
-
-
-

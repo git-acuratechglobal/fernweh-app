@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../models/itinerary_model.dart';
 part 'friend_list_notifier.g.dart';
-@Riverpod(keepAlive:false)
+@Riverpod(keepAlive:true)
 FutureOr<List<Itinerary>> getFriendListItinerary(Ref ref) async {
   return await ref.watch(apiServiceProvider).getFriendListItinerary();
 }

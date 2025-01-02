@@ -11,7 +11,11 @@ extension ListX<T> on List<T> {
     }
   }
 }
-
+extension ImageExtension on num {
+  int cacheSize(BuildContext context) {
+    return (this * MediaQuery.of(context).devicePixelRatio).round();
+  }
+}
 class FVariations extends FontVariation {
   FVariations._(super.axis, super.value);
 

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:fernweh/view/navigation/friends_list/controller/follow_friend_notifier.dart';
 import 'package:fernweh/view/navigation/friends_list/model/following_friends.dart';

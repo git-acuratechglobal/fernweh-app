@@ -122,7 +122,8 @@ class Itinerary {
     required this.shareUrl,
     required this.location,
      this.placesCount,
-    this.places
+    this.places,
+    required this.owner
   });
 
   final int? id;
@@ -155,6 +156,7 @@ class Itinerary {
   final int ?placesCount;
   @JsonKey(name: 'places')
   final List<Place>? places;
+  final String? owner;
 
   factory Itinerary.fromJson(Map<String, dynamic> json) =>
       _$ItineraryFromJson(json);
@@ -175,11 +177,21 @@ class Itinerary {
     }
     return [];
   }
+  String? get ownerFullName {
+    if (owner!.isEmpty) return owner;
+    return owner!
+        .split(' ')
+        .map((word) => word.isNotEmpty
+        ? word[0].toUpperCase() + word.substring(1).toLowerCase()
+        : '')
+        .join(' ');
+  }
 }
 
 List<Itinerary> get userItinerarydummyList {
   return List.generate(8, (index) {
     return Itinerary(
+      owner: "",
       placesCount: 0,
       location: "",
         id: null,

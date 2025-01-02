@@ -27,23 +27,23 @@ class TripDetail extends _$TripDetail {
     });
   }
 
-  Future<void> getTripDetailsByLocation() async {
+  Future<void> getTripDetailsByLocation({String? homeLocation}) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      String? fullAddress;
-      final currentPosition = await ref.read(currentPositionProvider.future);
-      final adress = await ref
-          .watch(apiServiceProvider)
-          .getPlaceIdFromCoordinates(currentPosition);
-      if (adress != null) {
-         fullAddress = await ref
-            .read(fullAddressNotifierProvider.notifier)
-            .getFullAddress(placeId: adress);
-      }
-      print(fullAddress);
+      // String? fullAddress;
+      // final currentPosition = await ref.read(currentPositionProvider.future);
+      // final adress = await ref
+      //     .watch(apiServiceProvider)
+      //     .getPlaceIdFromCoordinates(currentPosition);
+      // if (adress != null) {
+      //    fullAddress = await ref
+      //       .read(fullAddressNotifierProvider.notifier)
+      //       .getFullAddress(placeId: adress);
+      // }
+
       return ref
           .watch(apiServiceProvider)
-          .getTripDetailsByLocation(address: fullAddress!);
+          .getTripDetailsByLocation(address: homeLocation!);
     });
   }
 }

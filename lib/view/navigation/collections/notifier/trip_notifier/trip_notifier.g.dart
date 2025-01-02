@@ -22,7 +22,7 @@ final getTripProvider = AutoDisposeFutureProvider<List<Trip>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef GetTripRef = AutoDisposeFutureProviderRef<List<Trip>>;
-String _$tripDetailHash() => r'3177ddecfb75d9d935f8e5d9c2e2dfafc9f1a032';
+String _$tripDetailHash() => r'fa20b0f158341bfe08dc89e3e2976a867a087976';
 
 /// See also [TripDetail].
 @ProviderFor(TripDetail)

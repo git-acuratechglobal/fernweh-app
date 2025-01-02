@@ -6,7 +6,7 @@ part of 'itinerary_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getUserItineraryHash() => r'35864743da7581f802c20434524b372f927d3139';
+String _$getUserItineraryHash() => r'8eaf9511bbe8ef239748409fbac1e7ea29c0a193';
 
 /// See also [getUserItinerary].
 @ProviderFor(getUserItinerary)

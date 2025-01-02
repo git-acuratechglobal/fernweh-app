@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,11 +20,10 @@ class _FriendsItineraryListState extends ConsumerState<FriendsItineraryList> {
     return AsyncDataWidgetB(
         dataProvider: getFriendListItineraryProvider,
         dataBuilder: (data) {
-          List<Country> countries =
-              convertItinerariesToHierarchy(data);
+          List<Country> countries = convertItinerariesToHierarchy(data);
           return countries.isEmpty
               ? Center(
-                child: Column(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text("No itinerary found!"),
@@ -48,8 +45,10 @@ class _FriendsItineraryListState extends ConsumerState<FriendsItineraryList> {
                       ),
                     ],
                   ),
-              )
-              : followingWidget(countries,);
+                )
+              : followingWidget(
+                  countries,
+                );
         },
         errorBuilder: (error, st) => Center(
               child: Column(
@@ -61,8 +60,7 @@ class _FriendsItineraryListState extends ConsumerState<FriendsItineraryList> {
                   ),
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       minimumSize: const Size(60, 40),
                     ),
                     onPressed: () {
@@ -80,7 +78,8 @@ class _FriendsItineraryListState extends ConsumerState<FriendsItineraryList> {
 }
 
 Widget followingWidget(
-    List<Country> countries,) {
+  List<Country> countries,
+) {
   return StatefulBuilder(
       builder: (BuildContext context, void Function(void Function()) setState) {
     return ListView.builder(
@@ -177,28 +176,30 @@ Widget followingWidget(
                               if (city.isExpanded)
                                 ...city.itineraries.map((itinerary) {
                                   return InkWell(
-                                    onTap: (){
-                                      Navigator.of(context)
-                                          .push(
+                                    onTap: () {
+                                      Navigator.of(context).push(
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               ItenaryDetailsScreen(
-                                                userId: itinerary.userId??0,
-                                                title: itinerary.name??"",
-                                                itineraryId:
-                                                itinerary.id ??
-                                                    0,
-                                              ),
+                                            userId: itinerary.userId ?? 0,
+                                            title: itinerary.name ?? "",
+                                            itineraryId: itinerary.id ?? 0,
+                                          ),
                                         ),
                                       );
                                     },
-                                    child: MyCreatedItinerary(
-                                      isEditAccess: false,
-                                      placeCount: itinerary.placesCount ?? 0,
-                                      itinary: itinerary,
-                                      editList: const [],
-                                      viewOnly: const [],
-                                      placeUrls: itinerary.placesUrls,
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 10),
+                                      child: MyCreatedItinerary(
+                                        ownerName: itinerary.ownerFullName,
+                                        isEditAccess: false,
+                                        placeCount: itinerary.placesCount ?? 0,
+                                        itinary: itinerary,
+                                        editList: const [],
+                                        viewOnly: const [],
+                                        placeUrls: itinerary.placesUrls,
+                                      ),
                                     ),
                                   );
                                 }),

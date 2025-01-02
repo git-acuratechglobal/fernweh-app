@@ -25,6 +25,21 @@ FutureOr<ItineraryTabState> getUserItinerary(Ref ref) async {
       itineraryPhotos[itineraryId] = photoUrls;
     }
   }
+  for (var itinerary in userItinerary.sharedIteneries!) {
+    final int itineraryId = itinerary.itinerary?.id ?? 0;
+    if ((itinerary.placesCount ?? 0) > 0) {
+      final List<ItineraryPlaces> itineraryPlaces = await ref
+          .read(apiServiceProvider)
+          .getItineraryPlace(itineraryId, null);
+      final List<String> photoUrls = itineraryPlaces
+          .where((place) => place.photo != null)
+          .map((place) => place.photo ?? "")
+          .toList();
+      itineraryPhotos[itineraryId] = photoUrls;
+    }
+  }
+
+
   return ItineraryTabState(
       userItinerary: userItinerary, itineraryPhotos: itineraryPhotos);
 }

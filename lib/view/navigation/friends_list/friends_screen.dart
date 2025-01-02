@@ -458,7 +458,7 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                               child: Text(
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
-                                user.fullName ?? "",
+                                user.fullName ,
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 18,

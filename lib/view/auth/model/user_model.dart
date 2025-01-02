@@ -21,6 +21,8 @@ class User {
     required this.createdAt,
     required this.updatedAt,
     required this.token,
+    required this.homeLocation,
+    required this.homeAddress,
   });
 
   final int? id;
@@ -38,6 +40,10 @@ class User {
   @JsonKey(name: 'user_role')
   final int? userRole;
   final int? status;
+  @JsonKey(name: 'home_location')
+  final String? homeLocation;
+  @JsonKey(name: 'full_address')
+  final String? homeAddress;
 
   @JsonKey(name: 'is_deleted')
   final int? isDeleted;

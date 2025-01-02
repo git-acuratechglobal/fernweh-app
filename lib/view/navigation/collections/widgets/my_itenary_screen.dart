@@ -22,13 +22,11 @@ import '../../../../utils/common/common.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/widgets/search_places_widget.dart';
 import '../../../auth/signup/profile_setup/create_profile_screen.dart';
-import '../../../location_permission/location_service.dart';
 import '../../friends_list/friend_details/friend_detail_screen.dart';
 import '../../profile/profile.dart';
 import '../models/itinerary_model.dart';
 import '../models/states/itinerary_state.dart';
 import '../models/trip/trip.dart';
-import '../notifier/all_friends_notifier.dart';
 import '../notifier/full_address_notifier.dart';
 import '../notifier/itinerary_notifier.dart';
 import '../notifier/trip_notifier/create_trip_notifier.dart';
@@ -81,7 +79,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
               backgroundColor: Colors.transparent,
               centerTitle: true,
               title: Text(
-                "My Itinerary",
+                "My Collections",
                 style: TextStyle(
                   fontVariations: FVariations.w700,
                   color: const Color(0xFF1A1B28),
@@ -288,8 +286,9 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
 
                               if (index == 0) {
                                 return GestureDetector(
-                                  onTap: ()  {
-                                    setState(()  {
+                                  onTap: () {
+                                    if (user?.homeAddress != null) {
+                                      setState(() {
                                         selectedTabIndex = index;
                                         showModalBottomSheet(
                                           context: context,
@@ -305,14 +304,20 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                 top: Radius.circular(20)),
                                           ),
                                           builder: (context) {
-                                            return const ViewTripSheet(
+                                            return ViewTripSheet(
                                               tripId: null,
+                                              homeAddress: user?.homeAddress,
                                             );
                                           },
                                         ).then((val) => setState(() {
                                               selectedTabIndex = null;
                                             }));
-                                    });
+                                      });
+                                    } else {
+                                      Common.showToast(
+                                          message:
+                                              "Please add home location first");
+                                    }
                                   },
                                   child: Container(
                                       height: 55,
@@ -343,31 +348,28 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                   GestureDetector(
                                     onTap: () {
                                       setState(() {
-
-                                          selectedTabIndex = index;
-                                          showModalBottomSheet(
-                                            context: context,
-                                            backgroundColor: Colors.white,
-                                            isScrollControlled: true,
-                                            constraints:
-                                                BoxConstraints.tightFor(
-                                              height: MediaQuery.sizeOf(context)
-                                                      .height *
-                                                  0.8,
-                                            ),
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.vertical(
-                                                      top: Radius.circular(20)),
-                                            ),
-                                            builder: (context) {
-                                              return ViewTripSheet(
-                                                tripId: trip.id ?? 0,
-                                              );
-                                            },
-                                          ).then((val) => setState(() {
-                                                selectedTabIndex = null;
-                                              }));
+                                        selectedTabIndex = index;
+                                        showModalBottomSheet(
+                                          context: context,
+                                          backgroundColor: Colors.white,
+                                          isScrollControlled: true,
+                                          constraints: BoxConstraints.tightFor(
+                                            height: MediaQuery.sizeOf(context)
+                                                    .height *
+                                                0.8,
+                                          ),
+                                          shape: const RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.vertical(
+                                                top: Radius.circular(20)),
+                                          ),
+                                          builder: (context) {
+                                            return ViewTripSheet(
+                                              tripId: trip.id ?? 0,
+                                            );
+                                          },
+                                        ).then((val) => setState(() {
+                                              selectedTabIndex = null;
+                                            }));
                                       });
                                     },
                                     child: Container(
@@ -599,7 +601,9 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                           MaterialPageRoute(
                                                             builder: (context) =>
                                                                 ItenaryDetailsScreen(
-                                                                  userId: itinary.userId??0,
+                                                              userId: itinary
+                                                                      .userId ??
+                                                                  0,
                                                               title: itinary
                                                                       .name ??
                                                                   "",
@@ -609,7 +613,6 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                             ),
                                                           ),
                                                         );
-                                                      default:
                                                     }
                                                   },
                                                   child: MyCreatedItinerary(
@@ -634,12 +637,6 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                               ],
                                             );
                                           },
-                                          // separatorBuilder:
-                                          //     (BuildContext context, int index) {
-                                          //   return const SizedBox(
-                                          //     height: 10,
-                                          //   );
-                                          // },
                                           onReorder:
                                               (int oldIndex, int newIndex) {
                                             setState(() {
@@ -701,7 +698,9 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                             MaterialPageRoute(
                                                               builder: (context) =>
                                                                   ItenaryDetailsScreen(
-                                                                    userId: itinary.userId??0,
+                                                                userId: itinary
+                                                                        .userId ??
+                                                                    0,
                                                                 title: itinary
                                                                         .name ??
                                                                     "",
@@ -711,7 +710,6 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                               ),
                                                             ),
                                                           );
-                                                        default:
                                                       }
                                                     },
                                                     child: MyCreatedItinerary(
@@ -730,6 +728,9 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                           localCollaborateList[
                                                                   index]
                                                               .canView!,
+                                                      placeUrls: userItinerary
+                                                          .itineraryPhotos[
+                                                      itinary.id],
                                                     ),
                                                   ),
                                                   const SizedBox(height: 10),
@@ -824,8 +825,9 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                       onRefresh: () async {
                         ref.invalidate(followingNotifierProvider);
                       },
-                      child:  FollowingList(key: ValueKey(tabIndex),)),
-
+                      child: FollowingList(
+                        key: ValueKey(tabIndex),
+                      )),
 
                   RefreshIndicator(
                       color: const Color(0xffCF5253),
@@ -834,7 +836,6 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                         ref.invalidate(getFriendListItineraryProvider);
                       },
                       child: const FriendsItineraryList()),
-
                 ],
               ),
             ),
@@ -911,7 +912,7 @@ class _CreateItineraryState extends ConsumerState<CreateItinerary>
           Navigator.pop(context);
           Common.showSnackBar(context, "UserItinerary created successfully");
         case UserItineraryError(:final error):
-          Common.showToast(context: context, message: error.toString());
+          Common.showToast(message: error.toString());
         default:
       }
     });
@@ -1458,9 +1459,9 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
         case AsyncData<String?> d when d.value != null:
           ref.invalidate(getTripProvider);
           Navigator.of(context).pop(next);
-          Common.showToast(context: context, message: d.value.toString());
+          Common.showToast(message: d.value.toString());
         case AsyncError e:
-          Common.showToast(context: context, message: e.error.toString());
+          Common.showToast(message: e.error.toString());
       }
     });
     super.initState();
@@ -1583,9 +1584,11 @@ class ViewTripSheet extends ConsumerStatefulWidget {
   const ViewTripSheet({
     super.key,
     this.tripId,
+    this.homeAddress,
   });
 
   final int? tripId;
+  final String? homeAddress;
 
   @override
   ConsumerState<ViewTripSheet> createState() => _ViewTripSheetState();
@@ -1602,7 +1605,9 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
         if (widget.tripId != null) {
           ref.read(tripDetailProvider.notifier).getTripDetails(widget.tripId!);
         } else {
-          ref.read(tripDetailProvider.notifier).getTripDetailsByLocation();
+          ref
+              .read(tripDetailProvider.notifier)
+              .getTripDetailsByLocation(homeLocation: widget.homeAddress);
         }
       });
       ref.listenManual(createTripNotifierProvider, (previous, next) {
@@ -1613,10 +1618,10 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
               Navigator.of(context).pop();
               ref.invalidate(getTripProvider);
 
-              Common.showToast(context: context, message: d.value.toString());
+              Common.showToast(message: d.value.toString());
             }
           case AsyncError e:
-            Common.showToast(context: context, message: e.error.toString());
+            Common.showToast(message: e.error.toString());
         }
       });
     });
@@ -1744,7 +1749,9 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                           },
                           orElse: () => null);
                     },
-                  ),
+                  )
+                else
+                  const SizedBox.shrink(),
               ],
             ),
           ),
@@ -2136,8 +2143,8 @@ class _StateCityToggleState extends State<StateCityToggle> {
               width: 82,
               decoration: BoxDecoration(
                 color: _isStateSelected
-                    ? Theme.of(context).colorScheme.secondary
-                    : Colors.white,
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.secondary,
                 borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(3),
                     bottomLeft: Radius.circular(3)),
@@ -2148,7 +2155,7 @@ class _StateCityToggleState extends State<StateCityToggle> {
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
-                    color: _isStateSelected ? Colors.white : Colors.black),
+                    color: _isStateSelected ?  Colors.black:Colors.white),
               )),
             ),
             Container(
@@ -2156,8 +2163,8 @@ class _StateCityToggleState extends State<StateCityToggle> {
               width: 83,
               decoration: BoxDecoration(
                 color: _isStateSelected
-                    ? Colors.white
-                    : Theme.of(context).colorScheme.secondary,
+                    ?
+                     Theme.of(context).colorScheme.secondary:Colors.white,
                 borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(3),
                     bottomRight: Radius.circular(3)),
@@ -2168,7 +2175,7 @@ class _StateCityToggleState extends State<StateCityToggle> {
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
-                    color: _isStateSelected ? Colors.black : Colors.white),
+                    color: _isStateSelected ?  Colors.white:Colors.black ),
               )),
             ),
           ],

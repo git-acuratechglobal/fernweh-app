@@ -13,6 +13,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/common/extensions.dart';
 import '../../../../utils/widgets/picker_form_field.dart';
+import '../../../../utils/widgets/search_places_widget.dart';
+import '../../../navigation/collections/notifier/full_address_notifier.dart';
 
 class CreateProfileScreen extends ConsumerStatefulWidget {
   const CreateProfileScreen(this.email, {super.key});
@@ -29,6 +31,7 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen>
   String countryCode = "1";
   XFile? file;
   FocusNode _focusNode = FocusNode();
+  final searchController=TextEditingController();
   @override
   Widget build(BuildContext context) {
     final validation = ref.watch(validatorsProvider);
@@ -197,6 +200,33 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen>
                           _focusNode.unfocus();
                       },),
                       const SizedBox(height: 16),
+
+                      SearchPlacesWidget(
+                        onTap: (val) async{
+                          final fullAddress = await ref
+                              .read(fullAddressNotifierProvider.notifier)
+                              .getFullAddress(placeId: val??"");
+                          if(fullAddress!=null){
+                            ref
+                                .read(authNotifierProvider.notifier)
+                                .updateFormData('full_address',fullAddress
+                            );
+                          }
+                        },
+                        hintText: "Add your home location",
+                        searchController: searchController,
+                        validator: (val) {
+                          return null;
+                        },
+                        onSaved: (val) {
+                          ref
+                              .read(authNotifierProvider.notifier)
+                              .updateFormData('home_location',val
+                          );
+
+                        },
+                      ),
+                      const SizedBox(height: 12),
                       Text(
                         'Gender',
                         style: TextStyle(
@@ -234,6 +264,8 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen>
                             .updateFormData(
                                 "dob", "${val!.day}/${val.month}/${val.year}"),
                       ),
+
+
                       const SizedBox(height: 24),
                       AppButton(
                         isLoading: false,
@@ -248,7 +280,7 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen>
                           }
                         },
                       ),
-                      const SizedBox(height: 34),
+                      const SizedBox(height: 154),
                     ],
                   ),
                 ),

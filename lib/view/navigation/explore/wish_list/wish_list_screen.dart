@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/common/extensions.dart';
-import '../../collections/widgets/my_curated_list/curated_list_item_view/itenary_details_screen.dart';
+import '../../../../utils/widgets/image_widget.dart';
 import '../../map/restaurant_detail/restaurant_detail_screen.dart';
 import '../explore_screen.dart';
 
@@ -104,11 +104,10 @@ class _WishListScreenState extends ConsumerState<WishListScreen> {
             wishListData.wishList.isEmpty
                 ? const Center(child: Text("No wish list"))
                 : Expanded(
-                    child: ListView.separated(
+                    child: GridView.builder(
                       itemCount: wishListData.wishList.length,
-                      padding: const EdgeInsets.all(15),
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 12.0),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 25),
                       itemBuilder: (context, index) {
                         final wishList = wishListData.wishList[index];
                         bool isSelected = wishListData.selectedItems
@@ -119,32 +118,84 @@ class _WishListScreenState extends ConsumerState<WishListScreen> {
                                 .read(wishListProvider.notifier)
                                 .toggleSelection(wishList.placeId);
                           },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: isSelected
-                                    ? Colors.blue
-                                    : Colors.transparent,
-                                width: 2.0,
+                          onTap: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => RestaurantDetailScreen(
+                                  types:  [wishList.type.toLowerCase()],
+                                  distance: wishList.distance.toString(),
+                                  walkingTime: wishList.walkingTime,
+                                  address: wishList.address,
+                                  images: null,
+                                  image: wishList.image,
+                                  name: wishList.name,
+                                  rating: wishList.rating.toString(),
+                                  locationId: wishList.placeId ,
+                                ),
                               ),
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: ItinerayItem(
-                              isSelected: wishListData.selectedItems.isNotEmpty,
-                              placeType: wishList.type,
-                              name: wishList.name,
-                              placeId: wishList.placeId,
-                              address: wishList.address,
-                              rating: wishList.rating,
-                              distance: wishList.distance,
-                              url: wishList.image,
-                              selection: null,
-                              walkTime: wishList.walkingTime,
-                              showingInWishList: true,
-                            ),
+                            );
+                          },
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                    border: isSelected
+                                        ? Border.all(
+                                            width: 3,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary,
+                                          )
+                                        : null,
+                                  ),
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          child: ImageWidget(
+                                            url: wishList.image,
+                                          )),
+                                      Positioned(
+                                        top: 10,
+                                        right: 10,
+                                        child: Image.asset(
+                                          isSelected
+                                              ? 'assets/images/selected.png'
+                                              : 'assets/images/unselected.png',
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 6.0),
+                              Text(
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                wishList.name,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: const Color(0xFF1A1B28),
+                                  fontSize: 16,
+                                  fontVariations: FVariations.w700,
+                                ),
+                              )
+                            ],
                           ),
                         );
                       },
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 15,
+                        mainAxisSpacing: 15,
+                        childAspectRatio: 1,
+                      ),
                     ),
                   )
           ],

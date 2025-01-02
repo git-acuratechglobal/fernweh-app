@@ -352,7 +352,8 @@ class RestaurantDetailScreen extends ConsumerWidget {
                                       // ),
 
                                       Row(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: [
                                           SizedBox(
                                             width: 16,
@@ -384,28 +385,42 @@ class RestaurantDetailScreen extends ConsumerWidget {
                                     ],
                                   ),
                                 ),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  child: SizedBox(
-                                    width: 100,
-                                    height: 100,
-                                    child: Stack(
-                                      fit: StackFit.expand,
-                                      children: [
-                                        Image.asset(
-                                          'assets/images/mapview.png',
-                                          fit: BoxFit.cover,
-                                        ),
-                                        Align(
-                                          alignment: Alignment.center,
-                                          child: Image.asset(
-                                            'assets/images/location.png',
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary,
+                                InkWell(
+                                  onTap: () async {
+                                    String googleUrl =
+                                        'https://www.google.com/maps/search/?api=1&query=Google&query_place_id=$locationId';
+                                    if (await canLaunchUrl(
+                                        Uri.parse(googleUrl))) {
+                                      await launchUrl(Uri.parse(googleUrl));
+                                    } else {
+                                      return Common.showToast(
+                                          message:
+                                              "Could not open the place details.");
+                                    }
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: SizedBox(
+                                      width: 100,
+                                      height: 100,
+                                      child: Stack(
+                                        fit: StackFit.expand,
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/mapview.png',
+                                            fit: BoxFit.cover,
                                           ),
-                                        )
-                                      ],
+                                          Align(
+                                            alignment: Alignment.center,
+                                            child: Image.asset(
+                                              'assets/images/location.png',
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .secondary,
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -493,7 +508,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
           });
           Common.showSnackBar(context, "UserItinerary created successfully");
         case UserItineraryError(:final error):
-          Common.showToast(context: context, message: error.toString());
+          Common.showToast(message: error.toString());
         default:
       }
     });
@@ -504,7 +519,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
           Common.showSnackBar(context, "Place added in itinerary successfully");
           Navigator.pop(context);
         case MyItineraryErrorState(:final error):
-          Common.showToast(context: context, message: error.toString());
+          Common.showToast(message: error.toString());
         default:
       }
     });

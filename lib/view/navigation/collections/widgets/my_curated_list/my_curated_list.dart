@@ -102,8 +102,9 @@ class MyCreatedItinerary extends ConsumerStatefulWidget {
       required this.placeCount,
       required this.editList,
       required this.viewOnly,
-    required  this.isEditAccess ,
-      this.placeUrls});
+      required this.isEditAccess,
+      this.placeUrls,
+      this.ownerName});
 
   final Itinerary itinary;
   final int placeCount;
@@ -111,6 +112,7 @@ class MyCreatedItinerary extends ConsumerStatefulWidget {
   final List<Can> viewOnly;
   final List<String>? placeUrls;
   final bool isEditAccess;
+  final String? ownerName;
 
   @override
   ConsumerState<MyCreatedItinerary> createState() => _MyCreatedItineraryState();
@@ -141,29 +143,32 @@ class _MyCreatedItineraryState extends ConsumerState<MyCreatedItinerary> {
                 width: 120,
                 child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: widget.placeUrls == null
-                        ? ImageWidget(url: widget.itinary.imageUrl)
-                        : GridView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            padding: EdgeInsets.zero,
-                            itemCount: 4,
-                            shrinkWrap: true,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 4.0,
-                              crossAxisSpacing: 4.0,
-                            ),
-                            itemBuilder: (context, index) {
-                              if (index < widget.placeUrls!.length) {
-                                return ImageWidget(
-                                    url: widget.placeUrls![index]);
-                              } else {
-                                return Container(
-                                  color: Colors.grey[300],
-                                );
-                              }
-                            })),
+                    child: GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: EdgeInsets.zero,
+                        itemCount: 4,
+                        shrinkWrap: true,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 4.0,
+                          crossAxisSpacing: 4.0,
+                        ),
+                        itemBuilder: (context, index) {
+                          if (widget.placeUrls == null) {
+                            return Container(
+                              color: Colors.grey[300],
+                            );
+                          } else {
+                            if (index < widget.placeUrls!.length) {
+                              return ImageWidget(url: widget.placeUrls![index]);
+                            } else {
+                              return Container(
+                                color: Colors.grey[300],
+                              );
+                            }
+                          }
+                        })),
               ),
               const SizedBox(width: 12.0),
               Expanded(
@@ -193,48 +198,70 @@ class _MyCreatedItineraryState extends ConsumerState<MyCreatedItinerary> {
                     const SizedBox(
                       height: 10,
                     ),
-
-                    widget.isEditAccess? const Text(
-                      'Shared with',
-                      style: TextStyle(
-                        color: Color(0xFF505050),
-                        fontSize: 12,
+                    if(widget.ownerName!=null)
+                      Row(
+                        children: [
+                          const Text(
+                            'Owner:  ',
+                            style: TextStyle(
+                              color: Color(0xFF505050),
+                              fontSize: 13,)),
+                          Text(
+                            overflow:TextOverflow.ellipsis,
+                            maxLines: 1,
+                            widget.ownerName!,
+                            style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ],
                       ),
-                    ):const SizedBox.shrink(),
-                    Flexible(
-                      flex: 1,
-                      child: GestureDetector(
-                          onTap: () {
-                            // if(widget.editList
-                            //     .where((val) => val.id == userId?.id)
-                            //     .isNotEmpty){
-                            showModalBottomSheet(
-                              context: context,
-                              backgroundColor: Colors.white,
-                              isScrollControlled: true,
-                              constraints: BoxConstraints.tightFor(
-                                height:
-                                    MediaQuery.sizeOf(context).height * 0.85,
-                              ),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(20)),
-                              ),
-                              builder: (context) {
-                                return UnShareItenarySheet(
-                                  itineraryId: widget.itinary.id!,
-                                  viewOnly: widget.viewOnly,
-                                  editOnly: widget.editList,
-                                );
-                              },
-                            );
-                            // }
-                          },
-                          child: AvatarList(images: [
-                            ...widget.editList,
-                            ...widget.viewOnly
-                          ])),
-                    )
+
+
+                    widget.isEditAccess
+                        ? const Text(
+                            'Shared with',
+                            style: TextStyle(
+                              color: Color(0xFF505050),
+                              fontSize: 12,
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                    if (widget.isEditAccess)
+                      Flexible(
+                        flex: 1,
+                        child: GestureDetector(
+                            onTap: () {
+                              // if(widget.editList
+                              //     .where((val) => val.id == userId?.id)
+                              //     .isNotEmpty){
+                              showModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.white,
+                                isScrollControlled: true,
+                                constraints: BoxConstraints.tightFor(
+                                  height:
+                                      MediaQuery.sizeOf(context).height * 0.85,
+                                ),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(20)),
+                                ),
+                                builder: (context) {
+                                  return UnShareItenarySheet(
+                                    itineraryId: widget.itinary.id!,
+                                    viewOnly: widget.viewOnly,
+                                    editOnly: widget.editList,
+                                  );
+                                },
+                              );
+                              // }
+                            },
+                            child: AvatarList(images: [
+                              ...widget.editList,
+                              ...widget.viewOnly
+                            ])),
+                      )
                     // const Text(
                     //   'Shared with',
                     //   style: TextStyle(
