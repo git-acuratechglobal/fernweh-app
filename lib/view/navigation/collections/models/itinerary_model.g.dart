@@ -79,6 +79,7 @@ Itinerary _$ItineraryFromJson(Map<String, dynamic> json) => Itinerary(
           ?.map((e) => Place.fromJson(e as Map<String, dynamic>))
           .toList(),
       owner: json['owner'] as String?,
+      ownerImage: json['owner_image'] as String?,
     );
 
 Map<String, dynamic> _$ItineraryToJson(Itinerary instance) => <String, dynamic>{
@@ -98,4 +99,5 @@ Map<String, dynamic> _$ItineraryToJson(Itinerary instance) => <String, dynamic>{
       'placesCount': instance.placesCount,
       'places': instance.places,
       'owner': instance.owner,
+      'owner_image': instance.ownerImage,
     };

@@ -73,7 +73,7 @@ static const String locationText= "This app requires that location services are 
   static List<({String image, String title})> onboarding = [
     (
       title: "Find the best\nplaces for you.",
-      image: 'assets/images/onboarding0.jpg'
+      image: 'assets/images/eiffel tower.png'
     ),
     (title: "Discover new things", image: 'assets/images/onboarding1.jpg'),
     (title: "Share your moments", image: 'assets/images/onboarding2.jpg'),

@@ -32,4 +32,5 @@ ItineraryPlaces _$ItineraryPlacesFromJson(Map<String, dynamic> json) =>
       distance: (json['distance'] as num?)?.toInt(),
       walkingTime: (json['walking_time'] as num?)?.toInt(),
       placeTypes: json['place_types'] as String?,
+      ownerImage: json['owner_image'] as String?,
     );

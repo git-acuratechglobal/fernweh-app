@@ -240,7 +240,7 @@ class _FriendsListState extends ConsumerState<FriendsList> {
                       ),
                     ),
                     Text(
-                      '${user.itineraryCount} Itinerary',
+                      '${user.itineraryCount} ${user.itineraryCount!>=2?"Collections":"Collection"}',
                       style: const TextStyle(
                         color: Color(0xFF505050),
                       ),

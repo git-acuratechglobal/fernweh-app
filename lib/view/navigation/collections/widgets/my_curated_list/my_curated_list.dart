@@ -25,6 +25,7 @@ class MyCuratedListTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(placeUrls);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -45,9 +46,7 @@ class MyCuratedListTab extends StatelessWidget {
                 children: [
                   ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: placeUrls == null
-                          ? ImageWidget(url: itinary.imageUrl)
-                          : GridView.builder(
+                      child:  GridView.builder(
                               physics: const NeverScrollableScrollPhysics(),
                               padding: EdgeInsets.zero,
                               itemCount: 4,
@@ -59,7 +58,12 @@ class MyCuratedListTab extends StatelessWidget {
                                 crossAxisSpacing: 4.0,
                               ),
                               itemBuilder: (context, index) {
-                                if (index < placeUrls!.length) {
+                                if (placeUrls == null) {
+                                  return Container(
+                                    color: Colors.grey[300],
+                                  );
+                                }
+                               else if (index < placeUrls!.length) {
                                   return ImageWidget(url: placeUrls![index]);
                                 } else {
                                   return Container(

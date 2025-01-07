@@ -501,6 +501,8 @@ class _FriendListState extends ConsumerState<FriendList> {
                               );
                             },
                             child: FriendsListItems(
+                              ownerName: data.addedByName,
+                              ownerImage: data.ownerImageUrl,
                               address: data.formattedAddress.toString(),
                               categoryName: data.placeTypes ?? "",
                               image: data.photo,
@@ -526,6 +528,8 @@ class _FriendListState extends ConsumerState<FriendList> {
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
                 return const FriendsListItems(
+                  ownerName: "",
+                  ownerImage: null,
                   address: "lklklklko",
                   categoryName: "jhjjhjj",
                   type: "data.name",

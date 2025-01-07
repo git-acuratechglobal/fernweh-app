@@ -819,7 +819,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   ),
                                 ),
                                 errorBuilder: (error, stack) => const Center(
-                                    child: Text("No Itinerary Found")))),
+                                    child: Text("No Collection Found")))),
                       ),
 
                     ///*** if titinearay is map view then this widget show
@@ -930,7 +930,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     ),
                                   ),
                                   errorBuilder: (error, stack) => const Center(
-                                      child: Text("No Itinerary Found")))),
+                                      child: Text("No Collection Found")))),
                         ),
                       ),
 
@@ -1018,7 +1018,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   ),
                                 ),
                                 errorBuilder: (error, stack) => const Center(
-                                    child: Text("No Itinerary Found")))),
+                                    child: Text("No Collection Found")))),
                       ),
 
                     ///*** this widget show when category view is map view
@@ -1148,7 +1148,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     ),
                                   ),
                                   errorBuilder: (error, stack) => const Center(
-                                      child: Text("No Itinerary Found")))),
+                                      child: Text("No Collection Found")))),
                         ),
                       ),
                     AnimatedPositioned(

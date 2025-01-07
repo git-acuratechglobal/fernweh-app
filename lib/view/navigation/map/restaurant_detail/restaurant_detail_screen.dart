@@ -286,7 +286,7 @@ class RestaurantDetailScreen extends ConsumerWidget {
                               },
                               child: const Text(
                                 textAlign: TextAlign.center,
-                                "Add to My Itinerary",
+                                "Add to My Collection",
                                 style: TextStyle(fontSize: 16),
                               ),
                             ),
@@ -506,7 +506,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
             itineraryController.clear();
             file = null;
           });
-          Common.showSnackBar(context, "UserItinerary created successfully");
+          Common.showSnackBar(context, "Collection created successfully");
         case UserItineraryError(:final error):
           Common.showToast(message: error.toString());
         default:
@@ -516,7 +516,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
     ref.listen(myItineraryNotifierProvider, (previous, next) {
       switch (next) {
         case MyItineraryCreatedState() when previous is MyItineraryLoading:
-          Common.showSnackBar(context, "Place added in itinerary successfully");
+          Common.showSnackBar(context, "Place added in Collection successfully");
           Navigator.pop(context);
         case MyItineraryErrorState(:final error):
           Common.showToast(message: error.toString());
@@ -547,7 +547,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                   icon: const Icon(Icons.clear),
                 ),
                 Text(
-                  'Add to My Itinerary',
+                  'Add to My Collection',
                   style: TextStyle(
                     color: const Color(0xFF1A1B28),
                     fontSize: 20,
@@ -612,7 +612,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                     padding:
                         const EdgeInsets.only(top: 12, left: 24, bottom: 5),
                     child: Text(
-                      "My itinerary list",
+                      "My Collection list",
                       style: TextStyle(
                           fontVariations: FVariations.w700, fontSize: 15),
                     ),
@@ -627,7 +627,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                           ? Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Text("No user Itinerary found"),
+                                const Text("No user Collection found"),
                                 const SizedBox(
                                   width: 10,
                                 ),
@@ -819,7 +819,7 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                               padding: const EdgeInsets.only(
                                   top: 16, left: 24, right: 24),
                               child: Text(
-                                "Create a new itinerary",
+                                "Create a new Collection",
                                 style: TextStyle(
                                   fontVariations: FVariations.w700,
                                 ),
@@ -990,8 +990,8 @@ class _AddToItineraySheetState extends ConsumerState<AddToItineraySheet>
                         }
                       },
                       child: _isSelected
-                          ? const Text("Create Itinerary")
-                          : const Text("Add to itinerary"),
+                          ? const Text("Create Collection")
+                          : const Text("Add to Collection"),
                     ),
                   ),
                   const SizedBox(height: 24),

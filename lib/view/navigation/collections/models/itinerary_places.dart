@@ -25,6 +25,7 @@ class ItineraryPlaces {
     required this.distance,
     required this.walkingTime,
     required this.placeTypes,
+    required this.ownerImage,
   });
 
   final int? id;
@@ -61,6 +62,8 @@ class ItineraryPlaces {
   final int? walkingTime;
   @JsonKey(name: 'place_types')
   final String? placeTypes;
+  @JsonKey(name: 'owner_image')
+  final String? ownerImage;
 
   factory ItineraryPlaces.fromJson(Map<String, dynamic> json) =>
       _$ItineraryPlacesFromJson(json);
@@ -78,4 +81,12 @@ class ItineraryPlaces {
         : '';
     return lastNameInitial.isNotEmpty ? '$firstName $lastNameInitial' : firstName;
   }
+  String? get ownerImageUrl {
+    if (ownerImage != null) {
+
+      return "http://fernweh.acublock.in/public/$ownerImage";
+    }
+    return null;
+  }
+
 }

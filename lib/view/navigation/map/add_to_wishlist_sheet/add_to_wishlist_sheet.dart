@@ -204,7 +204,7 @@ class _AddToWishlistSheetState extends ConsumerState<AddToWishlistSheet> {
                   },
                   child: const Text(
                     textAlign: TextAlign.center,
-                    "Add to My Itinerary",
+                    "Add to My Collection",
                     style: TextStyle(fontSize: 16),
                   ),
                 ),

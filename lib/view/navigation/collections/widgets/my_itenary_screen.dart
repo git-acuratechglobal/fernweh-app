@@ -204,7 +204,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                   itemBuilder: (BuildContext context) {
                     return [
                       'New Trip',
-                      'New Itinerary',
+                      'New Collection',
                     ].map((String choice) {
                       return PopupMenuItem<String>(
                         value: choice,
@@ -234,7 +234,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                             return const AddTripSheet();
                           },
                         );
-                      case "New Itinerary":
+                      case "New Collection":
                         showModalBottomSheet(
                           context: context,
                           backgroundColor: Colors.white,
@@ -910,7 +910,7 @@ class _CreateItineraryState extends ConsumerState<CreateItinerary>
       switch (next) {
         case UserItineraryCreated() when previous is UserItineraryLoading:
           Navigator.pop(context);
-          Common.showSnackBar(context, "UserItinerary created successfully");
+          Common.showSnackBar(context, "Collection created successfully");
         case UserItineraryError(:final error):
           Common.showToast(message: error.toString());
         default:
@@ -943,7 +943,7 @@ class _CreateItineraryState extends ConsumerState<CreateItinerary>
                         icon: const Icon(Icons.clear),
                       ),
                       Text(
-                        'Add to My Itinerary',
+                        'Add to My Collection',
                         style: TextStyle(
                           color: const Color(0xFF1A1B28),
                           fontSize: 20,
@@ -958,7 +958,7 @@ class _CreateItineraryState extends ConsumerState<CreateItinerary>
                 Padding(
                   padding: const EdgeInsets.only(top: 16, left: 24, right: 24),
                   child: Text(
-                    "Create a new itinerary",
+                    "Create a new Collection",
                     style: TextStyle(
                       fontVariations: FVariations.w700,
                     ),
@@ -1089,7 +1089,7 @@ class _CreateItineraryState extends ConsumerState<CreateItinerary>
                               .createItinerary();
                         }
                       },
-                      child: const Text("Create Itinerary")),
+                      child: const Text("Create Collection")),
                 ),
               ],
             ),

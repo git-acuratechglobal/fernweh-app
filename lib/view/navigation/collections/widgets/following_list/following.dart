@@ -1,11 +1,8 @@
 import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../models/itinerary_model.dart';
 import '../my_curated_list/curated_list_item_view/itenary_details_screen.dart';
 import '../my_curated_list/my_curated_list.dart';
-import 'model/following_model.dart';
 import 'notifier/followlist_notifier.dart';
 
 // class FollowingList extends ConsumerStatefulWidget {
@@ -331,6 +328,7 @@ class _FollowingListState extends ConsumerState<FollowingList> {
                                   );
                                 },
                                 child: MyCreatedItinerary(
+                                   ownerName: itinary.ownerFullName,
                                   isEditAccess: false,
                                   placeCount: itinary.placesCount ?? 0,
                                   itinary: itinary,

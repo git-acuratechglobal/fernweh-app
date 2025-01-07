@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:flutter/material.dart';
 import '../../../../utils/common/extensions.dart';
 import '../../../../utils/common/fav_button.dart';
 import '../../../../utils/widgets/loading_widget.dart';
+import '../../profile/profile.dart';
 import '../explore_screen.dart';
 
 class FriendsListItems extends StatelessWidget {
@@ -16,6 +18,8 @@ class FriendsListItems extends StatelessWidget {
     this.distance,
     required this.categoryName,
     required this.address,
+    required this.ownerImage,
+    required this.ownerName,
   });
 
   final String? type;
@@ -26,6 +30,8 @@ class FriendsListItems extends StatelessWidget {
   final String? distance;
   final String categoryName;
   final String address;
+  final String? ownerImage;
+  final String ownerName;
 
   @override
   Widget build(BuildContext context) {
@@ -98,13 +104,18 @@ class FriendsListItems extends StatelessWidget {
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white),
                         ),
-                        child: ClipOval(
-                          child: Image.asset('assets/images/avatar1.png'),
-                        ),
+                        child: ownerImage == null
+                            ? UserInitials(
+                          fontSize: 14,
+                                name: ownerName,
+                              )
+                            : ClipOval(
+                                child: ImageWidget(url: ownerImage!),
+                              ),
                       ),
                       const SizedBox(width: 6.0),
                       Text(
-                        'Alia Fernandes',
+                        ownerName,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 14,

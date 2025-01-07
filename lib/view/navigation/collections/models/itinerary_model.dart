@@ -81,7 +81,7 @@ class Can {
 
   String get fullName {
     if ((firstname == null || firstname!.isEmpty) && (lastname == null || lastname!.isEmpty)) {
-      return ''; // Return empty if both firstname and lastname are missing or empty.
+      return '';
     }
 
     String capitalize(String name) {
@@ -96,9 +96,9 @@ class Can {
         : '';
 
     if (formattedLastName.isEmpty) {
-      return formattedFirstName; // Return only firstname if lastname is missing or empty.
+      return formattedFirstName;
     } else {
-      return '$formattedFirstName $formattedLastName'; // Return both if available.
+      return '$formattedFirstName $formattedLastName';
     }
   }
 
@@ -123,7 +123,8 @@ class Itinerary {
     required this.location,
      this.placesCount,
     this.places,
-    required this.owner
+    required this.owner,
+    required this.ownerImage
   });
 
   final int? id;
@@ -157,7 +158,8 @@ class Itinerary {
   @JsonKey(name: 'places')
   final List<Place>? places;
   final String? owner;
-
+  @JsonKey(name: 'owner_image')
+final String? ownerImage;
   factory Itinerary.fromJson(Map<String, dynamic> json) =>
       _$ItineraryFromJson(json);
 
@@ -191,6 +193,7 @@ class Itinerary {
 List<Itinerary> get userItinerarydummyList {
   return List.generate(8, (index) {
     return Itinerary(
+      ownerImage: "",
       owner: "",
       placesCount: 0,
       location: "",
