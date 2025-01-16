@@ -539,7 +539,7 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Text("No user Itineraries found"),
+                                    const Text("No Collections found"),
                                     const SizedBox(
                                       height: 10,
                                     ),

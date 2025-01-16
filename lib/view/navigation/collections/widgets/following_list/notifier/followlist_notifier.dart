@@ -12,7 +12,8 @@ class FollowingNotifier extends _$FollowingNotifier {
   FutureOr<FollowingState> build() async {
     final response =
         await ref.watch(apiServiceProvider).getFollowingItinerary();
-
+     response.followingFriendsItineraries.removeWhere((e)=>e.name=="Default list");
+     response.followingItineraries.removeWhere((e)=>e.name=="Default list");
     return FollowingState(
         followingFriendsItineraries: response.followingFriendsItineraries,
         followingItineraries: response.followingItineraries);

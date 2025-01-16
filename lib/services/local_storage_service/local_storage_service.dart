@@ -1,20 +1,22 @@
 import 'dart:convert';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../view/auth/model/user_model.dart';
 import '../../view/navigation/collections/models/itinerary_model.dart';
+import '../../view/navigation/map/notifier/wish_list_notifier.dart';
 
 part 'local_storage_service.g.dart';
 
 @Riverpod(keepAlive: true)
-SharedPreferences sharedPreferences(SharedPreferencesRef ref) {
+SharedPreferences sharedPreferences(Ref ref) {
   return throw UnimplementedError();
 }
 
 @Riverpod(keepAlive: true)
-LocalStorageService localStorageService(LocalStorageServiceRef ref) {
+LocalStorageService localStorageService(Ref ref) {
   return LocalStorageService(ref.watch(sharedPreferencesProvider));
 }
 
@@ -28,6 +30,7 @@ class LocalStorageService {
   static const String _userItinerary = "userItinerary";
   static const String _sharedItinerary = "sharedItinerary";
   static const String _collaborateList = "collaborateList";
+  static const String _quickSave = "quickSave";
 
   LocalStorageService(this._preferences);
 
@@ -172,12 +175,28 @@ class LocalStorageService {
     return localList;
   }
 
+  Future<void> setQuickSave(List<WishList> wishList) async {
+    final jsonList = wishList.map((item) => item.toJson()).toList();
+    await _preferences.setString(_quickSave, jsonEncode(jsonList));
+  }
+
+  List<WishList> getWishList() {
+    final jsonString = _preferences.getString(_quickSave);
+    if (jsonString != null) {
+      List<dynamic> jsonList = jsonDecode(jsonString);
+      return jsonList.map((e) => WishList.fromJson(e)).toList();
+    }
+    return [];
+  }
+
   Future<void> clearSession() async {
     await _preferences.remove(_user);
     await _preferences.remove(_selectedItineraryId);
     await _preferences.remove(_token);
     await _preferences.remove(_sharedItinerary);
     await _preferences.remove(_userItinerary);
+    await _preferences.remove(_collaborateList);
+    await _preferences.remove(_quickSave);
   }
 
   Future<void> clearGuestSession() async {

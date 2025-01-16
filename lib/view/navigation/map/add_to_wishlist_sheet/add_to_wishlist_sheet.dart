@@ -155,7 +155,7 @@ class _AddToWishlistSheetState extends ConsumerState<AddToWishlistSheet> {
                       child: const Text(
                         textAlign: TextAlign.center,
                         maxLines: 2,
-                        "Back to  Google Maps",
+                        "Back to Map",
                         style: TextStyle(
                           fontSize: 16,
                         ),

@@ -91,10 +91,7 @@ String? selectedType;
                                   ],
                                 );
                               },
-                              errorBuilder: (error, stack) => const Center(
-                                child:
-                                    Text("Unable to load current location"),
-                              ),
+                              errorBuilder: (error, stack) => const Text("Unable to load location"),
                               loadingBuilder: const Skeletonizer(
                                 child: Text("this is dummy location"),
                               ),

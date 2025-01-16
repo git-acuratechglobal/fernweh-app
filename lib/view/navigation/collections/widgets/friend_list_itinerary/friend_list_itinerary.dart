@@ -20,6 +20,7 @@ class _FriendsItineraryListState extends ConsumerState<FriendsItineraryList> {
     return AsyncDataWidgetB(
         dataProvider: getFriendListItineraryProvider,
         dataBuilder: (data) {
+          data.removeWhere((e)=>e.name=="Default list");
           List<Country> countries = convertItinerariesToHierarchy(data);
           return countries.isEmpty
               ? Center(

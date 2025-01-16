@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
-import 'package:google_places_flutter/model/place_type.dart';
 import 'package:google_places_flutter/model/prediction.dart';
-
 import '../../../../utils/common/config.dart';
 import '../../../../utils/common/extensions.dart';
 import '../../../location_permission/location_service.dart';
@@ -55,15 +53,16 @@ class _CurrentLocationState extends ConsumerState<CurrentLocation> {
                         ),
                       ),
                       GooglePlaceAutoCompleteTextField(
+                        showError: false,
                         boxDecoration: BoxDecoration(
                             border: Border.all(color: const Color(0xffE2E2E2)),
                             borderRadius: BorderRadius.circular(8.0)),
                         textEditingController: locationController,
-                        googleAPIKey: 'AIzaSyCG4YZMnrZwDGA2sXcUF4XLQdddSL4tz5Y',
+                        googleAPIKey:'AIzaSyCG4YZMnrZwDGA2sXcUF4XLQdddSL4tz5Y',
                         inputDecoration: const InputDecoration(
                           hintText: "Search your location",
                         ),
-                        isCrossBtnShown: false,
+                         isCrossBtnShown: false,
                         isLatLngRequired: true,
                         getPlaceDetailWithLatLng: (Prediction prediction) {
                           if (mounted) {

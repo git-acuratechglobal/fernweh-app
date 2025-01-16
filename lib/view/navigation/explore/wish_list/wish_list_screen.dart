@@ -1,3 +1,4 @@
+import 'package:fernweh/services/local_storage_service/local_storage_service.dart';
 import 'package:fernweh/view/navigation/map/notifier/wish_list_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -69,7 +70,7 @@ class _WishListScreenState extends ConsumerState<WishListScreen> {
                               builder: (context) => AlertDialog(
                                 title: const Text('Are you sure?'),
                                 content: const Text(
-                                    'Do you want to remove  from Wish List?'),
+                                    'Do you want to remove  from Quick Save?'),
                                 actions: <Widget>[
                                   TextButton(
                                     onPressed: () {
@@ -102,7 +103,7 @@ class _WishListScreenState extends ConsumerState<WishListScreen> {
               ],
             ),
             wishListData.wishList.isEmpty
-                ? const Center(child: Text("No wish list"))
+                ? const Center(child: Text("No Quick Save"))
                 : Expanded(
                     child: GridView.builder(
                       itemCount: wishListData.wishList.length,
@@ -113,17 +114,12 @@ class _WishListScreenState extends ConsumerState<WishListScreen> {
                         bool isSelected = wishListData.selectedItems
                             .contains(wishList.placeId);
                         return GestureDetector(
-                          onLongPress: () {
-                            ref
-                                .read(wishListProvider.notifier)
-                                .toggleSelection(wishList.placeId);
-                          },
-                          onTap: (){
+                          onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => RestaurantDetailScreen(
-                                  types:  [wishList.type.toLowerCase()],
+                                  types: [wishList.type.toLowerCase()],
                                   distance: wishList.distance.toString(),
                                   walkingTime: wishList.walkingTime,
                                   address: wishList.address,
@@ -131,7 +127,7 @@ class _WishListScreenState extends ConsumerState<WishListScreen> {
                                   image: wishList.image,
                                   name: wishList.name,
                                   rating: wishList.rating.toString(),
-                                  locationId: wishList.placeId ,
+                                  locationId: wishList.placeId,
                                 ),
                               ),
                             );
@@ -163,10 +159,18 @@ class _WishListScreenState extends ConsumerState<WishListScreen> {
                                       Positioned(
                                         top: 10,
                                         right: 10,
-                                        child: Image.asset(
-                                          isSelected
-                                              ? 'assets/images/selected.png'
-                                              : 'assets/images/unselected.png',
+                                        child: InkWell(
+                                          onTap: () {
+                                            ref
+                                                .read(wishListProvider.notifier)
+                                                .toggleSelection(
+                                                    wishList.placeId);
+                                          },
+                                          child: Image.asset(
+                                            isSelected
+                                                ? 'assets/images/selected.png'
+                                                : 'assets/images/unselected.png',
+                                          ),
                                         ),
                                       )
                                     ],

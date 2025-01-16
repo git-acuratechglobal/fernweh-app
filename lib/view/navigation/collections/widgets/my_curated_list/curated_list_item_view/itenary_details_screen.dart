@@ -6,12 +6,10 @@ import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/utils/widgets/loading_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
-import 'package:fernweh/view/navigation/map/notifier/wish_list_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../../../../utils/common/common.dart';
 import '../../../../../../utils/common/config.dart';
 import '../../../../../../utils/common/extensions.dart';
@@ -215,7 +213,7 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
                                     builder: (context) => AlertDialog(
                                       title: const Text('Are you sure?'),
                                       content: const Text(
-                                          'Do you want to delete place  from Itinerary?'),
+                                          'Do you want to delete place  from Collections?'),
                                       actions: <Widget>[
                                         TextButton(
                                           onPressed: () {

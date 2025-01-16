@@ -5,6 +5,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../navigation/explore/notifier/explore_notifier.dart';
+
 part 'location_service.g.dart';
 
 class LocationService {
@@ -78,6 +80,7 @@ class CurrentPosition extends _$CurrentPosition {
     state = AsyncData(position);
     ref.read(positionProvider.notifier).updatePosition(position);
     ref.invalidate(addressProvider);
+     ref.invalidate(friendsItineraryNotifierProvider);
   }
   Future<void> updatePositionForSearchArea(Position position) async {
     state = AsyncData(position);

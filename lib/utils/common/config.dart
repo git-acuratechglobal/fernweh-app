@@ -47,6 +47,11 @@ static const String locationText= "This app requires that location services are 
       title: "Restaurant",
       type: "restaurant|bakery|meal_delivery|meal_takeaway"
     ),
+    (
+    icon: Icons.restaurant,
+    title: "Lodging",
+    type: "lodging"
+    ),
     (icon: Icons.coffee, title: "Cafe", type: "cafe"),
     (icon: Icons.wine_bar, title: "Bar", type: "bar|night_club|liquor_store"),
     (icon: Icons.movie, title: "Theater", type: "movie_theater"),
@@ -75,7 +80,7 @@ static const String locationText= "This app requires that location services are 
       title: "Find the best\nplaces for you.",
       image: 'assets/images/eiffel tower.png'
     ),
-    (title: "Discover new things", image: 'assets/images/onboarding1.jpg'),
+    (title: "Discover new things", image: 'assets/images/friends_at_cafe.jpg'),
     (title: "Share your moments", image: 'assets/images/onboarding2.jpg'),
   ];
 

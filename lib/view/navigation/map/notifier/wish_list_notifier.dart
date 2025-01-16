@@ -1,3 +1,4 @@
+import 'package:fernweh/services/local_storage_service/local_storage_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class WishList {
@@ -20,6 +21,32 @@ class WishList {
       required this.walkingTime,
       required this.distance});
 
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'image': image,
+      'placeId': placeId,
+      'type': type,
+      'rating': rating,
+      'walkingTime': walkingTime,
+      'distance': distance,
+      'address': address,
+    };
+  }
+
+  factory WishList.fromJson(Map<String, dynamic> json) {
+    return WishList(
+      name: json['name'],
+      image: json['image'],
+      placeId: json['placeId'],
+      type: json['type'],
+      rating: json['rating'],
+      walkingTime: json['walkingTime'],
+      distance: json['distance'],
+      address: json['address'],
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -31,13 +58,30 @@ class WishList {
   int get hashCode => placeId.hashCode;
 }
 
-final wishListProvider = StateNotifierProvider.autoDispose<WishListNotifier, WishListState>(
-    (ref) => WishListNotifier());
+final wishListProvider =
+    StateNotifierProvider.autoDispose<WishListNotifier, WishListState>(
+        (ref) => WishListNotifier(ref: ref));
 
 class WishListNotifier extends StateNotifier<WishListState> {
-  WishListNotifier() : super(WishListState(wishList: [], selectedItems: {}));
+  WishListNotifier({required this.ref})
+      : super(WishListState(wishList: [], selectedItems: {})) {
+    _initializeWishList();
+  }
 
-  void addItemToWishList(WishList item) {
+  Ref ref;
+
+  Future<void> _initializeWishList() async {
+    final wishList = ref.watch(localStorageServiceProvider).getWishList();
+    if (wishList.isNotEmpty) {
+      updateList(wishList);
+    }
+  }
+
+  void updateList(List<WishList> wishList) {
+    state = state.copyWith(data: wishList);
+  }
+
+  Future<void> addItemToWishList(WishList item) async {
     final List<WishList> updatedList = List.from(state.wishList);
     if (updatedList.contains(item)) {
       updatedList.remove(item);
@@ -45,15 +89,12 @@ class WishListNotifier extends StateNotifier<WishListState> {
       updatedList.add(item);
     }
     state = WishListState(wishList: updatedList, selectedItems: {});
+    await saveWishList(updatedList);
   }
 
-  // void addToItinerary(WishList item) {
-  //   final data = state;
-  //   if (!data.contains(item)) {
-  //     data.add(item);
-  //   }
-  //   state = data;
-  // }
+  Future<void> saveWishList(List<WishList> wishList) async {
+    await ref.read(localStorageServiceProvider).setQuickSave(wishList);
+  }
 
   void toggleSelection(String id) {
     final selectedItems = Set<String>.from(state.selectedItems);
@@ -69,12 +110,13 @@ class WishListNotifier extends StateNotifier<WishListState> {
     final updatedList = state.wishList
         .where((item) => !state.selectedItems.contains(item.placeId))
         .toList();
-
+    ref.read(localStorageServiceProvider).setQuickSave(updatedList);
     state = state.copyWith(
       data: updatedList,
       selected: {},
     );
   }
+
   void clearSelection() {
     state = state.copyWith(selected: {});
   }

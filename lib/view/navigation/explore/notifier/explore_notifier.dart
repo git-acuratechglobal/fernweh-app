@@ -15,7 +15,7 @@ part 'explore_notifier.g.dart';
 class FriendsItineraryNotifier extends _$FriendsItineraryNotifier {
   @override
   FutureOr<FriendsPlacesState> build() async {
-    final position = await ref.read(currentPositionProvider.future);
+    final position = await ref.watch(currentPositionProvider.future);
 
 
     List<Itinerary> filteredList=[];

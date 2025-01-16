@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:fernweh/view/auth/login/login_screen.dart';
+import 'package:fernweh/view/navigation/map/notifier/wish_list_notifier.dart';
 import 'package:fernweh/view/navigation/navigation_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,7 +48,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           final user = ref.read(localStorageServiceProvider).getUser();
 
           final guest = ref.read(localStorageServiceProvider).getGuestLogin();
-
           if (onBoarding == null) {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => const OnboardingScreen()),
@@ -66,6 +66,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             return;
           }
           ref.read(userDetailProvider.notifier).update((state) => user);
+
+
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const NavigationScreen()),
           );
