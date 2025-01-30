@@ -467,22 +467,24 @@ class _FriendRequestsState extends ConsumerState<FriendRequests> {
                               ),
                             ),
                             isSelected
-                                ? OutlinedButton(
-                                    style: OutlinedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12),
-                                      minimumSize: const Size(60, 40),
+                                ? Expanded(
+                                  child: OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12),
+                                        minimumSize: const Size(60, 40),
+                                      ),
+                                      onPressed: () {
+                                        // setState(() {
+                                        //   widget.isSelected = ! widget.isSelected;
+                                        // });
+                                      },
+                                      child: const Text(
+                                        "Accepted",
+                                        style: TextStyle(fontSize: 14),
+                                      ),
                                     ),
-                                    onPressed: () {
-                                      // setState(() {
-                                      //   widget.isSelected = ! widget.isSelected;
-                                      // });
-                                    },
-                                    child: const Text(
-                                      "Accepted",
-                                      style: TextStyle(fontSize: 14),
-                                    ),
-                                  )
+                                )
                                 : Expanded(
                                     child: AppButton(
                                       isLoading: isLoading,

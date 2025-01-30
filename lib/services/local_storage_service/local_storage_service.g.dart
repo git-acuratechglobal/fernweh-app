@@ -6,7 +6,7 @@ part of 'local_storage_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sharedPreferencesHash() => r'2503ed7b530eb31a9d9de8c4c0229b18d6e5bcb1';
+String _$sharedPreferencesHash() => r'8a6fbb0abb408164c2ed71825f83c5d5f8727c7f';
 
 /// See also [sharedPreferences].
 @ProviderFor(sharedPreferences)
@@ -24,7 +24,7 @@ final sharedPreferencesProvider = Provider<SharedPreferences>.internal(
 // ignore: unused_element
 typedef SharedPreferencesRef = ProviderRef<SharedPreferences>;
 String _$localStorageServiceHash() =>
-    r'70a995f6d02ace8822779c1fcf36bd7f4607e488';
+    r'44802982a66a1f134a706a216757e197947967c9';
 
 /// See also [localStorageService].
 @ProviderFor(localStorageService)

@@ -214,6 +214,7 @@ class TripDetails {
             "fullName": friendTrip.friendFirstName != null && friendTrip.friendLastName != null
                 ? '${friendTrip.friendFirstName} ${friendTrip.friendLastName}'
                 : (friendTrip.friendFirstName ?? friendTrip.friendLastName ?? ""),
+            "tripLocation":friendTrip.goingTo??""
           });
         }
       }

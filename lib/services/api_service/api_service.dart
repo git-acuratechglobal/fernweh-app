@@ -579,6 +579,7 @@ class ApiService {
 
   Future<TripDetails> getTripDetailsByLocation(
       {required String address}) async {
+    print(address);
     return asyncGuard(() async {
       final response = await _dio.get('get-trip-location',
           options: Options(

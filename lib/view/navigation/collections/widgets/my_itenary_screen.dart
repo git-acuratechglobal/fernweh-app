@@ -1822,7 +1822,8 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                       "firstname":
                                                           e.friendFirstName,
                                                       "lastname":
-                                                          e.friendLastName
+                                                          e.friendLastName,
+                                              "tripLocation":e.goingTo
                                                     }))
                                                 .toList(),
                                           );
@@ -2001,6 +2002,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                                           20)),
                                                         ),
                                                         builder: (context) {
+                                                          print(friends);
                                                           return ViewFriends(
                                                             friends: friends
                                                                 .map((e) =>
@@ -2015,6 +2017,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                                           e['lastName'],
                                                                       "image": e[
                                                                           'image'],
+                                                                      "tripLocation":e["tripLocation"]
                                                                     }))
                                                                 .toList(),
                                                           );
@@ -2275,6 +2278,13 @@ class _ViewFriendsState extends ConsumerState<ViewFriends> {
                             : ImageWidget(url: friend.imageUrl ?? "")),
                   ),
                   title: Text(friend.fullName),
+                  trailing: SizedBox(
+                    width: 100,
+                    child: Text(
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
+                      friend.tripLocation??"",),
+                  ),
                 );
               },
               separatorBuilder: (BuildContext context, int index) {

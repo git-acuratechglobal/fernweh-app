@@ -44,6 +44,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   bool showSearchMessage = false;
   LatLng? _latLng;
 
+
+
   void searchMessage() {
     Position position = Position(
         latitude: _latLng!.latitude,
@@ -92,16 +94,18 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_)async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+
       final locationPermissionStatus = await Geolocator.checkPermission();
-      final _isGpsOn= await Geolocator.isLocationServiceEnabled();
+      final _isGpsOn = await Geolocator.isLocationServiceEnabled();
       if (locationPermissionStatus == LocationPermission.denied ||
-          locationPermissionStatus == LocationPermission.deniedForever||!_isGpsOn) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => const LocationPermissionScreen(),
-            ),
-          );
+          locationPermissionStatus == LocationPermission.deniedForever ||
+          !_isGpsOn) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const LocationPermissionScreen(),
+          ),
+        );
         return;
       }
       ref.listenManual<Position?>(positionProvider, (previous, current) {
@@ -198,7 +202,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         AsyncDataWidgetB(
                           dataProvider: addressProvider,
                           dataBuilder: (data) {
-
                             return Row(
                               children: [
                                 ConstrainedBox(
@@ -220,7 +223,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           loadingBuilder: const Skeletonizer(
                             child: Text("this is dummy location"),
                           ),
-                          errorBuilder: (error, stack) =>  const Text("Unable to load location"),
+                          errorBuilder: (error, stack) =>
+                              const Text("Unable to load location"),
                         )
                       ],
                     ),
@@ -472,117 +476,133 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           ///*** this is category list
 
                           SizedBox(
-                            width: MediaQuery.sizeOf(context).width,
-                            height: 56,
-                            child:  AsyncDataWidgetB(dataProvider: categoriesProvider,
-                                dataBuilder: (categoryData){
-                              return ListView.separated(
-                                padding:
-                                const EdgeInsets.symmetric(horizontal: 24),
-                                scrollDirection: Axis.horizontal,
-                                itemBuilder: (context, index) {
-                                  final category =
-                                  Config.dashboardCategories[index];
-                                  return RawChip(
-                                    backgroundColor: mapViewState
-                                        .selectedCategory ==
-                                        category.title
-                                        ? Theme.of(context).colorScheme.secondary
-                                        : Colors.white,
-                                    onPressed: () {
-                                      if (mapViewState.selectedCategory ==
-                                          category.title) {
-                                        setState(() {
-                                          floatingButtonsHide = true;
-                                        });
-                                        mapState.update(
-                                            categoryView: true,
-                                            itineraryView: false,
-                                            selectedCategory: "null");
-                                        filterData = {
-                                          'type': null,
-                                          'rating': filters['rating'],
-                                          'radius': filters['radius'],
-                                          'sort_by': filters['sort_by'],
-                                          'selected_category': "All",
-                                          'selected_rating':
-                                          filters['selected_rating'],
-                                          'selected_distance':
-                                          filters['selected_distance'],
-                                          'selected_radius':
-                                          filters['selected_radius'],
-                                          'input': filters['input'],
-                                          'search_term': filters['search_term'],
-                                        };
-                                        ref
-                                            .read(filtersProvider.notifier)
-                                            .updateFilter(filterData);
-                                        ref.invalidate(itineraryNotifierProvider);
-                                        return;
-                                      } else {
-                                        setState(() {
-                                          floatingButtonsHide = false;
-                                        });
-                                        mapState.update(
-                                            categoryView: true,
-                                            itineraryView: false,
-                                            selectedCategory: category.title,
-                                            selectedItinerary: -1);
-                                        filterData = {
-                                          'type': category.type,
-                                          'rating': filters['rating'],
-                                          'radius': filters['radius'],
-                                          'sort_by': filters['sort_by'],
-                                          'selected_category': category.title,
-                                          'selected_rating':
-                                          filters['selected_rating'],
-                                          'selected_distance':
-                                          filters['selected_distance'],
-                                          'selected_radius':
-                                          filters['selected_radius'],
-                                          'input': filters['input'],
-                                          'search_term': filters['search_term'],
-                                        };
-                                        ref
-                                            .read(filtersProvider.notifier)
-                                            .updateFilter(filterData);
-                                        ref
-                                            .read(itineraryNotifierProvider
-                                            .notifier)
-                                            .filteredItinerary();
-                                        ref.invalidate(
-                                            itineraryPlacesNotifierProvider);
-                                      }
-                                    },
-                                    avatar: Icon(
-                                      category.icon,
-                                      color: mapViewState.selectedCategory ==
-                                          category.title
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                      side: const BorderSide(
-                                          color: Color(0xffE2E2E2)),
-                                    ),
-                                    label: Text(
-                                      category.title,
-                                      style: TextStyle(
-                                          color: mapViewState.selectedCategory ==
-                                              category.title
-                                              ? Colors.white
-                                              : Colors.black),
-                                    ),
-                                  );
-                                },
-                                separatorBuilder: (context, index) {
-                                  return const SizedBox(width: 6.0);
-                                },
-                                itemCount: Config.dashboardCategories.length,
-                              );
-                            }, errorBuilder: (error,st)=>const SizedBox.shrink())
-                          ),
+                              width: MediaQuery.sizeOf(context).width,
+                              height: 56,
+                              child: AsyncDataWidgetB(
+                                  dataProvider: categoriesProvider,
+                                  dataBuilder: (categoryData) {
+                                    return ListView.separated(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 24),
+                                      scrollDirection: Axis.horizontal,
+                                      itemBuilder: (context, index) {
+                                        final category =
+                                            Config.dashboardCategories[index];
+                                        return RawChip(
+                                          backgroundColor:
+                                              mapViewState.selectedCategory ==
+                                                      category.title
+                                                  ? Theme.of(context)
+                                                      .colorScheme
+                                                      .secondary
+                                                  : Colors.white,
+                                          onPressed: () {
+                                            if (mapViewState.selectedCategory ==
+                                                category.title) {
+                                              setState(() {
+                                                floatingButtonsHide = true;
+                                              });
+                                              mapState.update(
+                                                  categoryView: true,
+                                                  itineraryView: false,
+                                                  selectedCategory: "null");
+                                              filterData = {
+                                                'type': null,
+                                                'rating': filters['rating'],
+                                                'radius': filters['radius'],
+                                                'sort_by': filters['sort_by'],
+                                                'selected_category': "All",
+                                                'selected_rating':
+                                                    filters['selected_rating'],
+                                                'selected_distance': filters[
+                                                    'selected_distance'],
+                                                'selected_radius':
+                                                    filters['selected_radius'],
+                                                'input': filters['input'],
+                                                'search_term':
+                                                    filters['search_term'],
+                                              };
+                                              ref
+                                                  .read(
+                                                      filtersProvider.notifier)
+                                                  .updateFilter(filterData);
+                                              ref.invalidate(
+                                                  itineraryNotifierProvider);
+                                              return;
+                                            } else {
+                                              setState(() {
+                                                floatingButtonsHide = false;
+                                              });
+                                              mapState.update(
+                                                  categoryView: true,
+                                                  itineraryView: false,
+                                                  selectedCategory:
+                                                      category.title,
+                                                  selectedItinerary: -1);
+                                              filterData = {
+                                                'type': category.type,
+                                                'rating': filters['rating'],
+                                                'radius': filters['radius'],
+                                                'sort_by': filters['sort_by'],
+                                                'selected_category':
+                                                    category.title,
+                                                'selected_rating':
+                                                    filters['selected_rating'],
+                                                'selected_distance': filters[
+                                                    'selected_distance'],
+                                                'selected_radius':
+                                                    filters['selected_radius'],
+                                                'input': filters['input'],
+                                                'search_term':
+                                                    filters['search_term'],
+                                              };
+                                              ref
+                                                  .read(
+                                                      filtersProvider.notifier)
+                                                  .updateFilter(filterData);
+                                              ref
+                                                  .read(
+                                                      itineraryNotifierProvider
+                                                          .notifier)
+                                                  .filteredItinerary();
+                                              ref.invalidate(
+                                                  itineraryPlacesNotifierProvider);
+                                            }
+                                          },
+                                          avatar: Icon(
+                                            category.icon,
+                                            color:
+                                                mapViewState.selectedCategory ==
+                                                        category.title
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                            side: const BorderSide(
+                                                color: Color(0xffE2E2E2)),
+                                          ),
+                                          label: Text(
+                                            category.title,
+                                            style: TextStyle(
+                                                color: mapViewState
+                                                            .selectedCategory ==
+                                                        category.title
+                                                    ? Colors.white
+                                                    : Colors.black),
+                                          ),
+                                        );
+                                      },
+                                      separatorBuilder: (context, index) {
+                                        return const SizedBox(width: 6.0);
+                                      },
+                                      itemCount:
+                                          Config.dashboardCategories.length,
+                                    );
+                                  },
+                                  errorBuilder: (error, st) =>
+                                      const SizedBox.shrink())),
 
                           ///*** here is the user itinerary list widget
 
@@ -983,8 +1003,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                             placeId: data.placeId,
                                             address: data.vicinity ?? "",
                                             type: formatCategory(
-                                                data.type ?? ["All"],mapViewState
-                                                .selectedCategory),
+                                                data.type ?? ["All"],
+                                                mapViewState.selectedCategory),
                                             image: data.photoUrls!.isEmpty
                                                 ? ""
                                                 : data.photoUrls?[0],
@@ -1101,8 +1121,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                                       address:
                                                           data.vicinity ?? "",
                                                       type: formatCategory(
-                                                          data.type ?? ["All"],mapViewState
-                                                          .selectedCategory),
+                                                          data.type ?? ["All"],
+                                                          mapViewState
+                                                              .selectedCategory),
                                                       image: data.photoUrls!
                                                               .isEmpty
                                                           ? ""
@@ -1298,6 +1319,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
   }
 
+
+
   void _scrollToSelectedItineraryPlace(
       List<ItineraryPlaces> itinerary, String placeId) {
     final index =
@@ -1311,4 +1334,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       );
     }
   }
+
+
 }

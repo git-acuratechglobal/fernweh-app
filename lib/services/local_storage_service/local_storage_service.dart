@@ -31,6 +31,7 @@ class LocalStorageService {
   static const String _sharedItinerary = "sharedItinerary";
   static const String _collaborateList = "collaborateList";
   static const String _quickSave = "quickSave";
+  static const String _tutorialSave = "tutorialSave";
 
   LocalStorageService(this._preferences);
 
@@ -57,6 +58,12 @@ class LocalStorageService {
 
   bool? getOnboarding() {
     return _preferences.getBool(_onBoarding);
+  }
+  void setTutorial()async{
+    await _preferences.setBool(_tutorialSave, true);
+  }
+  bool? getTutorial() {
+    return _preferences.getBool(_tutorialSave);
   }
 
   void setGuestLogin() async {

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/auth_service/auth_service.dart';
+import '../../utils/widgets/tutorial_coach_mark.dart';
 import 'collections/widgets/my_itenary_screen.dart';
 import 'explore/explore_screen.dart';
 import 'friends_list/friends_screen.dart';
@@ -22,7 +23,12 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
     with AutomaticKeepAliveClientMixin {
   int _selectedIndex = 2;
   PageController pageController = PageController(initialPage: 2);
-
+  late TutorialCoachMark tutorialCoachMark;
+  GlobalKey keyBottomNavigation1 = GlobalKey();
+  GlobalKey keyBottomNavigation2 = GlobalKey();
+  GlobalKey keyBottomNavigation3 = GlobalKey();
+  GlobalKey keyBottomNavigation4 = GlobalKey();
+  GlobalKey keyBottomNavigation5 = GlobalKey();
   @override
   bool get wantKeepAlive => true;
 
@@ -50,7 +56,12 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await ref.read(authServiceProvider).refreshToken();
+      ref.read(authServiceProvider).refreshToken();
+      final isTutorialFinished =
+          ref.watch(localStorageServiceProvider).getTutorial();
+      if (isTutorialFinished == null || !isTutorialFinished) {
+        createTutorial();
+      }
     });
   }
 
@@ -77,80 +88,354 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
                 guest == true ? const GuestLogin() : const Profile()
               ],
             ),
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: _selectedIndex,
-              onTap: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: Colors.white,
-              selectedItemColor: Colors.black,
-              selectedLabelStyle:
-                  TextStyle(fontVariations: FVariations.w700, fontSize: 13),
-              items: [
-                BottomNavigationBarItem(
-                  icon: Image.asset(
-                    'assets/images/ex.png',
-                    color: const Color.fromARGB(255, 179, 179, 180),
+            bottomNavigationBar: Stack(
+              children: [
+                SizedBox(
+                  height: 50,
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: Center(
+                        child: SizedBox(
+                          key: keyBottomNavigation1,
+                          height: 40,
+                          width: 40,
+                        ),
+                      )),
+                      Expanded(
+                          child: Center(
+                        child: SizedBox(
+                          key: keyBottomNavigation2,
+                          height: 40,
+                          width: 40,
+                        ),
+                      )),
+                      Expanded(
+                        child: Center(
+                          child: SizedBox(
+                            key: keyBottomNavigation3,
+                            height: 40,
+                            width: 40,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                          child: Center(
+                        child: SizedBox(
+                          key: keyBottomNavigation4,
+                          height: 40,
+                          width: 40,
+                        ),
+                      )),
+                      Expanded(
+                          child: Center(
+                        child: SizedBox(
+                          key: keyBottomNavigation5,
+                          height: 40,
+                          width: 40,
+                        ),
+                      )),
+                    ],
                   ),
-                  activeIcon: Image.asset(
-                    'assets/images/ex.png',
-                    color: const Color(0xff1A72FF),
-                  ),
-                  label: "Explore",
-                  tooltip: "Explore",
                 ),
-                BottomNavigationBarItem(
-                  icon: Image.asset(
-                    'assets/images/fav.png',
-                    color: const Color.fromARGB(255, 179, 179, 180),
-                  ),
-                  activeIcon: Image.asset(
-                    'assets/images/fav.png',
-                    color: const Color(0xff1A72FF),
-                  ),
-                  label: "Collections",
-                  tooltip: "Collections",
-                ),
-                BottomNavigationBarItem(
-                  icon: Image.asset(
-                    'assets/images/maps.png',
-                    color: const Color.fromARGB(255, 179, 179, 180),
-                  ),
-                  activeIcon: Image.asset(
-                    'assets/images/maps.png',
-                    color: const Color(0xff1A72FF),
-                  ),
-                  label: "Map",
-                  tooltip: "Map",
-                ),
-                BottomNavigationBarItem(
-                  icon: Image.asset(
-                    'assets/images/profile.png',
-                    color: const Color.fromARGB(255, 179, 179, 180),
-                  ),
-                  activeIcon: Image.asset(
-                    'assets/images/profile.png',
-                    color: const Color(0xff1A72FF),
-                  ),
-                  label: "Friends",
-                  tooltip: "Friends",
-                ),
-                BottomNavigationBarItem(
-                  icon: Image.asset(
-                    'assets/images/profile-circle.png',
-                    color: const Color.fromARGB(255, 179, 179, 180),
-                  ),
-                  activeIcon: Image.asset(
-                    'assets/images/profile-circle.png',
-                    color: const Color(0xff1A72FF),
-                  ),
-                  label: "Profile",
-                  tooltip: "Profile",
+                BottomNavigationBar(
+                  currentIndex: _selectedIndex,
+                  onTap: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  type: BottomNavigationBarType.fixed,
+                  backgroundColor: Colors.white,
+                  selectedItemColor: Colors.black,
+                  selectedLabelStyle:
+                      TextStyle(fontVariations: FVariations.w700, fontSize: 13),
+                  items: [
+                    BottomNavigationBarItem(
+                      // key: keyBottomNavigation1,
+                      icon: Image.asset(
+                        'assets/images/ex.png',
+                        color: const Color.fromARGB(255, 179, 179, 180),
+                      ),
+                      activeIcon: Image.asset(
+                        'assets/images/ex.png',
+                        color: const Color(0xff1A72FF),
+                      ),
+                      label: "Explore",
+                      tooltip: "Explore",
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Image.asset(
+                        'assets/images/fav.png',
+                        color: const Color.fromARGB(255, 179, 179, 180),
+                      ),
+                      activeIcon: Image.asset(
+                        'assets/images/fav.png',
+                        color: const Color(0xff1A72FF),
+                      ),
+                      label: "Collections",
+                      tooltip: "Collections",
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Image.asset(
+                        'assets/images/maps.png',
+                        color: const Color.fromARGB(255, 179, 179, 180),
+                      ),
+                      activeIcon: Image.asset(
+                        'assets/images/maps.png',
+                        color: const Color(0xff1A72FF),
+                      ),
+                      label: "Map",
+                      tooltip: "Map",
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Image.asset(
+                        'assets/images/profile.png',
+                        color: const Color.fromARGB(255, 179, 179, 180),
+                      ),
+                      activeIcon: Image.asset(
+                        'assets/images/profile.png',
+                        color: const Color(0xff1A72FF),
+                      ),
+                      label: "Friends",
+                      tooltip: "Friends",
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Image.asset(
+                        'assets/images/profile-circle.png',
+                        color: const Color.fromARGB(255, 179, 179, 180),
+                      ),
+                      activeIcon: Image.asset(
+                        'assets/images/profile-circle.png',
+                        color: const Color(0xff1A72FF),
+                      ),
+                      label: "Profile",
+                      tooltip: "Profile",
+                    ),
+                  ],
                 ),
               ],
             )));
+  }
+
+  void createTutorial() {
+    tutorialCoachMark = TutorialCoachMark(
+      opacityShadow: 0.6,
+      alignSkip: Alignment.topCenter,
+      targets: _createTargets(),
+      colorShadow: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+      hideSkip: false,
+      onFinish: () {
+        ref.read(localStorageServiceProvider).setTutorial();
+      },
+      onClickTarget: (target) {},
+      onClickTargetWithTapPosition: (target, tapDetails) {},
+      onClickOverlay: (target) {
+
+      },
+      onSkip: () {},
+    )..show(context: context);
+  }
+
+  List<TargetFocus> _createTargets() {
+    List<TargetFocus> targets = [];
+
+    targets.add(
+      TargetFocus(
+
+        identify: "BottomNavigationBarItem",
+        keyTarget: keyBottomNavigation1,
+        alignSkip: Alignment.topRight,
+        contents: [
+          TargetContent(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+            align: ContentAlign.top,
+            builder: (context, controller) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                padding: const EdgeInsets.only(top: 20),
+                margin: EdgeInsets.zero,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    const Text(
+                      "This is explore tab in which you can see your friends collection",
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    TextButton(
+                        onPressed: () {
+                          controller.next();
+                        },
+                        child: const Text("Next"))
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+    targets.add(
+      TargetFocus(
+        identify: "BottomNavigationBarItem",
+        keyTarget: keyBottomNavigation2,
+        alignSkip: Alignment.topRight,
+        contents: [
+          TargetContent(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+            align: ContentAlign.top,
+            builder: (context, controller) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                padding: const EdgeInsets.only(top: 20),
+                margin: EdgeInsets.zero,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    const Text(
+                      "This is Collection tab in which you can see your  collection and friends Collection",
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    TextButton(
+                        onPressed: () {
+                          controller.next();
+                        },
+                        child: const Text("Next"))
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+    targets.add(
+      TargetFocus(
+        identify: "BottomNavigationBarItem",
+        keyTarget: keyBottomNavigation3,
+        alignSkip: Alignment.topRight,
+        contents: [
+          TargetContent(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+            align: ContentAlign.top,
+            builder: (context, controller) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                padding: const EdgeInsets.only(top: 20),
+                margin: EdgeInsets.zero,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    const Text(
+                      "This is Map tab in which you can see places",
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    TextButton(
+                        onPressed: () {
+                          controller.next();
+                        },
+                        child: const Text("Next"))
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+    targets.add(
+      TargetFocus(
+        identify: "BottomNavigationBarItem",
+        keyTarget: keyBottomNavigation4,
+        alignSkip: Alignment.topRight,
+        contents: [
+          TargetContent(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+            align: ContentAlign.top,
+            builder: (context, controller) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                padding: const EdgeInsets.only(top: 20),
+                margin: EdgeInsets.zero,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    const Text(
+                      "This is friends tab in which you can see your  friends",
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    TextButton(
+                        onPressed: () {
+                          controller.next();
+                        },
+                        child: const Text("Next"))
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+    targets.add(
+      TargetFocus(
+        identify: "BottomNavigationBarItem",
+        keyTarget: keyBottomNavigation5,
+          alignSkip: Alignment.topRight,
+        contents: [
+          TargetContent(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+            align: ContentAlign.top,
+            builder: (context, controller) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                padding: const EdgeInsets.only(top: 20),
+                margin: EdgeInsets.zero,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    const Text(
+                      "This is profile tab in which you can see your  profile",
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    TextButton(
+                        onPressed: () {
+                          controller.next();
+                        },
+                        child: const Text("Next"))
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+    return targets;
   }
 }

@@ -26,7 +26,7 @@ final getFollowItinerariesListProvider =
 // ignore: unused_element
 typedef GetFollowItinerariesListRef
     = AutoDisposeFutureProviderRef<List<String>>;
-String _$followingNotifierHash() => r'1517ab898e6953070cae1ec78b3d58cd757af2a1';
+String _$followingNotifierHash() => r'16640070056de807805bfdf586052fe5a5807092';
 
 /// See also [FollowingNotifier].
 @ProviderFor(FollowingNotifier)
