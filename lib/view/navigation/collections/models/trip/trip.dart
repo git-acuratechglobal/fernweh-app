@@ -54,7 +54,6 @@ class Trip {
         "${startDateTime.month.toString().padLeft(2, '0')}/${startDateTime.day.toString().padLeft(2, '0')}-${endDateTime.month.toString().padLeft(2, '0')}/${endDateTime.day.toString().padLeft(2, '0')}";
     return formattedDate;
   }
-  
 }
 
 @JsonSerializable(createToJson: false)
@@ -71,17 +70,16 @@ class Address {
   final String? country;
   final String? stateCode;
 
-  factory Address.fromJson(Map<String, dynamic> json) => _$AddressFromJson(json);
+  factory Address.fromJson(Map<String, dynamic> json) =>
+      _$AddressFromJson(json);
   String get addressFormat {
     return [
-      if (city != null && city!.isNotEmpty) city,
-      if (state != null && state!.isNotEmpty) state,
-      if (country != null && country!.isNotEmpty) country,
+      if (city != null && city!.isNotEmpty && city != "null") city,
+      if (state != null && state!.isNotEmpty && state != "null") state,
+      if (country != null && country!.isNotEmpty && country != "null") country,
     ].join(', ');
   }
 }
-
-
 
 @JsonSerializable(createToJson: false)
 class FriendsTrip {
@@ -122,10 +120,12 @@ class FriendsTrip {
   @JsonKey(name: 'friend_address')
   final Address friendAddress;
 
-  factory FriendsTrip.fromJson(Map<String, dynamic> json) => _$FriendsTripFromJson(json);
+  factory FriendsTrip.fromJson(Map<String, dynamic> json) =>
+      _$FriendsTripFromJson(json);
 
   String get fullName {
-    if ((friendFirstName == null || friendFirstName!.isEmpty) && (friendLastName == null || friendLastName!.isEmpty)) {
+    if ((friendFirstName == null || friendFirstName!.isEmpty) &&
+        (friendLastName == null || friendLastName!.isEmpty)) {
       return '';
     }
 
@@ -133,12 +133,14 @@ class FriendsTrip {
       return name[0].toUpperCase() + name.substring(1).toLowerCase();
     }
 
-    String formattedFirstName = friendFirstName != null && friendFirstName!.isNotEmpty
-        ? capitalize(friendFirstName!)
-        : '';
-    String formattedLastName = friendLastName != null && friendLastName!.isNotEmpty
-        ? capitalize(friendLastName!)
-        : '';
+    String formattedFirstName =
+        friendFirstName != null && friendFirstName!.isNotEmpty
+            ? capitalize(friendFirstName!)
+            : '';
+    String formattedLastName =
+        friendLastName != null && friendLastName!.isNotEmpty
+            ? capitalize(friendLastName!)
+            : '';
 
     if (formattedLastName.isEmpty) {
       return formattedFirstName;
@@ -146,33 +148,48 @@ class FriendsTrip {
       return '$formattedFirstName $formattedLastName';
     }
   }
-
-
 }
+
 @JsonSerializable(createToJson: false)
 class TripDetails {
   TripDetails({
     required this.trip,
     required this.friendsTrips,
+    this.matchingFriendRecords
   });
 
   final Trip? trip;
 
   @JsonKey(name: 'friends_trips')
   final List<FriendsTrip>? friendsTrips;
+  @JsonKey(name: 'matchingFriendRecords')
+  final List<FriendsTrip>? matchingFriendRecords;
 
-  factory TripDetails.fromJson(Map<String, dynamic> json) => _$TripDetailsFromJson(json);
+  factory TripDetails.fromJson(Map<String, dynamic> json) =>
+      _$TripDetailsFromJson(json);
+   
+  
 
+  List<FriendsTrip> get uniqueList {
+    Map<int, FriendsTrip> uniqueTrips = {};
+    final friendTripsData=[...friendsTrips??[],...matchingFriendRecords??[]];
+    for (var trip in friendTripsData ) {
+      int userId = trip.userId ?? 0;
+      if (!uniqueTrips.containsKey(userId) ) {
+        uniqueTrips[userId] = trip;
+      }
+    }
+    return uniqueTrips.values.toList();
+  }
 
-
-
-  Map<String, Map<String, List<Map<String, String>>>> getDaysByMonthWithFriends({
-     String? filterType,
+  Map<String, Map<String, List<Map<String, String>>>>
+      getDaysByMonthWithFriends({
+    String? filterType,
   }) {
-    if (trip == null || friendsTrips == null) {
+    if (trip == null || (friendsTrips == null&&matchingFriendRecords==null)) {
       return {};
     }
-
+  final List<FriendsTrip> friendTripsData=[...friendsTrips??[],...matchingFriendRecords??[]];
     final Map<String, Map<String, List<Map<String, String>>>> daysByMonth = {};
     final DateTime start = DateTime.parse(trip!.startDate);
     final DateTime end = DateTime.parse(trip!.endDate);
@@ -188,19 +205,20 @@ class TripDetails {
       daysByMonth.putIfAbsent(monthName, () => {});
       daysByMonth[monthName]!.putIfAbsent(day, () => []);
 
-      for (final friendTrip in friendsTrips!) {
+      for (final friendTrip in friendTripsData) {
         final DateTime friendStart = DateTime.parse(friendTrip.startDate);
         final DateTime friendEnd = DateTime.parse(friendTrip.endDate);
 
-        bool isWithinDateRange =
-            !currentDate.isBefore(friendStart) && !currentDate.isAfter(friendEnd);
+        bool isWithinDateRange = !currentDate.isBefore(friendStart) &&
+            !currentDate.isAfter(friendEnd);
         final friendAddress = friendTrip.friendAddress;
         final friendState = friendAddress.state ?? '';
         final friendStateCode = friendAddress.stateCode ?? '';
         final friendCity = friendAddress.city ?? '';
         bool matchesFilter = false;
         if (filterType == 'state') {
-          matchesFilter = friendState==mainTripState|| friendStateCode == mainTripStateCode;
+          matchesFilter = friendState == mainTripState ||
+              friendStateCode == mainTripStateCode;
         } else if (filterType == 'city') {
           matchesFilter = friendCity == mainTripCity;
         }
@@ -211,10 +229,13 @@ class TripDetails {
             'firstName': friendTrip.friendFirstName ?? "",
             'lastName': friendTrip.friendLastName ?? "",
             'image': friendTrip.friendImage ?? "",
-            "fullName": friendTrip.friendFirstName != null && friendTrip.friendLastName != null
+            "fullName": friendTrip.friendFirstName != null &&
+                    friendTrip.friendLastName != null
                 ? '${friendTrip.friendFirstName} ${friendTrip.friendLastName}'
-                : (friendTrip.friendFirstName ?? friendTrip.friendLastName ?? ""),
-            "tripLocation":friendTrip.goingTo??""
+                : (friendTrip.friendFirstName ??
+                    friendTrip.friendLastName ??
+                    ""),
+            "tripLocation": friendTrip.goingTo ?? ""
           });
         }
       }
@@ -224,7 +245,4 @@ class TripDetails {
 
     return daysByMonth;
   }
-
-
-
 }

@@ -8,6 +8,7 @@ import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/utils/widgets/loading_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
+import 'package:fernweh/view/navigation/friends_list/controller/friends_notifier.dart';
 import 'package:fernweh/view/navigation/friends_list/model/friends.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -729,8 +730,8 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                                                                   index]
                                                               .canView!,
                                                       placeUrls: userItinerary
-                                                          .itineraryPhotos[
-                                                      itinary.id],
+                                                              .itineraryPhotos[
+                                                          itinary.id],
                                                     ),
                                                   ),
                                                   const SizedBox(height: 10),
@@ -1759,7 +1760,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
             child: AsyncDataWidgetB(
                 dataProvider: tripDetailProvider,
                 dataBuilder: (tripData) {
-                  final friends = tripData?.friendsTrips;
+                  final friends = tripData?.uniqueList;
                   return Column(
                     children: [
                       Align(
@@ -1777,14 +1778,21 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                               children: [
                                 if (tripData?.trip?.goingTo == null)
                                   Text(
-                                    "Based in ${tripData?.trip?.address?.addressFormat}",
+                                    (widget.tripId != null
+                                            ? "Traveling to: "
+                                            : "Located in: ") +
+                                        (tripData?.trip?.address
+                                                ?.addressFormat??""),
                                     style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600),
                                   )
                                 else
                                   Text(
-                                    "Based in ${tripData?.trip?.goingTo}",
+                                    (widget.tripId != null
+                                        ? "Traveling to: "
+                                        : "Located in: ") +
+                                        (tripData?.trip?.goingTo??""),
                                     style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600),
@@ -1823,7 +1831,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                           e.friendFirstName,
                                                       "lastname":
                                                           e.friendLastName,
-                                              "tripLocation":e.goingTo
+                                                      "tripLocation": e.goingTo
                                                     }))
                                                 .toList(),
                                           );
@@ -2002,7 +2010,6 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                                           20)),
                                                         ),
                                                         builder: (context) {
-                                                          print(friends);
                                                           return ViewFriends(
                                                             friends: friends
                                                                 .map((e) =>
@@ -2017,7 +2024,8 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                                           e['lastName'],
                                                                       "image": e[
                                                                           'image'],
-                                                                      "tripLocation":e["tripLocation"]
+                                                                      "tripLocation":
+                                                                          e["tripLocation"]
                                                                     }))
                                                                 .toList(),
                                                           );
@@ -2158,7 +2166,7 @@ class _StateCityToggleState extends State<StateCityToggle> {
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
-                    color: _isStateSelected ?  Colors.black:Colors.white),
+                    color: _isStateSelected ? Colors.black : Colors.white),
               )),
             ),
             Container(
@@ -2166,8 +2174,8 @@ class _StateCityToggleState extends State<StateCityToggle> {
               width: 83,
               decoration: BoxDecoration(
                 color: _isStateSelected
-                    ?
-                     Theme.of(context).colorScheme.secondary:Colors.white,
+                    ? Theme.of(context).colorScheme.secondary
+                    : Colors.white,
                 borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(3),
                     bottomRight: Radius.circular(3)),
@@ -2178,7 +2186,7 @@ class _StateCityToggleState extends State<StateCityToggle> {
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
-                    color: _isStateSelected ?  Colors.white:Colors.black ),
+                    color: _isStateSelected ? Colors.white : Colors.black),
               )),
             ),
           ],
@@ -2283,7 +2291,8 @@ class _ViewFriendsState extends ConsumerState<ViewFriends> {
                     child: Text(
                       overflow: TextOverflow.ellipsis,
                       maxLines: 3,
-                      friend.tripLocation??"",),
+                      friend.tripLocation ?? "",
+                    ),
                   ),
                 );
               },

@@ -52,4 +52,7 @@ TripDetails _$TripDetailsFromJson(Map<String, dynamic> json) => TripDetails(
       friendsTrips: (json['friends_trips'] as List<dynamic>?)
           ?.map((e) => FriendsTrip.fromJson(e as Map<String, dynamic>))
           .toList(),
+      matchingFriendRecords: (json['matchingFriendRecords'] as List<dynamic>?)
+          ?.map((e) => FriendsTrip.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
