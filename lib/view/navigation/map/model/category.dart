@@ -29,6 +29,7 @@ class Category {
   @JsonKey(name: 'user_ratings_total')
   final int? userRatingsTotal;
   final String? vicinity;
+  @JsonKey(name: 'place_type')
   final List<String>? type;
   @JsonKey(name: 'photo_urls')
   final List<String>? photoUrls;

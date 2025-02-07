@@ -667,26 +667,36 @@ String convertMinutes(int minutes) {
   return '$hours hr${hours != 1 ? 's' : ''} and $remainingMinutes min${remainingMinutes != 1 ? 's' : ''}';
 }
 
-String formatCategory(List<String> categories,[String ?selectedType]) {
-  if(selectedType!=null){
-    if (categories.contains(selectedType.toLowerCase())) {
+String formatCategory(List<String>? categories, [String? selectedType]) {
+  // Ensure categories is not null and not empty
+  if (categories == null || categories.isEmpty) {
+    return "All"; // Default value if categories are empty
+  }
+
+  if (selectedType != null&&selectedType!="null") {
+    // Normalize case to avoid case sensitivity issues
+    String lowerSelected = selectedType.toLowerCase();
+
+    if (categories.map((e) => e.toLowerCase()).contains(lowerSelected)) {
       String formattedType = selectedType.replaceAll('_', ' ');
       formattedType = formattedType
           .split(' ')
           .map((word) => word[0].toUpperCase() + word.substring(1))
           .join(' ');
       return formattedType;
-    }else{
-      return selectedType;
+    } else {
+      return selectedType; // If not found, return as is
     }
   }
-  String firstName = categories[0];
 
-  firstName = firstName.replaceAll('_', ' ');
+  // Default to first category if no selection
+  String firstCategory = categories[0];
+  firstCategory = firstCategory.replaceAll('_', ' ');
 
-  firstName = firstName
+  firstCategory = firstCategory
       .split(' ')
       .map((word) => word[0].toUpperCase() + word.substring(1))
       .join(' ');
-  return firstName;
+  return firstCategory;
 }
+

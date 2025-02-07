@@ -972,6 +972,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                         const SizedBox(height: 12.0),
                                     itemBuilder: (context, index) {
                                       final data = category[index];
+                                      print(data.type);
                                       return InkWell(
                                         onTap: () {
                                           Navigator.of(context).push(

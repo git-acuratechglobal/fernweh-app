@@ -60,7 +60,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
       final isTutorialFinished =
           ref.watch(localStorageServiceProvider).getTutorial();
       if (isTutorialFinished == null || !isTutorialFinished) {
-        createTutorial();
+        Future.delayed(const Duration(seconds: 2), createTutorial);
       }
     });
   }
@@ -230,9 +230,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
       },
       onClickTarget: (target) {},
       onClickTargetWithTapPosition: (target, tapDetails) {},
-      onClickOverlay: (target) {
-
-      },
+      onClickOverlay: (target) {},
       onSkip: () {},
     )..show(context: context);
   }
@@ -242,7 +240,6 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
 
     targets.add(
       TargetFocus(
-
         identify: "BottomNavigationBarItem",
         keyTarget: keyBottomNavigation1,
         alignSkip: Alignment.topRight,
@@ -401,7 +398,7 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
       TargetFocus(
         identify: "BottomNavigationBarItem",
         keyTarget: keyBottomNavigation5,
-          alignSkip: Alignment.topRight,
+        alignSkip: Alignment.topRight,
         contents: [
           TargetContent(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
