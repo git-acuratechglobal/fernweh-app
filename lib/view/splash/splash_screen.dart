@@ -26,20 +26,22 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         final locationPermissionStatus = await Geolocator.checkPermission();
-        final _isGpsOn= await Geolocator.isLocationServiceEnabled();
+        final _isGpsOn = await Geolocator.isLocationServiceEnabled();
         if (locationPermissionStatus == LocationPermission.denied ||
-            locationPermissionStatus == LocationPermission.deniedForever||!_isGpsOn) {
+            locationPermissionStatus == LocationPermission.deniedForever ||
+            !_isGpsOn) {
           Future.delayed(const Duration(seconds: 3), () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) =>  const LocationPermissionScreen(),
+                builder: (context) => const LocationPermissionScreen(),
               ),
             );
           });
           return;
         }
-        Future.microtask(()async{
-          await ref.read(currentPositionProvider.future);
+        Future.microtask(() async {
+          final position = await ref.read(currentPositionProvider.future);
+          ref.read(positionProvider.notifier).updatePosition(position);
         });
         Future.delayed(const Duration(seconds: 3), () {
           final onBoarding =
@@ -67,7 +69,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           }
           ref.read(userDetailProvider.notifier).update((state) => user);
 
-
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const NavigationScreen()),
           );
@@ -94,5 +95,3 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     );
   }
 }
-
-
