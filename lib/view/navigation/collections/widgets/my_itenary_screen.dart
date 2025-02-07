@@ -1760,7 +1760,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
             child: AsyncDataWidgetB(
                 dataProvider: tripDetailProvider,
                 dataBuilder: (tripData) {
-                  final friends = tripData?.uniqueList;
+                  final friends = tripData?.matchingFriendRecords;
                   return Column(
                     children: [
                       Align(

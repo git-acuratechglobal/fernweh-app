@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -8,6 +10,10 @@ part 'dio_service.g.dart';
 
 @Riverpod(keepAlive: true)
 Dio dio(Ref ref) {
+  String prettyJson(dynamic json) {
+    const encoder = JsonEncoder.withIndent('  '); // Indentation for readability
+    return encoder.convert(json);
+  }
   final dio = Dio();
   final logger = Logger(
     printer: PrettyPrinter(
@@ -46,7 +52,7 @@ Dio dio(Ref ref) {
           "RESPONSE:\n"
               "URL: ${response.requestOptions.baseUrl}${response.requestOptions.path}\n"
               "Status Code: ${response.statusCode}\n"
-              "Data: ${response.data}",
+              "Data: ${prettyJson(response.data)}",
         );
         return handler.next(response);
       },
@@ -64,5 +70,7 @@ Dio dio(Ref ref) {
       },
     ),
   );
+
   return dio;
+
 }

@@ -315,8 +315,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       } else {
                                         await mapController.animateCamera(
                                             CameraUpdate.newLatLng(
-                                          LatLng(currentPosition!.latitude,
-                                              currentPosition.longitude),
+                                          LatLng(currentPosition?.latitude??0.0,
+                                              currentPosition?.longitude??0.0),
                                         ));
                                       }
                                     },
@@ -422,8 +422,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   initialCameraPosition: CameraPosition(
                                     zoom: 10.0,
                                     target: latLag == null
-                                        ? LatLng(currentPosition!.latitude,
-                                            currentPosition.longitude)
+                                        ? LatLng(currentPosition?.latitude??0.0,
+                                            currentPosition?.longitude??0.0)
                                         : LatLng(
                                             latLag.latitude, latLag.longitude),
                                   ),

@@ -407,7 +407,7 @@ class UserInitials extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<String> nameParts = name.split(' ');
-    String firstInitial = nameParts.isNotEmpty ? nameParts[0][0] : '';
+    String firstInitial = nameParts.isNotEmpty&&nameParts[0].isNotEmpty ? nameParts[0][0] : '';
     String lastInitial = nameParts.length > 1 ? nameParts[1][0] : '';
     return Container(
       decoration: BoxDecoration(
