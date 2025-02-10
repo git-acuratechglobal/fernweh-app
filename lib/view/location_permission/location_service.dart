@@ -57,7 +57,7 @@ final locationServiceProvider = Provider<LocationService>((ref) {
   return LocationService();
 });
 
-@Riverpod(keepAlive: true)
+@riverpod
 class CurrentPosition extends _$CurrentPosition {
   @override
   FutureOr<Position> build() async {
@@ -111,9 +111,8 @@ class PositionNotifier extends StateNotifier<Position?> {
 
 @Riverpod(keepAlive: true)
 FutureOr<String> address(Ref ref) async {
-  await Future.delayed(const Duration(seconds: 2));
-  final position = await ref.read(currentPositionProvider.future);
   final locationService = ref.read(locationServiceProvider);
+  final Position position = await locationService.getCurrentLocation();
   return await locationService.getAddressFromPosition(position);
 }
 

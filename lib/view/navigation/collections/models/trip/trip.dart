@@ -186,10 +186,10 @@ class TripDetails {
       getDaysByMonthWithFriends({
     String? filterType,
   }) {
-    if (trip == null || (friendsTrips == null&&matchingFriendRecords==null)) {
+    if (trip == null || (friendsTrips == null)) {
       return {};
     }
-  final List<FriendsTrip> friendTripsData=[...friendsTrips??[],...matchingFriendRecords??[]];
+  final List<FriendsTrip> friendTripsData=[...friendsTrips??[]];
     final Map<String, Map<String, List<Map<String, String>>>> daysByMonth = {};
     final DateTime start = DateTime.parse(trip!.startDate);
     final DateTime end = DateTime.parse(trip!.endDate);

@@ -329,8 +329,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                         ? CameraPosition(
                                             zoom: 14,
                                             target: LatLng(
-                                                currentPosition!.latitude,
-                                                currentPosition.longitude))
+                                                currentPosition?.latitude??0.0,
+                                                currentPosition?.longitude??0.0))
                                         : CameraPosition(
                                             zoom: 13,
                                             target: LatLng(latLag.latitude,

@@ -1778,21 +1778,14 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                               children: [
                                 if (tripData?.trip?.goingTo == null)
                                   Text(
-                                    (widget.tripId != null
-                                            ? "Traveling to: "
-                                            : "Located in: ") +
-                                        (tripData?.trip?.address
-                                                ?.addressFormat??""),
+                          "Based in ${tripData?.trip?.address?.addressFormat}",
                                     style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600),
                                   )
                                 else
                                   Text(
-                                    (widget.tripId != null
-                                        ? "Traveling to: "
-                                        : "Located in: ") +
-                                        (tripData?.trip?.goingTo??""),
+                                  "Based in ${tripData?.trip?.goingTo}",
                                     style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600),
