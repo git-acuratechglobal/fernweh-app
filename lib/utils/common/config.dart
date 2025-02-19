@@ -76,12 +76,14 @@ static const String locationText= "This app requires that location services are 
   ];
 
   static List<({String image, String title})> onboarding = [
-    (
-      title: "Find the best\nplaces for you.",
-      image: 'assets/images/effiel_tower.jpg'
-    ),
+
+
+    (title: "Find the best\nplaces for you.", image: 'assets/images/onboarding2.jpg'),
     (title: "Discover new things", image: 'assets/images/friends_at_cafe.jpg'),
-    (title: "Share your moments", image: 'assets/images/onboarding2.jpg'),
+    (
+    title: "Share your moments.",
+    image: 'assets/images/eiffle_tower.jpg'
+    ),
   ];
 
   static List<String> selectionOptions = [

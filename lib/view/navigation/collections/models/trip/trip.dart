@@ -172,7 +172,7 @@ class TripDetails {
 
   List<FriendsTrip> get uniqueList {
     Map<int, FriendsTrip> uniqueTrips = {};
-    final friendTripsData=[...friendsTrips??[],...matchingFriendRecords??[]];
+    final friendTripsData=[...friendsTrips??[]];
     for (var trip in friendTripsData ) {
       int userId = trip.userId ?? 0;
       if (!uniqueTrips.containsKey(userId) ) {

@@ -1760,7 +1760,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
             child: AsyncDataWidgetB(
                 dataProvider: tripDetailProvider,
                 dataBuilder: (tripData) {
-                  final friends = tripData?.matchingFriendRecords;
+                  final friends = tripData?.matchingFriendRecords??[];
                   return Column(
                     children: [
                       Align(
@@ -1778,14 +1778,14 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                               children: [
                                 if (tripData?.trip?.goingTo == null)
                                   Text(
-                          "Based in ${tripData?.trip?.address?.addressFormat}",
+                                    "Based in or near ${tripData?.trip?.address?.addressFormat}",
                                     style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600),
                                   )
                                 else
                                   Text(
-                                  "Based in ${tripData?.trip?.goingTo}",
+                                    "Based in or near ${tripData?.trip?.goingTo}",
                                     style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600),
@@ -1832,7 +1832,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                       );
                                     },
                                     child: Row(
-                                      children: friends!.isEmpty
+                                      children:friends==null|| friends.isEmpty
                                           ? [const Text("No friends match")]
                                           : friends.map((friend) {
                                               return Align(
@@ -1914,7 +1914,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                   : tripModifiedData?.entries.toList()[index];
                               final monthName = entry?.key;
                               final days = entry?.value;
-                              final stepperData = days?.entries.map((e) {
+                              final stepperData = days?.entries.where((e) => e.value.isNotEmpty).map((e) {
                                 final day = e.key;
                                 final friends = e.value;
                                 // print(friends);
@@ -1929,7 +1929,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                if( stepperData!.isNotEmpty)  Text(
                                     monthName.toString(),
                                     style: const TextStyle(
                                       color: Colors.black,

@@ -255,21 +255,58 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
                 ),
                 padding: const EdgeInsets.only(top: 20),
                 margin: EdgeInsets.zero,
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    const Text(
-                      "This is explore tab in which you can see your friends collection",
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    TextButton(
-                        onPressed: () {
-                          controller.next();
-                        },
-                        child: const Text("Next"))
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      const Text(
+                        "This is the ‘Explore’ tab. (It is currently still in development!) Discover new places",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Browse trending spots and personalized recommendations based on your preferences.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Save places directly to your collections for future trips or spontaneous outings.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Filter results by categories, distance, and popularity to find the perfect spot.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            controller.next();
+                          },
+                          child: const Text("Next"))
+                    ],
+                  ),
                 ),
               );
             },
@@ -294,21 +331,80 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
                 ),
                 padding: const EdgeInsets.only(top: 20),
                 margin: EdgeInsets.zero,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    const Text(
-                      "This is Collection tab in which you can see your  collection and friends Collection",
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    TextButton(
-                        onPressed: () {
-                          controller.next();
-                        },
-                        child: const Text("Next"))
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      const Text(
+                        "This is the ‘Collections’ tab. Organize and save your favorite places, as well as share your upcoming travels",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Create custom collections like “Tokyo 2025,” “Weekend foodspotting,” or “Pet-friendly cafes”.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Categorize places as Want to Visit, Visited, or Visited & Liked to keep track of your experiences.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Add personal notes and tags to each place for future reference.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Share collections with friends or collaborate on trip planning together.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Share your travel dates and see who will also be at the same destination.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            controller.next();
+                          },
+                          child: const Text("Next"))
+                    ],
+                  ),
                 ),
               );
             },
@@ -333,21 +429,67 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
                 ),
                 padding: const EdgeInsets.only(top: 20),
                 margin: EdgeInsets.zero,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    const Text(
-                      "This is Map tab in which you can see places",
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    TextButton(
-                        onPressed: () {
-                          controller.next();
-                        },
-                        child: const Text("Next"))
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      const Text(
+                        "This is the ‘Map’ tab. Visualize your saved places and plan better.",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "See all your saved locations pinned on an interactive map.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Text(
+                            "Tap on a pin to view details, navigate, or access notes.",
+                          ),
+                        ],
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Filter by categories, collections, or trip dates to focus on what matters.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Plan smarter by seeing how locations fit together geographically.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            controller.next();
+                          },
+                          child: const Text("Next"))
+                    ],
+                  ),
                 ),
               );
             },
@@ -372,21 +514,58 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
                 ),
                 padding: const EdgeInsets.only(top: 20),
                 margin: EdgeInsets.zero,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    const Text(
-                      "This is friends tab in which you can see your  friends",
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    TextButton(
-                        onPressed: () {
-                          controller.next();
-                        },
-                        child: const Text("Next"))
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      const Text(
+                        "This is the ‘Friends’ tab. Manage your friends and following lists.",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Connect with friends to share recommendations and travel plans.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Browse their saved places, visited locations, and curated collections.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Follow their lists or collaborate on shared itineraries.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            controller.next();
+                          },
+                          child: const Text("Next"))
+                    ],
+                  ),
                 ),
               );
             },
@@ -411,21 +590,48 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
                 ),
                 padding: const EdgeInsets.only(top: 20),
                 margin: EdgeInsets.zero,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    const Text(
-                      "This is profile tab in which you can see your  profile",
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    TextButton(
-                        onPressed: () {
-                          controller.next();
-                        },
-                        child: const Text("Next"))
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      const Text(
+                        "This is the ‘Profile’ tab. Everything about you.",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Customize your profile with home location and interests to get tailored recommendations.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("• "),
+                          Expanded(
+                            child: Text(
+                              "Manage your account preferences and app settings easily.",
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      TextButton(
+                          onPressed: () {
+                            controller.next();
+                          },
+                          child: const Text("Next"))
+                    ],
+                  ),
                 ),
               );
             },

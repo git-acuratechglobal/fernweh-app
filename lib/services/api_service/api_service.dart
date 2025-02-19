@@ -592,10 +592,12 @@ class ApiService {
           queryParameters: {"location": address});
       final tripJson = response.data['trips'];
       final List<dynamic> friendTripsJson = response.data['friends_trips'];
+      final List<dynamic> matchedFriendTripJson = response.data['matchingFriendRecords']??[];
       final trip = Trip.fromJson(tripJson);
       final friendsTrips =
           friendTripsJson.map((e) => FriendsTrip.fromJson(e)).toList();
-      return TripDetails(trip: trip, friendsTrips: friendsTrips);
+      final matchedFriendTrip=matchedFriendTripJson.map((e)=>FriendsTrip.fromJson(e)).toList();
+      return TripDetails(trip: trip, friendsTrips: friendsTrips,matchingFriendRecords: matchedFriendTrip);
     });
   }
 }
