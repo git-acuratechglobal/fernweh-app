@@ -64,6 +64,7 @@ class CurrentPosition extends _$CurrentPosition {
     final locationService = ref.watch(locationServiceProvider);
     final Position position = await locationService.getCurrentLocation();
     ref.read(positionProvider.notifier).updatePosition(position);
+    ref.invalidate(addressProvider);
     return position;
   }
 
@@ -109,8 +110,8 @@ class PositionNotifier extends StateNotifier<Position?> {
   }
 }
 
-@Riverpod(keepAlive: true)
-FutureOr<String> address(Ref ref) async {
+@riverpod
+FutureOr<String> address(Ref ref,) async {
   final locationService = ref.read(locationServiceProvider);
   final Position position = await locationService.getCurrentLocation();
   return await locationService.getAddressFromPosition(position);

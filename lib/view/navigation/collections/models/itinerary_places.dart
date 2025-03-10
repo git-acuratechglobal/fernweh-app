@@ -1,3 +1,4 @@
+import 'package:fernweh/utils/common/common.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'itinerary_places.g.dart';
@@ -84,7 +85,7 @@ class ItineraryPlaces {
   String? get ownerImageUrl {
     if (ownerImage != null) {
 
-      return "http://fernweh.acublock.in/public/$ownerImage";
+      return "${Common.baseUrl}/public/$ownerImage";
     }
     return null;
   }

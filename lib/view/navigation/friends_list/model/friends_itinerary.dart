@@ -1,3 +1,4 @@
+import 'package:fernweh/utils/common/common.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../../collections/models/itinerary_model.dart';
@@ -52,7 +53,7 @@ class FriendsItinerary {
     if (image == null) {
       return "https://cdn-icons-png.flaticon.com/512/2343/2343940.png";
     } else {
-      return "http://fernweh.acublock.in/public/$image";
+      return "${Common.baseUrl}/public/$image";
     }
   }
 }

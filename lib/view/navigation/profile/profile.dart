@@ -33,7 +33,22 @@ class Profile extends ConsumerStatefulWidget {
 class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
   String countryCode = "1";
   XFile? file;
-final searchController=TextEditingController();
+  final searchController = TextEditingController();
+
+  void showDeleteAccountDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Account deletion'),
+        content: const Text("Are you sure you want to delete this account?"),
+        actions: [
+          TextButton(onPressed: () {}, child: const Text("Yes")),
+          TextButton(onPressed: () {}, child: const Text("No"))
+        ],
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -97,6 +112,7 @@ final searchController=TextEditingController();
                                     .read(authNotifierProvider.notifier)
                                     .logOut();
                               case "Delete Account":
+                                showDeleteAccountDialog();
                               default:
                             }
                           },
@@ -189,7 +205,7 @@ final searchController=TextEditingController();
                           }
                         },
                         hintText: "Add your home location",
-                        searchController:searchController,
+                        searchController: searchController,
                         validator: (val) {
                           return null;
                         },
@@ -407,7 +423,8 @@ class UserInitials extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<String> nameParts = name.split(' ');
-    String firstInitial = nameParts.isNotEmpty&&nameParts[0].isNotEmpty ? nameParts[0][0] : '';
+    String firstInitial =
+        nameParts.isNotEmpty && nameParts[0].isNotEmpty ? nameParts[0][0] : '';
     String lastInitial = nameParts.length > 1 ? nameParts[1][0] : '';
     return Container(
       decoration: BoxDecoration(

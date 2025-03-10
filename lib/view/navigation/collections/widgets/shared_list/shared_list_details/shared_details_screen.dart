@@ -1,4 +1,5 @@
 import 'package:custom_info_window/custom_info_window.dart';
+import 'package:fernweh/utils/common/common.dart';
 import 'package:fernweh/utils/common/config.dart';
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/async_widget.dart';
@@ -143,8 +144,7 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                             visible: _isMapView,
                             child: AsyncDataWidgetB(
                               dataProvider: itineraryPlacesNotifierProvider,
-                              dataBuilder:
-                                  ( itineraryPlace) {
+                              dataBuilder: (itineraryPlace) {
                                 markers.clear();
                                 for (var data in itineraryPlace) {
                                   markers.add(Marker(
@@ -274,8 +274,7 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                                       child: AsyncDataWidgetB(
                                           dataProvider:
                                               itineraryPlacesNotifierProvider,
-                                          dataBuilder:
-                                              ( itineraryPlaces) {
+                                          dataBuilder: (itineraryPlaces) {
                                             return ListView.separated(
                                               itemCount: itineraryPlaces.length,
                                               scrollDirection: Axis.horizontal,
@@ -361,7 +360,7 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                                 aspectRatio: 2,
                                 child: ImageWidget(
                                     url:
-                                        "http://fernweh.acublock.in/public/${widget.itinerary.itinerary!.image}")),
+                                        "${Common.baseUrl}/public/${widget.itinerary.itinerary!.image}")),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -426,7 +425,7 @@ class _SharedDetailsScreenState extends ConsumerState<SharedDetailsScreen> {
                         Expanded(
                             child: AsyncDataWidgetB(
                                 dataProvider: itineraryPlacesNotifierProvider,
-                                dataBuilder: ( itineraryPlaces) {
+                                dataBuilder: (itineraryPlaces) {
                                   return ListView.separated(
                                     padding: const EdgeInsets.all(24),
                                     itemCount: itineraryPlaces.length,

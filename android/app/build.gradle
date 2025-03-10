@@ -39,7 +39,7 @@ android {
 
 
     defaultConfig {
-        applicationId = "com.example.fernweh"
+        applicationId "com.lumi.app"
         minSdk = 21
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()

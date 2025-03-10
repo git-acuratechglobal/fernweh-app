@@ -1,4 +1,5 @@
 
+import 'package:fernweh/utils/common/common.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../../collections/models/itinerary_model.dart';
@@ -35,7 +36,7 @@ class FollowingFriends {
   String? get imageUrl {
     if (image != null) {
 
-      return "http://fernweh.acublock.in/public/$image";
+      return "${Common.baseUrl}/public/$image";
     }
     return null;
   }

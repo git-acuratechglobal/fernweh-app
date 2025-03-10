@@ -1,3 +1,4 @@
+import 'package:fernweh/utils/common/common.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user_model.g.dart';
@@ -65,7 +66,7 @@ class User {
   String? get imageUrl {
     if (image != null) {
 
-      return "http://fernweh.acublock.in/public/$image";
+      return "${Common.baseUrl}/public/$image";
     }
     return null;
   }

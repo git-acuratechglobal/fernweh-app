@@ -49,7 +49,7 @@ class RecommendedItem extends StatelessWidget {
                     child: CachedNetworkImage(
                         imageUrl: image.toString(),
                         errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
+                             Image.asset("assets/images/restaurant.png"),
                         progressIndicatorBuilder: (context, url, progress) =>
                             const Center(child: LoadingWidget()),
                         fit: BoxFit.cover)),

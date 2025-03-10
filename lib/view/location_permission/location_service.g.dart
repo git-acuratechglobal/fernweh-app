@@ -6,11 +6,11 @@ part of 'location_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$addressHash() => r'6b70548951a3965647231a9fedc71b04ad93f22a';
+String _$addressHash() => r'377c621f055ba67125ef461ac46fd14a01f104b7';
 
 /// See also [address].
 @ProviderFor(address)
-final addressProvider = FutureProvider<String>.internal(
+final addressProvider = AutoDisposeFutureProvider<String>.internal(
   address,
   name: r'addressProvider',
   debugGetCreateSourceHash:
@@ -21,7 +21,7 @@ final addressProvider = FutureProvider<String>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef AddressRef = FutureProviderRef<String>;
+typedef AddressRef = AutoDisposeFutureProviderRef<String>;
 String _$currentPositionHash() => r'55e7c6eb5185fcfb678a4b79621471def3a6b8db';
 
 /// See also [CurrentPosition].

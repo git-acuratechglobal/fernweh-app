@@ -82,7 +82,7 @@ static const String locationText= "This app requires that location services are 
     (title: "Discover new things", image: 'assets/images/friends_at_cafe.jpg'),
     (
     title: "Share your moments.",
-    image: 'assets/images/eiffle_tower.jpg'
+    image: 'assets/images/eifle_tower.png'
     ),
   ];
 

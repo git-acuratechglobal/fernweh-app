@@ -482,8 +482,8 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
               height: 20,
             ),
             TabBar(
-              tabAlignment: TabAlignment.center,
-              isScrollable: true,
+              tabAlignment: TabAlignment.fill,
+              isScrollable: false,
               controller: tabController,
               labelColor: Theme.of(context).colorScheme.secondary,
               indicatorColor: Theme.of(context).colorScheme.secondary,
@@ -1760,7 +1760,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
             child: AsyncDataWidgetB(
                 dataProvider: tripDetailProvider,
                 dataBuilder: (tripData) {
-                  final friends = tripData?.matchingFriendRecords??[];
+                  final friends = tripData?.matchingFriendRecords ?? [];
                   return Column(
                     children: [
                       Align(
@@ -1832,7 +1832,8 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                       );
                                     },
                                     child: Row(
-                                      children:friends==null|| friends.isEmpty
+                                      children: friends == null ||
+                                              friends.isEmpty
                                           ? [const Text("No friends match")]
                                           : friends.map((friend) {
                                               return Align(
@@ -1862,7 +1863,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                             )
                                                           : ImageWidget(
                                                               url:
-                                                                  "http://fernweh.acublock.in/public/${friend.friendImage}")),
+                                                                  "${Common.baseUrl}/public/${friend.friendImage}")),
                                                 ),
                                               );
                                             }).toList(),
@@ -1914,7 +1915,9 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                   : tripModifiedData?.entries.toList()[index];
                               final monthName = entry?.key;
                               final days = entry?.value;
-                              final stepperData = days?.entries.where((e) => e.value.isNotEmpty).map((e) {
+                              final stepperData = days?.entries
+                                  .where((e) => e.value.isNotEmpty)
+                                  .map((e) {
                                 final day = e.key;
                                 final friends = e.value;
                                 // print(friends);
@@ -1929,14 +1932,15 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                if( stepperData!.isNotEmpty)  Text(
-                                    monthName.toString(),
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
+                                  if (stepperData!.isNotEmpty)
+                                    Text(
+                                      monthName.toString(),
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
                                     ),
-                                  ),
                                   const SizedBox(
                                     height: 20,
                                   ),
@@ -2065,7 +2069,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                                                             "")
                                                                     : ImageWidget(
                                                                         url:
-                                                                            "http://fernweh.acublock.in/public/$image")),
+                                                                            "${Common.baseUrl}/public/$image")),
                                                           ),
                                                         );
                                                       }).toList(),

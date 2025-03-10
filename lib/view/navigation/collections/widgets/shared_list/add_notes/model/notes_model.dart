@@ -1,3 +1,4 @@
+import 'package:fernweh/utils/common/common.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'notes_model.g.dart';
@@ -31,7 +32,7 @@ class Notes {
 
   String? get imageUrl {
     if (userImage != null) {
-      return "http://fernweh.acublock.in/public/$userImage";
+      return "${Common.baseUrl}/public/$userImage";
     } else {
       return null;
     }

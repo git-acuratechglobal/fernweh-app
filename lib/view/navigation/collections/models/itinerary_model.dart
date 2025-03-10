@@ -1,3 +1,4 @@
+import 'package:fernweh/utils/common/common.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../widgets/following_list/model/following_model.dart';
@@ -73,7 +74,7 @@ class Can {
 
   String? get imageUrl {
     if (image != null) {
-      return "http://fernweh.acublock.in/public/$image";
+      return "http://${Common.baseUrl}/public/$image";
     } else {
       return null;
     }
@@ -169,7 +170,7 @@ final String? ownerImage;
     if (image == null) {
       return "https://cdn-icons-png.flaticon.com/512/2343/2343940.png";
     } else {
-      return "http://fernweh.acublock.in/public/$image";
+      return "${Common.baseUrl}/public/$image";
     }
   }
 

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 abstract class Common {
-  static String baseUrl = "https://fernweh.acublock.in";
+  static String baseUrl = "https://fernweh.o2media.ai";
   static String localUrl = "http://203.129.220.19:5000/fernweh.acublock.in";
   static String imageBaseUrl = "http://aafh.acumobi.com/storage/app/";
 

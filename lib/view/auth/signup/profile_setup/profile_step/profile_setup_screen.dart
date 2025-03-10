@@ -1,4 +1,5 @@
 import 'package:fernweh/utils/common/app_button.dart';
+import 'package:fernweh/utils/common/common.dart';
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
@@ -265,7 +266,7 @@ class SelectCategory extends StatelessWidget {
                             children: [
                               ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
-                                  child: ImageWidget(url: 'http://fernweh.acublock.in/public/${category.image}',)),
+                                  child: ImageWidget(url: 'http://${Common.baseUrl}/public/${category.image}',)),
                               Positioned(
                                 top: 10,
                                 right: 10,
