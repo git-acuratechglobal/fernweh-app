@@ -43,10 +43,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: MediaQuery.viewPaddingOf(context).top + 16),
-                  Image.asset('assets/images/logo.png'),
+                  Image.asset('assets/images/Lumi..png'),
                   const SizedBox(height: 34),
                   const Text(
-                    'Hi, Welcome to Fernweh',
+                    'Hi, Welcome to Lumi',
                     style: TextStyle(
                       color: Color(0xFF1A1B28),
                       fontSize: 24,

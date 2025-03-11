@@ -88,7 +88,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         constraints: const BoxConstraints.expand(),
         decoration: BoxDecoration(gradient: Config.backgroundGradient),
         child: Center(
-          child: Image.asset('assets/images/logo.png'),
+          child: Image.asset('assets/images/Lumi..png'),
         ),
       ),
     );

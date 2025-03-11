@@ -5,7 +5,6 @@ import 'package:fernweh/view/location_permission/location_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../../services/local_storage_service/local_storage_service.dart';
 import '../../utils/common/common.dart';
 import '../../utils/common/config.dart';
@@ -198,7 +197,7 @@ class _LocationPermissionScreenState
 
       if (shouldOpenSettings == true) {
 
-        await openAppSettings();
+        await Geolocator.openAppSettings();
       }
       return;
     }

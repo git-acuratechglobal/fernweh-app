@@ -2,7 +2,6 @@ import 'package:fernweh/view/navigation/map/notifier/category_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../navigation/explore/notifier/explore_notifier.dart';
@@ -120,20 +119,20 @@ FutureOr<String> address(Ref ref,) async {
 
 
 
-class PermissionNotifier extends StateNotifier<PermissionStatus> {
-  PermissionNotifier() : super(PermissionStatus.denied);
-
-  Future<void> checkPermission() async {
-    final status = await Permission.locationWhenInUse.status;
-    state = status;
-  }
-
-  Future<void> requestPermission() async {
-    final status = await Permission.locationWhenInUse.request();
-    state = status;
-  }
-}
-
-final permissionProvider = StateNotifierProvider<PermissionNotifier, PermissionStatus>(
-      (ref) => PermissionNotifier(),
-);
+// class PermissionNotifier extends StateNotifier<PermissionStatus> {
+//   PermissionNotifier() : super(PermissionStatus.denied);
+//
+//   Future<void> checkPermission() async {
+//     final status = await Permission.locationWhenInUse.status;
+//     state = status;
+//   }
+//
+//   Future<void> requestPermission() async {
+//     final status = await Permission.locationWhenInUse.request();
+//     state = status;
+//   }
+// }
+//
+// final permissionProvider = StateNotifierProvider<PermissionNotifier, PermissionStatus>(
+//       (ref) => PermissionNotifier(),
+// );
