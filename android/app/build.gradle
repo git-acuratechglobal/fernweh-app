@@ -39,7 +39,7 @@ android {
 
 
     defaultConfig {
-        applicationId "com.lumi.app"
+        applicationId "com.lumio2media.app"
         minSdk = 21
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
