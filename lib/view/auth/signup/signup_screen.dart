@@ -43,10 +43,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: MediaQuery.viewPaddingOf(context).top + 16),
-                  Image.asset('assets/images/Lumi..png'),
+                  Image.asset('assets/images/Lumi..png',height: 30,),
                   const SizedBox(height: 34),
                   const Text(
-                    'Hi, Welcome to Lumi',
+                    'Hi, Welcome to Lumiix',
                     style: TextStyle(
                       color: Color(0xFF1A1B28),
                       fontSize: 24,

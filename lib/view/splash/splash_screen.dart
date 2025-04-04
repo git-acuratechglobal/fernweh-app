@@ -24,23 +24,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final isLocationPermission = ref.watch(locationPermissionProvider);
       try {
-        final locationPermissionStatus = await Geolocator.checkPermission();
-        final _isGpsOn= await Geolocator.isLocationServiceEnabled();
-        if (locationPermissionStatus == LocationPermission.denied ||
-            locationPermissionStatus == LocationPermission.deniedForever||!_isGpsOn) {
-          Future.delayed(const Duration(seconds: 3), () {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) =>  const LocationPermissionScreen(),
-              ),
-            );
-          });
-          return;
-        }
-        Future.microtask(()async{
+        if (isLocationPermission) {
           await ref.read(currentPositionProvider.future);
-        });
+        }
         Future.delayed(const Duration(seconds: 3), () {
           final onBoarding =
               ref.read(localStorageServiceProvider).getOnboarding();
@@ -65,8 +53,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 MaterialPageRoute(builder: (context) => const LoginScreen()));
             return;
           }
-          ref.read(userDetailProvider.notifier).update((state) => user);
 
+          ref.read(userDetailProvider.notifier).update((state) => user);
 
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const NavigationScreen()),
@@ -88,11 +76,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         constraints: const BoxConstraints.expand(),
         decoration: BoxDecoration(gradient: Config.backgroundGradient),
         child: Center(
-          child: Image.asset('assets/images/Lumi..png'),
+          child: Image.asset(
+            'assets/images/Lumi..png',
+            height: 35,
+          ),
         ),
       ),
     );
   }
 }
-
-

@@ -8,7 +8,6 @@ import 'package:fernweh/utils/widgets/async_widget.dart';
 import 'package:fernweh/utils/widgets/image_widget.dart';
 import 'package:fernweh/utils/widgets/loading_widget.dart';
 import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
-import 'package:fernweh/view/navigation/friends_list/controller/friends_notifier.dart';
 import 'package:fernweh/view/navigation/friends_list/model/friends.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -104,102 +103,6 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                       ),
                     ),
                   ),
-                // if (!isEditing && tabIndex == 0) const ShareIcon(),
-                // if (!isEditing && tabIndex == 0)
-                // IconButton(
-                //     onPressed: () {
-                //       showDialog(
-                //         context: context,
-                //         builder: (BuildContext context) {
-                //           return Dialog(
-                //             child: SizedBox(
-                //               height: 240,
-                //               child: Padding(
-                //                 padding: const EdgeInsets.symmetric(
-                //                     horizontal: 40),
-                //                 child: Center(
-                //                   child: Column(
-                //                     mainAxisSize: MainAxisSize.min,
-                //                     mainAxisAlignment:
-                //                         MainAxisAlignment.center,
-                //                     children: [
-                //                       const SizedBox(
-                //                         height: 20,
-                //                       ),
-                //                       OutlinedButton(
-                //                           onPressed: () {
-                //                             Navigator.pop(context);
-                //                             showModalBottomSheet(
-                //                               context: context,
-                //                               backgroundColor: Colors.white,
-                //                               isScrollControlled: true,
-                //                               constraints:
-                //                                   BoxConstraints.tightFor(
-                //                                 height:
-                //                                     MediaQuery.sizeOf(context)
-                //                                             .height *
-                //                                         0.8,
-                //                               ),
-                //                               shape:
-                //                                   const RoundedRectangleBorder(
-                //                                 borderRadius:
-                //                                     BorderRadius.vertical(
-                //                                         top: Radius.circular(
-                //                                             20)),
-                //                               ),
-                //                               builder: (context) {
-                //                                 return const AddTripSheet();
-                //                               },
-                //                             );
-                //                           },
-                //                           child: const Text('New Trip')),
-                //                       const SizedBox(
-                //                         height: 30,
-                //                       ),
-                //                       OutlinedButton(
-                //                           onPressed: () {
-                //                             Navigator.pop(context);
-                //                             showModalBottomSheet(
-                //                               context: context,
-                //                               backgroundColor: Colors.white,
-                //                               isScrollControlled: true,
-                //                               constraints:
-                //                                   BoxConstraints.tightFor(
-                //                                 height:
-                //                                     MediaQuery.sizeOf(context)
-                //                                             .height *
-                //                                         0.9,
-                //                               ),
-                //                               shape:
-                //                                   const RoundedRectangleBorder(
-                //                                 borderRadius:
-                //                                     BorderRadius.vertical(
-                //                                         top: Radius.circular(
-                //                                             20)),
-                //                               ),
-                //                               builder: (context) {
-                //                                 return const CreateItinerary();
-                //                               },
-                //                             );
-                //                           },
-                //                           child: const Text('New Itinerary')),
-                //                       Center(
-                //                         child: TextButton(
-                //                           onPressed: () =>
-                //                               Navigator.pop(context),
-                //                           child: const Text('Cancel'),
-                //                         ),
-                //                       ),
-                //                     ],
-                //                   ),
-                //                 ),
-                //               ),
-                //             ),
-                //           );
-                //         },
-                //       );
-                //     },
-                //     icon: const Icon(Icons.add)),
                 PopupMenuButton(
                   icon: const Icon(Icons.add),
                   itemBuilder: (BuildContext context) {
@@ -447,35 +350,6 @@ class _MyItenaryScreenState extends ConsumerState<MyItenaryScreen>
                     ),
                   ),
                 ),
-                // Padding(
-                //   padding: const EdgeInsets.only(right: 20, left: 5),
-                //   child: Column(
-                //     children: [
-                //       Container(
-                //           height: 55,
-                //           width: 55,
-                //           decoration: BoxDecoration(
-                //               color: Colors.white,
-                //               borderRadius: BorderRadius.circular(30)),
-                //           child: Padding(
-                //               padding: const EdgeInsets.all(8.0),
-                //               child: IconButton(
-                //                   onPressed: () {},
-                //                   icon: const Icon(
-                //                     Icons.add_circle,
-                //                     color: Colors.black,
-                //                   )))),
-                //       const SizedBox(
-                //         height: 5,
-                //       ),
-                //       const Text(
-                //         "Add more",
-                //         style: TextStyle(
-                //             fontSize: 10, fontWeight: FontWeight.w500),
-                //       )
-                //     ],
-                //   ),
-                // ),
               ],
             ),
             const SizedBox(
@@ -1832,7 +1706,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                       );
                                     },
                                     child: Row(
-                                      children: friends == null ||
+                                      children:
                                               friends.isEmpty
                                           ? [const Text("No friends match")]
                                           : friends.map((friend) {
@@ -1945,7 +1819,7 @@ class _ViewTripSheetState extends ConsumerState<ViewTripSheet> {
                                     height: 20,
                                   ),
                                   StepperListView(
-                                    stepperData: stepperData ?? [],
+                                    stepperData: stepperData ,
                                     stepAvatar: (_, data) {
                                       final stepData = data as StepperItemData;
                                       final day =

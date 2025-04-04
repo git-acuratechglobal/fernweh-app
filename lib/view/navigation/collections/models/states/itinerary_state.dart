@@ -17,7 +17,6 @@
 
 
 import '../create_itinerary_model.dart';
-import '../itinerary_model.dart';
 
 sealed class UserItineraryState {}
 

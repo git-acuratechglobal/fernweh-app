@@ -5,7 +5,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
-	<string>Lumi</string>
+	<string>Lumiix</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -13,17 +13,17 @@
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-	<string>Lumi</string>
+	<string>Lumiix</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>NSCameraUsageDescription</key>
-    <string>Used to take pictures from camera</string>
+    <string>Your camera will be used to take photos for your profile picture.</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>Grant photo library access to share camera roll content with other users.</string>
+    <string>Your photos will be used to update your profile picture.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>We need your location to provide location-based services.</string>
+    <string>Your location will be used to show your position on the map and recommend nearby restaurants, cafes, and other categories.</string>
     <key>NSLocationAlwaysUsageDescription</key>
-    <string>We need your location to provide location-based services.</string>
+    <string>Your location will be used to show your position on the map and recommend nearby restaurants, cafes, and other categories.</string>
     <key>CFBundleShortVersionString</key>
     <string>$(FLUTTER_BUILD_NAME)</string>
     <key>CFBundleSignature</key>

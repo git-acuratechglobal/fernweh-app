@@ -74,7 +74,7 @@ class Can {
 
   String? get imageUrl {
     if (image != null) {
-      return "http://${Common.baseUrl}/public/$image";
+      return "${Common.baseUrl}/public/$image";
     } else {
       return null;
     }

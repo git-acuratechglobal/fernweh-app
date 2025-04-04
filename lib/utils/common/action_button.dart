@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'extensions.dart';
 
 class ActionButton extends StatelessWidget {
   const ActionButton({super.key, required this.value, required this.onPressed});

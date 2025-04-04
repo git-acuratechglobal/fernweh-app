@@ -1,5 +1,6 @@
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/view/navigation/friends_list/controller/friends_itinerary_notifier.dart';
+import 'package:fernweh/view/navigation/friends_list/controller/friends_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -50,6 +51,57 @@ class _FriendDetailScreenState extends ConsumerState<FriendDetailScreen> {
                   )
                 ],
               ),
+              actions: [
+                PopupMenuButton<String>(
+                  onSelected: (value) async {
+                    switch (value) {
+                      case 'unfriend':
+                        ref
+                            .read(friendListProvider.notifier)
+                            .removeFriend(friendId: widget.friends.id ?? 0);
+                        Navigator.pop(context);
+                        break;
+                      case 'report':
+                        await showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("Report Submitted"),
+                            content: const Text(
+                              "Your request has been forwarded to the Administrator, and will be reviewed.",
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                }, // Close confirmation
+
+                                child: const Text("OK"),
+                              ),
+                            ],
+                          ),
+                        );
+                        ref
+                            .read(friendListProvider.notifier)
+                            .removeFriend(friendId: widget.friends.id ?? 0);
+
+                        Navigator.of(context).pop();
+                        break;
+                    }
+                  },
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<String>>[
+                    const PopupMenuItem<String>(
+                      value: 'unfriend',
+                      child: Text('Unfriend'),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'report',
+                      child: Text('Report User'),
+                    ),
+                  ],
+                  icon: const Icon(Icons.more_vert), // Or any icon you like
+                )
+              ],
             ),
             Container(
               width: 125,

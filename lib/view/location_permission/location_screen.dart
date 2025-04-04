@@ -1,17 +1,14 @@
 import 'dart:async';
-
+import 'dart:io';
 import 'package:fernweh/utils/common/extensions.dart';
 import 'package:fernweh/view/location_permission/location_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import '../../services/local_storage_service/local_storage_service.dart';
 import '../../utils/common/common.dart';
 import '../../utils/common/config.dart';
-import '../auth/auth_provider/auth_provider.dart';
-import '../auth/login/login_screen.dart';
 import '../navigation/navigation_screen.dart';
-import '../onboarding/onboarding_screen.dart';
 
 class LocationPermissionScreen extends ConsumerStatefulWidget {
   const LocationPermissionScreen({super.key});
@@ -36,45 +33,14 @@ class _LocationPermissionScreenState
   }
   Future<void> _checkLocationPermission() async {
     final permission = await Geolocator.checkPermission();
-    final _isGpsOn= await Geolocator.isLocationServiceEnabled();
+    final isGpsOn= await Geolocator.isLocationServiceEnabled();
     if (permission == LocationPermission.whileInUse ||
-        permission == LocationPermission.always && _isGpsOn) {
-      await _navigateToNextScreen();
+        permission == LocationPermission.always && isGpsOn) {
+      await ref.read(currentPositionProvider.future);
+      ref.read(locationPermissionProvider.notifier).checkPermission();
     }
   }
-  Future<void> _navigateToNextScreen()async{
-   Future.microtask(()async{
-     await ref.read(currentPositionProvider.future);
-   });
-    final onBoarding =
-    ref.read(localStorageServiceProvider).getOnboarding();
 
-    final user = ref.read(localStorageServiceProvider).getUser();
-
-    final guest = ref.read(localStorageServiceProvider).getGuestLogin();
-
-    if (onBoarding == null) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const OnboardingScreen()),
-      );
-      return;
-    }
-    if (guest == true) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const NavigationScreen()),
-      );
-      return;
-    }
-    if (user == null) {
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginScreen()));
-      return;
-    }
-    ref.read(userDetailProvider.notifier).update((state) => user);
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const NavigationScreen()),
-    );
-  }
 
   @override
   void dispose() {
@@ -127,7 +93,7 @@ class _LocationPermissionScreenState
                       onPressed: () async {
                         await  _handleAppPermission(context);
                       },
-                      child: const Text("Allow"),
+                      child: const Text("Continue"),
                     ),
                   ),
                 ],
@@ -139,27 +105,17 @@ class _LocationPermissionScreenState
     );
   }
   Future<void> _handleAppPermission(BuildContext context) async {
-    LocationPermission permission = await Geolocator.checkPermission();
+
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    LocationPermission permission = await Geolocator.checkPermission();
+
     if (!serviceEnabled) {
       Common.showSnackBar(context, "Location services are disabled.");
-      final shouldOpenSettings = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Location Services Disabled"),
-          content: const Text(
-              "Location services are required. Would you like to open settings to enable them?"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text("Open Settings"),
-            ),
-          ],
-        ),
+
+      final shouldOpenSettings = await _showLocationDialog(
+        context,
+        title: "Location Services Disabled",
+        content: "Location services are turned off. Please enable them to use this feature.",
       );
 
       if (shouldOpenSettings == true) {
@@ -177,29 +133,56 @@ class _LocationPermissionScreenState
     }
 
     if (permission == LocationPermission.deniedForever) {
-
-      final shouldOpenSettings = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Enable Location Permission"),
-          content: const Text(
-            "The app requires location permission to function properly. "
-                "Please enable location permissions in the app settings.",
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text("Open Settings"),
-            ),
-          ],
-        ),
+      final shouldOpenSettings = await _showLocationDialog(
+        context,
+        title: "Enable Location Permission",
+        content: "To show your location on the map, please enable location access in your device settings."
       );
 
       if (shouldOpenSettings == true) {
-
         await Geolocator.openAppSettings();
       }
       return;
     }
   }
+
+  Future<bool?> _showLocationDialog(BuildContext context,
+      {required String title, required String content}) async {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return Platform.isAndroid
+            ? AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text("Open Settings"),
+            ),
+          ],
+        )
+            : CupertinoAlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text("Cancel"),
+            ),
+            CupertinoDialogAction(
+              onPressed: () => Navigator.of(context).pop(true),
+              isDefaultAction: true,
+              child: const Text("Open Settings"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }

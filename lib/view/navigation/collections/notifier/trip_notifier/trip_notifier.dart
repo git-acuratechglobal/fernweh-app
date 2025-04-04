@@ -1,10 +1,7 @@
 import 'package:fernweh/services/api_service/api_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../../../../location_permission/location_service.dart';
 import '../../models/trip/trip.dart';
-import '../full_address_notifier.dart';
 
 part 'trip_notifier.g.dart';
 

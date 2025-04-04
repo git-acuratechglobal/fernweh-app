@@ -1,10 +1,12 @@
 import 'package:fernweh/services/local_storage_service/local_storage_service.dart';
 import 'package:fernweh/utils/common/extensions.dart';
+import 'package:fernweh/view/location_permission/location_screen.dart';
 import 'package:fernweh/view/navigation/guest_login/guest_login.dart';
 import 'package:fernweh/view/navigation/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../services/auth_service/auth_service.dart';
 import '../../utils/widgets/tutorial_coach_mark.dart';
 import 'collections/widgets/my_itenary_screen.dart';
@@ -57,9 +59,10 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       ref.read(authServiceProvider).refreshToken();
+      final isLocationAllowed = ref.watch(locationPermissionProvider);
       final isTutorialFinished =
-          ref.watch(localStorageServiceProvider).getTutorial();
-      if (isTutorialFinished == null || !isTutorialFinished) {
+          ref.watch(localStorageServiceProvider).getTutorial() ?? false;
+      if (!isTutorialFinished && isLocationAllowed) {
         Future.delayed(const Duration(seconds: 2), createTutorial);
       }
     });
@@ -68,7 +71,9 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final guest = ref.watch(localStorageServiceProvider).getGuestLogin();
+    final guest =
+        ref.watch(localStorageServiceProvider).getGuestLogin() ?? false;
+    final isLocationAllowed = ref.watch(locationPermissionProvider);
     return PopScope(
         canPop: false,
         onPopInvokedWithResult: (bool didPop, Object? result) async {
@@ -81,9 +86,23 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
             body: IndexedStack(
               index: _selectedIndex,
               children: [
-                const ExploreScreen(),
-                guest == true ? const GuestLogin() : const MyItenaryScreen(),
-                const MapScreen(),
+                isLocationAllowed
+                    ? const ExploreScreen()
+                    : _selectedIndex == 0
+                        ? const LocationPermissionScreen()
+                        : const SizedBox(),
+                isLocationAllowed
+                    ? guest == true
+                        ? const GuestLogin()
+                        : const MyItenaryScreen()
+                    : _selectedIndex == 1
+                        ? const LocationPermissionScreen()
+                        : const SizedBox(),
+                isLocationAllowed
+                    ? const MapScreen()
+                    : _selectedIndex == 2
+                        ? const LocationPermissionScreen()
+                        : const SizedBox(),
                 guest == true ? const GuestLogin() : const FriendsScreen(),
                 guest == true ? const GuestLogin() : const Profile()
               ],
@@ -640,5 +659,24 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen>
       ),
     );
     return targets;
+  }
+}
+
+final locationPermissionProvider =
+    StateNotifierProvider<LocationPermissionNotifier, bool>((ref) {
+  return LocationPermissionNotifier();
+});
+
+class LocationPermissionNotifier extends StateNotifier<bool> {
+  LocationPermissionNotifier() : super(false) {
+    checkPermission();
+  }
+
+  Future<void> checkPermission() async {
+    final permission = await Geolocator.checkPermission();
+    final isGpsOn = await Geolocator.isLocationServiceEnabled();
+    state = !(permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever ||
+        !isGpsOn);
   }
 }

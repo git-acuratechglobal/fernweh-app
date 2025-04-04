@@ -209,7 +209,7 @@ class _FollowingListState extends ConsumerState<FollowingList> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("No itineraries found!"),
+                  const Text("No collections found!"),
                   const SizedBox(
                     height: 10,
                   ),

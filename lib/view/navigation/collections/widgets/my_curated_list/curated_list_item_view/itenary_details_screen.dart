@@ -88,7 +88,6 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
     final itineraryState = ref.watch(itineraryLocalListProvider);
     final userId = ref.watch(userDetailProvider)?.id;
     final followState = ref.watch(followItineraryProvider);
-    final followingItineraryList = ref.watch(getFollowItinerariesListProvider);
     return Scaffold(
       body: Container(
         constraints: const BoxConstraints.expand(),

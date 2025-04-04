@@ -27,7 +27,7 @@ class _FriendsItineraryListState extends ConsumerState<FriendsItineraryList> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("No itinerary found!"),
+                      const Text("No collections found!"),
                       const SizedBox(
                         height: 10,
                       ),

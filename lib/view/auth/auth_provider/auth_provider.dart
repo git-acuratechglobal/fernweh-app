@@ -1,11 +1,10 @@
 import 'package:fernweh/services/local_storage_service/local_storage_service.dart';
 import 'package:fernweh/view/auth/auth_state/auth_state.dart';
 import 'package:fernweh/view/auth/signup/profile_setup/profile_step/model/intrestedin_category.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../services/api_service/api_service.dart';
 import '../../../services/auth_service/auth_service.dart';
-import '../../location_permission/location_service.dart';
+import '../../navigation/collections/notifier/full_address_notifier.dart';
 import '../../navigation/collections/notifier/itinerary_notifier.dart';
 import '../model/user_model.dart';
 
@@ -60,15 +59,14 @@ class AuthNotifier extends _$AuthNotifier {
   }
 
   Future<void> updateUser() async {
-    final currentPosition = await ref.read(currentPositionProvider.future);
-    final adress = await ref
-        .watch(apiServiceProvider)
-        .getPlaceIdFromCoordinates(currentPosition);
     try {
       state = Loading();
       final user = await ref.watch(authServiceProvider).updateUser(_formData);
-      final data = await ref.watch(apiServiceProvider).createUserItinerary(
-          {'name': "Default list", 'type': 1,});
+      final data = await ref.watch(apiServiceProvider).createUserItinerary({
+        'name': "Default list",
+        'type': 1,
+      });
+
       final List<String> placeId = [
         "ChIJmQJIxlVYwokRLgeuocVOGVU",
         "ChIJCewJkL2LGGAR3Qmk0vCTGkg",
@@ -78,10 +76,13 @@ class AuthNotifier extends _$AuthNotifier {
         "ChIJxRO7WVEDdkgRrGM1fCYoHqY"
       ];
       for (var id in placeId) {
+        final fullAddress = await ref
+            .read(fullAddressNotifierProvider.notifier)
+            .getFullAddress(placeId: id);
         ref.read(myItineraryNotifierProvider.notifier).updateForm('type', 1);
         ref
             .read(myItineraryNotifierProvider.notifier)
-            .updateForm('location', adress);
+            .updateForm('location', fullAddress);
         ref
             .read(myItineraryNotifierProvider.notifier)
             .updateForm('userId', data.userId);

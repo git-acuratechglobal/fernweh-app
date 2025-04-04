@@ -43,10 +43,10 @@ class _EditIteneraryState extends ConsumerState<EditItenerary>
       switch (next) {
         case Saved() when previous is SavedLoading:
           Navigator.of(context).pop();
-          Common.showSnackBar(context, "Itinerary updated successfully");
+          Common.showSnackBar(context, "Collection updated successfully");
         case Deleted() when previous is DeleteLoading:
           Navigator.of(context).pop();
-          Common.showSnackBar(context, "Itinerary deleted successfully");
+          Common.showSnackBar(context, "Collection deleted successfully");
 
         case UserItineraryError(:final error):
           Common.showSnackBar(context, error.toString());
@@ -75,7 +75,7 @@ class _EditIteneraryState extends ConsumerState<EditItenerary>
                       icon: const Icon(Icons.clear),
                     ),
                     Text(
-                      'Edit itenerary',
+                      'Edit Collection',
                       style: TextStyle(
                         color: const Color(0xFF1A1B28),
                         fontSize: 20,
@@ -138,7 +138,7 @@ class _EditIteneraryState extends ConsumerState<EditItenerary>
                   }
                 },
                 child: const Text(
-                  "Change Itinerary Image",
+                  "Change Collection Image",
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
                 ),
               ),
@@ -171,7 +171,7 @@ class _EditIteneraryState extends ConsumerState<EditItenerary>
               ),
               AppButton(
                 isLoading: state is SavedLoading,
-                child: const Text('Save Itinerary'),
+                child: const Text('Save Collection'),
                 onTap: () {
                   if (validateAndSave()) {
                     ref
@@ -191,7 +191,7 @@ class _EditIteneraryState extends ConsumerState<EditItenerary>
               ),
               AppButton(
                 isLoading: state is DeleteLoading,
-                child: const Text('Delete Itinerary'),
+                child: const Text('Delete Collection'),
                 onTap: () {
                   if (validateAndSave()) {
                     ref

@@ -8,11 +8,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geolocator/geolocator.dart';
 import '../../../utils/common/common.dart';
 import '../../../utils/common/privacy_policy.dart';
-import '../../location_permission/location_screen.dart';
-import '../../location_permission/location_service.dart';
 import '../../navigation/navigation_screen.dart';
 import '../auth_state/auth_state.dart';
 import '../signup/otp_verification/verification_screen.dart';
@@ -34,7 +31,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   void initState() {
-    ref.listenManual(authNotifierProvider, (previous, next)async {
+    ref.listenManual(authNotifierProvider, (previous, next) async {
       switch (next) {
         case Verified(:final user) when previous is Loading:
           ref.read(userDetailProvider.notifier).update((state) => user);
@@ -51,8 +48,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           break;
         case UserUpdated(:final user) when previous is Loading:
           ref.read(userDetailProvider.notifier).update((state) => user);
-            ref.read(localStorageServiceProvider).clearGuestSession();
-            context.navigateAndRemoveUntil(const NavigationScreen());
+          ref.read(localStorageServiceProvider).clearGuestSession();
+          context.navigateAndRemoveUntil(const NavigationScreen());
           break;
         case Error(:final error):
           Common.showSnackBar(context, error.toString());
@@ -81,10 +78,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: MediaQuery.viewPaddingOf(context).top + 16),
-                  Image.asset('assets/images/Lumi..png'),
+                  Image.asset(
+                    'assets/images/Lumi..png',
+                    height: 30,
+                  ),
                   const SizedBox(height: 34),
                   const Text(
-                    'Hi, Welcome to Lumi',
+                    'Hi, Welcome to Lumiix',
                     style: TextStyle(
                       color: Color(0xFF1A1B28),
                       fontSize: 24,
@@ -180,64 +180,65 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 24),
                   const PrivacyPolicyWidget(),
-                  const SizedBox(height: 24),
-                  const Row(
-                    children: [
-                      Expanded(child: Divider()),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          'OR',
-                          style: TextStyle(
-                            color: Color(0xFF81838B),
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      Expanded(child: Divider()),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  OutlinedButton(
-                    onPressed: () async{
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset('assets/images/google.png'),
-                        const SizedBox(width: 16.0),
-                        const Text(
-                          'Signup with Google',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF1A1B28),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  OutlinedButton(
-                    onPressed: () {},
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset('assets/images/facebook.png'),
-                        const SizedBox(width: 16.0),
-                        const Text(
-                          'Signup with Facebook',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF1A1B28),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
+                  const SizedBox(height: 25),
+                  // const Row(
+                  //   children: [
+                  //     Expanded(child: Divider()),
+                  //     Padding(
+
+                  //       padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  //       child: Text(
+                  //         'OR',
+                  //         style: TextStyle(
+                  //           color: Color(0xFF81838B),
+                  //           fontWeight: FontWeight.w700,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     Expanded(child: Divider()),
+                  //   ],
+                  // ),
+                  // const SizedBox(height: 24),
+                  // OutlinedButton(
+                  //   onPressed: () async{
+                  //   },
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.center,
+                  //     children: [
+                  //       Image.asset('assets/images/google.png'),
+                  //       const SizedBox(width: 16.0),
+                  //       const Text(
+                  //         'Signup with Google',
+                  //         textAlign: TextAlign.center,
+                  //         style: TextStyle(
+                  //           color: Color(0xFF1A1B28),
+                  //           fontSize: 16,
+                  //           fontWeight: FontWeight.w500,
+                  //         ),
+                  //       )
+                  //     ],
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 16),
+                  // OutlinedButton(
+                  //   onPressed: () {},
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.center,
+                  //     children: [
+                  //       Image.asset('assets/images/facebook.png'),
+                  //       const SizedBox(width: 16.0),
+                  //       const Text(
+                  //         'Signup with Facebook',
+                  //         textAlign: TextAlign.center,
+                  //         style: TextStyle(
+                  //           color: Color(0xFF1A1B28),
+                  //           fontSize: 16,
+                  //           fontWeight: FontWeight.w500,
+                  //         ),
+                  //       )
+                  //     ],
+                  //   ),
+                  // ),
                   Padding(
                     padding: const EdgeInsets.only(
                       left: 24,
@@ -291,6 +292,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 }
+
 class LowerCaseTextFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(

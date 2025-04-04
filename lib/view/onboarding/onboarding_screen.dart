@@ -50,7 +50,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             child: Padding(
               padding: EdgeInsets.only(
                   top: MediaQuery.viewPaddingOf(context).top + 24),
-              child: Image.asset('assets/images/Lumi..png'),
+              child: Image.asset('assets/images/Lumi..png',height: 30,),
             ),
           ),
           Positioned(

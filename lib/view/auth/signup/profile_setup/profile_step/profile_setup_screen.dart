@@ -19,7 +19,6 @@ class ProfileSetupScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
-  int _currentPage = 0;
   List<int> categoryFirst = [];
   List<int> categorySecond = [];
   List<int> category = [];
@@ -54,14 +53,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                           children: [
                             IconButton(
                               onPressed: () {
-                                // if (_currentPage == 0) {
                                 Navigator.of(context).pop();
-                                // } else {
-                                //   _pageController.previousPage(
-                                //       duration:
-                                //           const Duration(milliseconds: 250),
-                                //       curve: Curves.easeInOut);
-                                // }
+
                               },
                               icon: const Icon(Icons.arrow_back),
                             ),
@@ -77,49 +70,15 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                         ),
                       ),
                     ),
-                    // Expanded(
-                    //   flex: 5,
-                    //   child: Text.rich(
-                    //     TextSpan(
-                    //       children: [
-                    //         const TextSpan(
-                    //           text: 'Step',
-                    //           style: TextStyle(
-                    //             color: Color(0xFF494D60),
-                    //           ),
-                    //         ),
-                    //         const TextSpan(
-                    //           text: ' ',
-                    //           style: TextStyle(
-                    //             color: Color(0xFF1A1B28),
-                    //           ),
-                    //         ),
-                    //         TextSpan(
-                    //           text: '1 of 2',
-                    //           style: TextStyle(
-                    //             color: const Color(0xFF1A1B28),
-                    //             fontVariations: FVariations.w700,
-                    //           ),
-                    //         ),
-                    //       ],
-                    //     ),
-                    //     textAlign: TextAlign.left,
-                    //   ),
-                    // ),
                   ],
                 ),
-                // StepperWidget(currentPage: _currentPage),
+
               ],
             ),
             Expanded(
               child: PageView(
                 physics: const NeverScrollableScrollPhysics(),
                 controller: _pageController,
-                onPageChanged: (value) {
-                  setState(() {
-                    _currentPage = value;
-                  });
-                },
                 children: [
                   AsyncDataWidget(
                     dataProvider: categoriesProvider,
@@ -266,7 +225,7 @@ class SelectCategory extends StatelessWidget {
                             children: [
                               ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
-                                  child: ImageWidget(url: 'http://${Common.baseUrl}/public/${category.image}',)),
+                                  child: ImageWidget(url: '${Common.baseUrl}/public/${category.image}'),),
                               Positioned(
                                 top: 10,
                                 right: 10,

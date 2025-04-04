@@ -8,13 +8,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../../../utils/common/extensions.dart';
 import '../../../../../../utils/common/pagination_widget.dart';
-import '../../../../../../utils/widgets/async_widget.dart';
 import '../../../../friends_list/model/friends.dart';
 import '../../../../profile/profile.dart';
 import '../../../models/itinerary_model.dart';
 import '../../shared_list/notitifier/shareItinerary_notifier.dart';
 import '../../shared_list/state/shared_itinerary_state.dart';
-import 'invite_friend/invite_friend_sheet.dart';
 
 class ShareItenarySheet extends ConsumerStatefulWidget {
   const ShareItenarySheet(this.itineraryId, {super.key});

@@ -40,9 +40,8 @@ class FriendsNotifier extends _$FriendsNotifier {
   ) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final data =
-          await ref.watch(apiServiceProvider).acceptRequest(userId, 2);
-       ref.invalidate(friendListProvider);
+      final data = await ref.watch(apiServiceProvider).acceptRequest(userId, 2);
+      ref.invalidate(friendListProvider);
       return FriendsState(
           friendsEvent: FriendsEvent.requestAccept, response: data);
     });
@@ -116,18 +115,37 @@ class FriendList extends _$FriendList {
     }
   }
 
+  Future<void> removeFriend({required int friendId}) async {
+    state = const AsyncLoading();
+    final currentState = state.valueOrNull;
+    if (currentState == null) return;
+    final updatedList =
+        currentState.data.where((e) => e.id != friendId).toList();
+    await Future.delayed(const Duration(seconds: 2));
+    state = AsyncData(
+      PaginationResponse(
+        currentPage: currentState.currentPage,
+        totalPages: currentState.totalPages,
+        data: updatedList,
+      ),
+    );
+  }
+
   Future<void> search({String? search}) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       return ref.watch(apiServiceProvider).getFriends(1, search: search);
     });
   }
+
   Future<PaginationResponse<Friends>> loadAllData() async {
     int page = 1;
     List<Friends> allData = [];
     PaginationResponse<Friends> response;
     do {
-      response = await ref.watch(apiServiceProvider).getFriends(page,);
+      response = await ref.watch(apiServiceProvider).getFriends(
+            page,
+          );
       allData.addAll(response.data);
       page++;
     } while (page <= response.totalPages);

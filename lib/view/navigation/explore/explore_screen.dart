@@ -100,30 +100,9 @@ String? selectedType;
                         ),
                       ),
                     ),
-                    // IconButton(
-                    //   onPressed: () {
-                    //     Navigator.of(context).push(
-                    //       MaterialPageRoute(
-                    //           builder: (context) => const WishListScreen()),
-                    //     );
-                    //   },
-                    //   icon: Image.asset(
-                    //     'assets/images/heart.png',
-                    //     color: const Color(0xffCF5253),
-                    //   ),
-                    // ),
+
                     Image.asset('assets/images/notification.png'),
-                    // Container(
-                    //   width: 70,
-                    //   decoration: BoxDecoration(boxShadow: [
-                    //     BoxShadow(
-                    //       color: Colors.black.withOpacity(0.1),
-                    //       spreadRadius: 5,
-                    //       blurRadius: 20,
-                    //       offset: const Offset(0, 2),
-                    //     ),
-                    //   ]),
-                    //   child:
+
                     const SizedBox(
                       width: 10,
                     ),
@@ -204,55 +183,6 @@ String? selectedType;
                           }
                         });
 
-                        // if (category.title == mapViewState.selectedCategory) {
-                        //   mapState.update(
-                        //         categoryView: true,
-                        //         itineraryView: false,
-                        //         selectedCategory: "",
-                        //       );
-                        //   filterData = {
-                        //     'type': null,
-                        //     'rating': filters['rating'],
-                        //     'radius': filters['radius'],
-                        //     'sort_by': filters['sort_by'],
-                        //     'selected_category': "All",
-                        //     'selected_rating': filters['selected_rating'],
-                        //     'selected_distance': filters['selected_distance'],
-                        //     'selected_radius': filters['selected_radius'],
-                        //     'input': filters['input'],
-                        //     'search_term': filters['search_term'],
-                        //   };
-                        //   ref
-                        //       .read(filtersProvider.notifier)
-                        //       .updateFilter(filterData);
-                        //   ref.invalidate(itineraryNotifierProvider);
-                        //   return;
-                        // } else {
-                        //   mapState.update(
-                        //         categoryView: true,
-                        //         itineraryView: false,
-                        //         selectedCategory: category.title,
-                        //       );
-                        //   filterData = {
-                        //     'type': category.type,
-                        //     'rating': filters['rating'],
-                        //     'radius': filters['radius'],
-                        //     'sort_by': filters['sort_by'],
-                        //     'selected_category': category.title,
-                        //     'selected_rating': filters['selected_rating'],
-                        //     'selected_distance': filters['selected_distance'],
-                        //     'selected_radius': filters['selected_radius'],
-                        //     'input': filters['input'],
-                        //     'search_term': filters['search_term'],
-                        //   };
-                        //   ref
-                        //       .read(filtersProvider.notifier)
-                        //       .updateFilter(filterData);
-                        //   ref
-                        //       .read(itineraryNotifierProvider
-                        //       .notifier)
-                        //       .filteredItinerary();
-                        // }
                       },
                       child: CategoryItem(
                         category: category,
@@ -307,9 +237,9 @@ String? selectedType;
 
                     return category.isFilterApplied &&
                             category.filterCategories.isEmpty
-                        ? const Center(child: Text("No Itinerary Found"))
+                        ? const Center(child: Text("No Place List Found"))
                         : category.categories.isEmpty
-                            ? const Center(child: Text("No Itinerary Found"))
+                            ? const Center(child: Text("No Place List Found"))
                             : ListView.separated(
                                 shrinkWrap: true,
                                 itemCount: category.isFilterApplied
@@ -385,7 +315,7 @@ String? selectedType;
                     ),
                   ),
                   errorBuilder: (error, stack) =>
-                      const Center(child: Text("No Itinerary Found"))),
+                      const Center(child: Text("No Place List Found"))),
 
               const SizedBox(
                 height: 20,
@@ -461,9 +391,9 @@ class _FriendListState extends ConsumerState<FriendList> {
         dataProvider: friendsItineraryNotifierProvider,
         dataBuilder: ( category) {
           return category.isFilterApplied && category.filterList.isEmpty
-              ? const Center(child: Text("No Itinerary Found"))
+              ? const Center(child: Text("No Collection Places Found"))
               : category.placesList.isEmpty
-                  ? const Center(child: Text("No Itinerary Found"))
+                  ? const Center(child: Text("No Collection Places Found"))
                   : SizedBox.fromSize(
                       size: Size.fromHeight(height * 0.32),
                       child: ListView.separated(
@@ -539,7 +469,7 @@ class _FriendListState extends ConsumerState<FriendList> {
           ),
         ),
         errorBuilder: (error, stack) =>
-            const Center(child: Text("No Itinerary Found")));
+            const Center(child: Text("No Collection Places Found")));
   }
 }
 

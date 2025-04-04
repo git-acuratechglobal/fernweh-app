@@ -6,12 +6,9 @@ import 'package:fernweh/view/auth/auth_provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pinput/pinput.dart';
-import '../../../../services/local_storage_service/local_storage_service.dart';
-import '../../../../utils/common/common.dart';
 import '../../../../utils/common/config.dart';
 import '../../../../utils/common/extensions.dart';
 import '../../auth_state/auth_state.dart';
-import '../profile_setup/create_profile_screen.dart';
 
 class VerificationScreen extends ConsumerStatefulWidget {
   const VerificationScreen(this.email, {super.key});

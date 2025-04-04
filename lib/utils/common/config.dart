@@ -2,11 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+
 printLog(String message) {
   if (kDebugMode) {
     return debugPrint(message);
   }
 }
+
 abstract class Config {
   static LinearGradient backgroundGradient = const LinearGradient(
     begin: Alignment.topCenter,
@@ -16,7 +18,8 @@ abstract class Config {
       Color(0xffFBEBEC),
     ],
   );
-static const String locationText= "This app requires that location services are turned on your device and for this app. You must enable them in settings before using this app.";
+  static const String locationText =
+      "To use this feature, the app needs access to your location. You can enable location services in your device settings.";
   static List<({String image, String title})> categories = [
     (image: 'assets/images/restaurant.png', title: "Restaurant"),
     (image: 'assets/images/bars.png', title: "Bars"),
@@ -47,11 +50,7 @@ static const String locationText= "This app requires that location services are 
       title: "Restaurant",
       type: "restaurant|bakery|meal_delivery|meal_takeaway"
     ),
-    (
-    icon: Icons.restaurant,
-    title: "Lodging",
-    type: "lodging"
-    ),
+    (icon: Icons.restaurant, title: "Lodging", type: "lodging"),
     (icon: Icons.coffee, title: "Cafe", type: "cafe"),
     (icon: Icons.wine_bar, title: "Bar", type: "bar|night_club|liquor_store"),
     (icon: Icons.movie, title: "Theater", type: "movie_theater"),
@@ -76,14 +75,12 @@ static const String locationText= "This app requires that location services are 
   ];
 
   static List<({String image, String title})> onboarding = [
-
-
-    (title: "Find the best\nplaces for you.", image: 'assets/images/onboarding2.jpg'),
-    (title: "Discover new things", image: 'assets/images/friends_at_cafe.jpg'),
     (
-    title: "Share your moments.",
-    image: 'assets/images/eifle_tower.png'
+      title: "Find the best\nplaces for you.",
+      image: 'assets/images/onboarding2.jpg'
     ),
+    (title: "Discover new things", image: 'assets/images/friends_at_cafe.jpg'),
+    (title: "Share your moments.", image: 'assets/images/eifle_tower.png'),
   ];
 
   static List<String> selectionOptions = [
