@@ -24,7 +24,7 @@ final getUserItineraryProvider = FutureProvider<ItineraryTabState>.internal(
 // ignore: unused_element
 typedef GetUserItineraryRef = FutureProviderRef<ItineraryTabState>;
 String _$userItineraryNotifierHash() =>
-    r'205994ea6b28cfba10da18490a3fa8c12638b70c';
+    r'c35637ed7d2b5777588cd0241f66858de4fa7425';
 
 /// See also [UserItineraryNotifier].
 @ProviderFor(UserItineraryNotifier)
@@ -74,5 +74,22 @@ final itineraryPlacesNotifierProvider = AsyncNotifierProvider<
 );
 
 typedef _$ItineraryPlacesNotifier = AsyncNotifier<List<ItineraryPlaces>>;
+String _$removeItineraryPlacesHash() =>
+    r'd3c09615b71f32c86a0b0bba6cec03c8710d2bd2';
+
+/// See also [RemoveItineraryPlaces].
+@ProviderFor(RemoveItineraryPlaces)
+final removeItineraryPlacesProvider =
+    AutoDisposeAsyncNotifierProvider<RemoveItineraryPlaces, String?>.internal(
+  RemoveItineraryPlaces.new,
+  name: r'removeItineraryPlacesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$removeItineraryPlacesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$RemoveItineraryPlaces = AutoDisposeAsyncNotifier<String?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

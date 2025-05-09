@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import '../../../services/analytics_service/analytics_service.dart';
 import '../../../utils/common/common.dart';
 import '../../../utils/common/config.dart';
 import '../../../utils/common/extensions.dart';
@@ -209,7 +210,8 @@ class _ProfileState extends ConsumerState<Profile> with FormUtilsMixin {
                         validator: (val) {
                           return null;
                         },
-                        onSaved: (val) {
+                        onSaved: (val) async{
+                           await AnalyticsService.logHomeLocationSet(location:val!);
                           ref
                               .read(authNotifierProvider.notifier)
                               .updateFormData('home_location', val);

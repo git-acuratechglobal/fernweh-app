@@ -1,3 +1,4 @@
+import 'package:fernweh/services/analytics_service/analytics_service.dart';
 import 'package:fernweh/services/local_storage_service/local_storage_service.dart';
 import 'package:fernweh/utils/common/app_button.dart';
 import 'package:fernweh/utils/common/app_validation.dart';
@@ -34,6 +35,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ref.listenManual(authNotifierProvider, (previous, next) async {
       switch (next) {
         case Verified(:final user) when previous is Loading:
+          await AnalyticsService.saveUserId(userId: user.id.toString());
           ref.read(userDetailProvider.notifier).update((state) => user);
           ref.invalidate(localStorageServiceProvider);
           context.navigateAndRemoveUntil(const NavigationScreen());
@@ -42,11 +44,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           context.navigateTo(VerificationScreen(user.email.toString()));
           break;
         case OtpVerified(:final user) when previous is Loading:
+          await AnalyticsService.saveUserId(userId: user.id.toString());
+          await AnalyticsService.logUserSignupComplete(userId: user.id.toString());
           ref.read(userDetailProvider.notifier).update((state) => user);
           ref.invalidate(localStorageServiceProvider);
           context.navigateTo(CreateProfileScreen(user.email.toString()));
           break;
         case UserUpdated(:final user) when previous is Loading:
+
+
           ref.read(userDetailProvider.notifier).update((state) => user);
           ref.read(localStorageServiceProvider).clearGuestSession();
           context.navigateAndRemoveUntil(const NavigationScreen());

@@ -68,7 +68,21 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
             ref.invalidate(followingNotifierProvider);
             ref.invalidate(getFollowItinerariesListProvider);
           case AsyncError error:
-            Common.showSnackBar(context, error.toString());
+            Common.showSnackBar(context, error.error.toString());
+          default:
+        }
+      });
+      ref.listenManual(removeItineraryPlacesProvider, (_, next) {
+        switch (next) {
+          case AsyncValue<String?>? data when data.value != null:
+            Common.showSnackBar(context, data.value ?? "");
+            ref
+                .read(itineraryLocalListProvider
+                .notifier)
+                .removeSelectedItems();
+            ref.invalidate(itineraryPlacesNotifierProvider);
+          case AsyncError error:
+            Common.showSnackBar(context, error.error.toString());
           default:
         }
       });
@@ -88,254 +102,226 @@ class _ItenaryDetailsScreenState extends ConsumerState<ItenaryDetailsScreen> {
     final itineraryState = ref.watch(itineraryLocalListProvider);
     final userId = ref.watch(userDetailProvider)?.id;
     final followState = ref.watch(followItineraryProvider);
-    return Scaffold(
-      body: Container(
-        constraints: const BoxConstraints.expand(),
-        decoration: BoxDecoration(gradient: Config.backgroundGradient),
-        child: DefaultTabController(
-          length: Config.tabOptions.length,
-          child: Column(
-            children: [
-              AppBar(
-                backgroundColor: Colors.transparent,
-                centerTitle: false,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back_rounded),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                title: Text(
-                  widget.title,
-                  style: const TextStyle(fontSize: 18),
-                ),
-                actions: [
-                  if (userId != widget.userId)
-                    AsyncDataWidgetB(
-                        dataProvider: getFollowItinerariesListProvider,
-                        dataBuilder: (data) {
-                          bool isFollow =
-                              data.contains(widget.itineraryId.toString());
-                          return SizedBox(
-                            height: 40,
-                            width: 100,
-                            child: CustomButton(
-                              isFollow: isFollow,
-                              onTap: () {
-                                ref
-                                    .read(followItineraryProvider.notifier)
-                                    .followItinerary(
-                                        userId: widget.userId,
-                                        itineraryId: widget.itineraryId);
-                              },
-                              isLoading: followState.isLoading,
-                              child: Text(isFollow ? "Following" : "Follow",
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: isFollow
-                                          ? Colors.black
-                                          : Colors.white,
-                                      fontWeight: FontWeight.w900)),
-                            ),
-                          );
-                        },
-                        errorBuilder: (error, st) => const SizedBox.shrink()),
-                  // followingItineraryList.maybeWhen(data: (data) {
-                  //   bool isFollow =
-                  //       data.contains(widget.itineraryId.toString());
-                  //   return SizedBox(
-                  //     height: 40,
-                  //     width: 100,
-                  //     child: CustomButton(
-                  //       isFollow: isFollow,
-                  //       onTap: () {
-                  //         ref
-                  //             .read(followItineraryProvider.notifier)
-                  //             .followItinerary(
-                  //                 userId: widget.userId,
-                  //                 itineraryId: widget.itineraryId);
-                  //       },
-                  //       isLoading: followState.isLoading,
-                  //       child: Text(isFollow ? "Following" : "Follow",
-                  //           style: TextStyle(
-                  //               fontSize: 12,
-                  //               color: isFollow ? Colors.black : Colors.white,
-                  //               fontWeight: FontWeight.w900)),
-                  //     ),
-                  //   );
-                  // }, orElse: () {
-                  //   return SizedBox(
-                  //     height: 40,
-                  //     width: 100,
-                  //     child: CustomButton(
-                  //       isFollow: false,
-                  //       onTap: () {
-                  //         ref
-                  //             .read(followItineraryProvider.notifier)
-                  //             .followItinerary(
-                  //             userId: widget.userId,
-                  //             itineraryId: widget.itineraryId);
-                  //       },
-                  //       isLoading: followState.isLoading,
-                  //       child: const Text( "Follow",
-                  //           style: TextStyle(
-                  //               fontSize: 12,
-                  //               color:  Colors.white,
-                  //               fontWeight: FontWeight.w900)),
-                  //     ),
-                  //   );
-                  // }),
-                  itineraryState.selectedItems.isNotEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  ref
-                                      .read(itineraryLocalListProvider.notifier)
-                                      .clearSelection();
-                                },
-                                child: Text(
-                                  "Cancel",
-                                  style: TextStyle(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                      fontSize: 15),
+    return Stack(
+      children: [
+        Scaffold(
+          body: Container(
+            constraints: const BoxConstraints.expand(),
+            decoration: BoxDecoration(gradient: Config.backgroundGradient),
+            child: DefaultTabController(
+              length: Config.tabOptions.length,
+              child: Column(
+                children: [
+                  AppBar(
+                    backgroundColor: Colors.transparent,
+                    centerTitle: false,
+                    leading: IconButton(
+                      icon: const Icon(Icons.arrow_back_rounded),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    title: Text(
+                      widget.title,
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    actions: [
+                      if (userId != widget.userId)
+                        AsyncDataWidgetB(
+                            dataProvider: getFollowItinerariesListProvider,
+                            dataBuilder: (data) {
+                              bool isFollow =
+                                  data.contains(widget.itineraryId.toString());
+                              return SizedBox(
+                                height: 40,
+                                width: 100,
+                                child: CustomButton(
+                                  isFollow: isFollow,
+                                  onTap: () {
+                                    ref
+                                        .read(followItineraryProvider.notifier)
+                                        .followItinerary(
+                                            userId: widget.userId,
+                                            itineraryId: widget.itineraryId);
+                                  },
+                                  isLoading: followState.isLoading,
+                                  child: Text(isFollow ? "Following" : "Follow",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: isFollow
+                                              ? Colors.black
+                                              : Colors.white,
+                                          fontWeight: FontWeight.w900)),
                                 ),
-                              ),
-                              const SizedBox(width: 10),
-                              GestureDetector(
-                                onTap: () {
-                                  showDialog<void>(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text('Are you sure?'),
-                                      content: const Text(
-                                          'Do you want to delete place  from Collections?'),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          onPressed: () {
-                                            ref
-                                                .read(itineraryLocalListProvider
-                                                    .notifier)
-                                                .removeSelectedItems();
-                                            Navigator.of(context).pop(true);
-                                          },
-                                          child: const Text('Yes'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(false),
-                                          child: const Text('No'),
-                                        ),
-                                      ],
+                              );
+                            },
+                            errorBuilder: (error, st) => const SizedBox.shrink()),
+                      itineraryState.selectedItems.isNotEmpty
+                          ? Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      ref
+                                          .read(itineraryLocalListProvider.notifier)
+                                          .clearSelection();
+                                    },
+                                    child: Text(
+                                      "Cancel",
+                                      style: TextStyle(
+                                          color:
+                                              Theme.of(context).colorScheme.primary,
+                                          fontSize: 15),
                                     ),
-                                  );
-                                },
-                                child: Text(
-                                  "Delete",
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
-                                      fontSize: 15),
-                                ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  GestureDetector(
+                                    onTap: () {
+                                      showDialog<void>(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: const Text('Are you sure?'),
+                                          content: const Text(
+                                              'Do you want to delete place  from Collections?'),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                ref
+                                                    .read(
+                                                        removeItineraryPlacesProvider
+                                                            .notifier)
+                                                    .removePlaces(
+                                                        itineraryListId:
+                                                            widget.itineraryId,
+                                                        placesIds: itineraryState
+                                                            .selectedItems
+                                                            .toList());
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('Yes'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(false),
+                                              child: const Text('No'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      "Delete",
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                          fontSize: 15),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            )
+                          : ShareIcon(widget.itineraryId.toString()),
+                    ],
+                  ),
+                  TabBar(
+                    tabAlignment: TabAlignment.start,
+                    isScrollable: true,
+                    onTap: (val) {
+                      switch (val) {
+                        case 0:
+                          type = 0;
+                        case 1:
+                          type = 1;
+                        case 2:
+                          type = 2;
+                        case 3:
+                          type = 3;
+                      }
+                      ref
+                          .read(itineraryPlacesNotifierProvider.notifier)
+                          .getTypeItineraryPlace(widget.itineraryId, type);
+                      ref
+                          .read(itineraryLocalListProvider.notifier)
+                          .removeSelectedItems();
+                    },
+                    dividerColor: const Color(0xffE2E2E2),
+                    labelColor: Theme.of(context).colorScheme.secondary,
+                    indicatorColor: Theme.of(context).colorScheme.secondary,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    unselectedLabelStyle: TextStyle(
+                      fontFamily: "Plus Jakarta Sans",
+                      fontSize: 15,
+                      fontVariations: FVariations.w500,
+                    ),
+                    labelStyle: TextStyle(
+                      fontFamily: "Plus Jakarta Sans",
+                      fontSize: 15,
+                      fontVariations: FVariations.w700,
+                    ),
+                    tabs: Config.tabOptions.map((e) {
+                      return Tab(text: e);
+                    }).toList(),
+                  ),
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        TabBarView(
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: [
+                              DetailPage(
+                                isMapView: mapView,
+                                type: type,
+                              ),
+                              DetailPage(
+                                isMapView: mapView,
+                                type: type,
+                              ),
+                              DetailPage(
+                                isMapView: mapView,
+                                type: type,
+                              ),
+                              DetailPage(
+                                isMapView: mapView,
+                                type: type,
+                              ),
+                            ]),
+                        AnimatedPositioned(
+                          bottom: mapView ? 230 : 20,
+                          right: mapView ? 10 : 160,
+                          duration: const Duration(milliseconds: 200),
+                          child: FloatingActionButton(
+                            elevation: 0,
+                            heroTag: null,
+                            shape: const StadiumBorder(),
+                            backgroundColor: Colors.black,
+                            onPressed: () {
+                              setState(() {
+                                mapView = !mapView;
+                              });
+                            },
+                            child: Image.asset(mapView
+                                ? 'assets/images/task.png'
+                                : 'assets/images/map.png'),
                           ),
-                        )
-                      : ShareIcon(widget.itineraryId.toString()),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-              TabBar(
-                tabAlignment: TabAlignment.start,
-                isScrollable: true,
-                onTap: (val) {
-                  switch (val) {
-                    case 0:
-                      type = 0;
-                    case 1:
-                      type = 1;
-                    case 2:
-                      type = 2;
-                    case 3:
-                      type = 3;
-                  }
-                  ref
-                      .read(itineraryPlacesNotifierProvider.notifier)
-                      .getTypeItineraryPlace(widget.itineraryId, type);
-                  ref
-                      .read(itineraryLocalListProvider.notifier)
-                      .removeSelectedItems();
-                },
-                dividerColor: const Color(0xffE2E2E2),
-                labelColor: Theme.of(context).colorScheme.secondary,
-                indicatorColor: Theme.of(context).colorScheme.secondary,
-                indicatorSize: TabBarIndicatorSize.tab,
-                unselectedLabelStyle: TextStyle(
-                  fontFamily: "Plus Jakarta Sans",
-                  fontSize: 15,
-                  fontVariations: FVariations.w500,
-                ),
-                labelStyle: TextStyle(
-                  fontFamily: "Plus Jakarta Sans",
-                  fontSize: 15,
-                  fontVariations: FVariations.w700,
-                ),
-                tabs: Config.tabOptions.map((e) {
-                  return Tab(text: e);
-                }).toList(),
-              ),
-              Expanded(
-                child: Stack(
-                  children: [
-                    TabBarView(
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: [
-                          DetailPage(
-                            isMapView: mapView,
-                            type: type,
-                          ),
-                          DetailPage(
-                            isMapView: mapView,
-                            type: type,
-                          ),
-                          DetailPage(
-                            isMapView: mapView,
-                            type: type,
-                          ),
-                          DetailPage(
-                            isMapView: mapView,
-                            type: type,
-                          ),
-                        ]),
-                    AnimatedPositioned(
-                      bottom: mapView ? 230 : 20,
-                      right: mapView ? 10 : 160,
-                      duration: const Duration(milliseconds: 200),
-                      child: FloatingActionButton(
-                        elevation: 0,
-                        heroTag: null,
-                        shape: const StadiumBorder(),
-                        backgroundColor: Colors.black,
-                        onPressed: () {
-                          setState(() {
-                            mapView = !mapView;
-                          });
-                        },
-                        child: Image.asset(mapView
-                            ? 'assets/images/task.png'
-                            : 'assets/images/map.png'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ),
-      ),
+        if (ref.watch(removeItineraryPlacesProvider).isLoading)
+          Container(
+            color: Colors.black.withOpacity(0.5),
+            child: const Center(
+              child: LoadingWidget(),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -577,10 +563,10 @@ class _DetailPageState extends ConsumerState<DetailPage> {
                   itemBuilder: (context, index) {
                     final data = itineraryState.itineraryPlaces[index];
                     bool isSelected =
-                        itineraryState.selectedItems.contains(data.id);
+                        itineraryState.selectedItems.contains(data.locationId);
                     return GestureDetector(
                       onLongPress: () {
-                        itineraryNotifier.toggleSelection(data.id ?? 0);
+                        itineraryNotifier.toggleSelection(data.locationId??"");
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -735,7 +721,7 @@ class _ItinerayItemState extends ConsumerState<ItinerayItem> {
             if (widget.isSelected) {
               ref
                   .read(itineraryLocalListProvider.notifier)
-                  .toggleSelection(widget.id ?? 0);
+                  .toggleSelection(widget.locationId??"");
             } else {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -1103,7 +1089,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
             if (widget.isSelected) {
               ref
                   .read(itineraryLocalListProvider.notifier)
-                  .toggleSelection(widget.id ?? 0);
+                  .toggleSelection(widget.locationId??"");
             } else {
               Navigator.of(context).push(
                 MaterialPageRoute(

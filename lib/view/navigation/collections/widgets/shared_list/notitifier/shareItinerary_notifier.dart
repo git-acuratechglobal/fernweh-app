@@ -1,3 +1,4 @@
+import 'package:fernweh/services/analytics_service/analytics_service.dart';
 import 'package:fernweh/services/api_service/api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -16,12 +17,16 @@ class SharedItinerary extends _$SharedItinerary {
   Future<void> shareItinerary() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final message = await ref
+      final response = await ref
           .watch(apiServiceProvider)
           .shareItinerary(_formData, _formData["itineraryId"]);
       ref.invalidate(getUserItineraryProvider);
+      await AnalyticsService.logCollectionShared(
+          collectionId: response['id'],
+          sharedWithUserId:
+              response['data']['can_view'] + response['data']['can_edit']);
       return SharedItineraryState(
-          authEvent: SharedItineraryEvent.shared, message: message);
+          authEvent: SharedItineraryEvent.shared, message: response['success']);
     });
   }
 
@@ -40,6 +45,7 @@ class SharedItinerary extends _$SharedItinerary {
   void updateForm(String key, dynamic value) {
     _formData[key] = value;
   }
+
   void updateFromList(String key, List<String> userIdList) {
     final commaSeparatedIds = userIdList.join(",");
     _formData[key] = commaSeparatedIds;

@@ -1,3 +1,4 @@
+import 'package:fernweh/services/analytics_service/analytics_service.dart';
 import 'package:fernweh/services/api_service/api_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -39,7 +40,6 @@ FutureOr<ItineraryTabState> getUserItinerary(Ref ref) async {
     }
   }
 
-
   return ItineraryTabState(
       userItinerary: userItinerary, itineraryPhotos: itineraryPhotos);
 }
@@ -58,6 +58,9 @@ class UserItineraryNotifier extends _$UserItineraryNotifier {
           await ref.watch(apiServiceProvider).createUserItinerary(_formData);
       ref.invalidate(getUserItineraryProvider);
       state = UserItineraryCreated(itinerary: data);
+      await AnalyticsService.logCollectionCreated(
+          collectionId: data.id.toString(),
+          collectionName: data.name.toString());
     } catch (e) {
       state = UserItineraryError(error: e.toString());
     }
@@ -139,7 +142,6 @@ class ItineraryPlacesNotifier extends _$ItineraryPlacesNotifier {
 
   @override
   FutureOr<List<ItineraryPlaces>> build() async {
-
     return [];
   }
 
@@ -182,19 +184,19 @@ class LocalItineraryNotifier extends StateNotifier<LocalItineraryState> {
     state = state.copyWith(data: data);
   }
 
-  void toggleSelection(int id) {
-    final selectedItems = Set<int>.from(state.selectedItems);
-    if (selectedItems.contains(id)) {
-      selectedItems.remove(id);
+  void toggleSelection(String locationId) {
+    final selectedItems = Set<String>.from(state.selectedItems);
+    if (selectedItems.contains(locationId)) {
+      selectedItems.remove(locationId);
     } else {
-      selectedItems.add(id);
+      selectedItems.add(locationId);
     }
     state = state.copyWith(selected: selectedItems);
   }
 
   void removeSelectedItems() {
     final updatedList = state.itineraryPlaces
-        .where((item) => !state.selectedItems.contains(item.id))
+        .where((item) => !state.selectedItems.contains(item.locationId??""))
         .toList();
 
     state = state.copyWith(
@@ -210,16 +212,35 @@ class LocalItineraryNotifier extends StateNotifier<LocalItineraryState> {
 
 class LocalItineraryState {
   final List<ItineraryPlaces> itineraryPlaces;
-  final Set<int> selectedItems;
+  final Set<String> selectedItems;
 
   LocalItineraryState(
       {required this.itineraryPlaces, required this.selectedItems});
 
   LocalItineraryState copyWith(
-      {List<ItineraryPlaces>? data, Set<int>? selected}) {
+      {List<ItineraryPlaces>? data, Set<String>? selected}) {
     return LocalItineraryState(
       itineraryPlaces: data ?? itineraryPlaces,
       selectedItems: selected ?? selectedItems,
     );
+  }
+}
+
+@riverpod
+class RemoveItineraryPlaces extends _$RemoveItineraryPlaces {
+  @override
+  FutureOr<String?> build() async {
+    return null;
+  }
+
+  Future<void> removePlaces(
+      {required int itineraryListId, required List<String> placesIds}) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      print(itineraryListId);
+      print(placesIds);
+      return await ref.watch(apiServiceProvider).removeItineraryPlaces(
+          locationId: placesIds, itineraryListId: itineraryListId);
+    });
   }
 }

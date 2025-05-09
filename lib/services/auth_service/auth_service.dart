@@ -26,8 +26,9 @@ class AuthService {
 
   Future<User> login(Map<String, dynamic> formData) async {
     return asyncGuard(() async {
-      final response = await _dio.post('login',
-          data: formData,
+      final response = await _dio.post(
+        'login',
+        data: formData,
       );
       final userJson = response.data["user"];
       final user = User.fromJson(userJson);
@@ -39,8 +40,9 @@ class AuthService {
 
   Future<User> signUp(Map<String, dynamic> formData) async {
     return asyncGuard(() async {
-      final response = await _dio.post('register-otp',
-          data: formData,
+      final response = await _dio.post(
+        'register-otp',
+        data: formData,
       );
       final userJson = response.data["user"];
       final user = User.fromJson(userJson);
@@ -117,6 +119,8 @@ class AuthService {
       return token;
     });
   }
+
+
 }
 
 Future<T> asyncGuard<T>(Future<T> Function() future) async {

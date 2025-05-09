@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "284977950173",
+    "project_id": "project-fernweh",
+    "storage_bucket": "project-fernweh.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:284977950173:android:990d1c732ddb9b8efc1a34",
+        "android_client_info": {
+          "package_name": "com.lumiix.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFsXeaIQtB2feDDL730DIm0EBZ4xnuJ4I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

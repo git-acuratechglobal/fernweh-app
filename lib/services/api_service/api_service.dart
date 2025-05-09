@@ -345,18 +345,20 @@ class ApiService {
       return friendListItinerary.map((e) => Itinerary.fromJson(e)).toList();
     });
   }
+
   Future<List<String>> getFollowItinerary() async {
-    try{
+    try {
       final response = await _dio.get('get-user-itineraries',
           options: Options(headers: {
             'Authorization': "Bearer $_token",
           }));
       final List<dynamic> itineraries = response.data["itineraries"];
-      return itineraries.map((e)=>e.toString()).toList();
-    }catch(e){
+      return itineraries.map((e) => e.toString()).toList();
+    } catch (e) {
       return [];
     }
   }
+
   Future<String> followItinerary(int? userId, int? itineraryId) async {
     return asyncGuard(() async {
       final response = await _dio.post('follow-iternary',
@@ -379,7 +381,7 @@ class ApiService {
     return jsonList.map((e) => Friends.fromJson(e)).toList();
   }
 
-  Future<String> shareItinerary(
+  Future<dynamic> shareItinerary(
       Map<String, dynamic> data, String itineraryId) async {
     return asyncGuard(() async {
       data.remove("itineraryId");
@@ -388,7 +390,7 @@ class ApiService {
           options: Options(headers: {
             'Authorization': "Bearer $_token",
           }));
-      return response.data["success"];
+      return response.data;
     });
   }
 
@@ -456,7 +458,7 @@ class ApiService {
     });
   }
 
-  Future<String> createTrip(
+  Future<dynamic> createTrip(
       {required String startDate,
       required String endDate,
       required String goingTo}) async {
@@ -470,7 +472,7 @@ class ApiService {
           options: Options(headers: {
             'Authorization': "Bearer $_token",
           }));
-      final responseData = response.data['message'];
+      final responseData = response.data;
       return responseData;
     });
   }
@@ -570,12 +572,17 @@ class ApiService {
           }));
       final tripJson = response.data['trip'];
       final List<dynamic> friendTripsJson = response.data['friends_trips'];
-       final List<dynamic> matchedFriendTripJson = response.data['matchingFriendRecords']??[];
+      final List<dynamic> matchedFriendTripJson =
+          response.data['matchingFriendRecords'] ?? [];
       final trip = Trip.fromJson(tripJson);
       final friendsTrips =
           friendTripsJson.map((e) => FriendsTrip.fromJson(e)).toList();
-          final matchedFriendTrip=matchedFriendTripJson.map((e)=>FriendsTrip.fromJson(e)).toList();
-      return TripDetails(trip: trip, friendsTrips: friendsTrips,matchingFriendRecords: matchedFriendTrip);
+      final matchedFriendTrip =
+          matchedFriendTripJson.map((e) => FriendsTrip.fromJson(e)).toList();
+      return TripDetails(
+          trip: trip,
+          friendsTrips: friendsTrips,
+          matchingFriendRecords: matchedFriendTrip);
     });
   }
 
@@ -592,12 +599,34 @@ class ApiService {
           queryParameters: {"location": address});
       final tripJson = response.data['trips'];
       final List<dynamic> friendTripsJson = response.data['friends_trips'];
-      final List<dynamic> matchedFriendTripJson = response.data['matchingFriendRecords']??[];
+      final List<dynamic> matchedFriendTripJson =
+          response.data['matchingFriendRecords'] ?? [];
       final trip = Trip.fromJson(tripJson);
       final friendsTrips =
           friendTripsJson.map((e) => FriendsTrip.fromJson(e)).toList();
-      final matchedFriendTrip=matchedFriendTripJson.map((e)=>FriendsTrip.fromJson(e)).toList();
-      return TripDetails(trip: trip, friendsTrips: friendsTrips,matchingFriendRecords: matchedFriendTrip);
+      final matchedFriendTrip =
+          matchedFriendTripJson.map((e) => FriendsTrip.fromJson(e)).toList();
+      return TripDetails(
+          trip: trip,
+          friendsTrips: friendsTrips,
+          matchingFriendRecords: matchedFriendTrip);
+    });
+  }
+
+  Future<String> removeItineraryPlaces(
+      {required List<String> locationId, required int itineraryListId}) async {
+    return asyncGuard(() async {
+      final response = await _dio.post(
+        "itinerary/remove-place",
+        data: FormData.fromMap({
+          "location_id": locationId.join(", "),
+          "itineraryListId": itineraryListId
+        }),
+        options: Options(headers: {
+          'Authorization': "Bearer $_token",
+        }),
+      );
+      return response.data["message"];
     });
   }
 }

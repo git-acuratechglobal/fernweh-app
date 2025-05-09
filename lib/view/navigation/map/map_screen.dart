@@ -97,10 +97,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
 
       final locationPermissionStatus = await Geolocator.checkPermission();
-      final _isGpsOn = await Geolocator.isLocationServiceEnabled();
+      final isGpsOn = await Geolocator.isLocationServiceEnabled();
       if (locationPermissionStatus == LocationPermission.denied ||
           locationPermissionStatus == LocationPermission.deniedForever ||
-          !_isGpsOn) {
+          !isGpsOn) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const LocationPermissionScreen(),
@@ -108,15 +108,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         );
         return;
       }
-      ref.listenManual<Position?>(positionProvider, (previous, current) {
-        if (current != null) {
-          mapController.animateCamera(
-            CameraUpdate.newLatLng(
-              LatLng(current.latitude, current.longitude),
-            ),
-          );
-        }
-      });
+      // ref.listenManual<Position?>(positionProvider, (previous, current) async{
+      //   if (current != null) {
+      //    await mapController.animateCamera(
+      //       CameraUpdate.newLatLng(
+      //         LatLng(current.latitude, current.longitude),
+      //       ),
+      //     );
+      //   }
+      // });
     });
   }
 

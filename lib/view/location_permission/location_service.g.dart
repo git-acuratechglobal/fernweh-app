@@ -22,7 +22,7 @@ final addressProvider = AutoDisposeFutureProvider<String>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AddressRef = AutoDisposeFutureProviderRef<String>;
-String _$currentPositionHash() => r'55e7c6eb5185fcfb678a4b79621471def3a6b8db';
+String _$currentPositionHash() => r'68c6dd2754d2b5e03414293e0088fe17b8738e2e';
 
 /// See also [CurrentPosition].
 @ProviderFor(CurrentPosition)

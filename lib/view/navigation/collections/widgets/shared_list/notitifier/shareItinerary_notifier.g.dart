@@ -6,7 +6,7 @@ part of 'shareItinerary_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sharedItineraryHash() => r'0617802d497f913ba31e3f7c4cfc666ba7c80a17';
+String _$sharedItineraryHash() => r'9deac6a60371b5d976f5a9819a726e7307cb1767';
 
 /// See also [SharedItinerary].
 @ProviderFor(SharedItinerary)
